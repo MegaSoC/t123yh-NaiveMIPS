@@ -32,7 +32,7 @@ THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ------------------------------------------------------------------------------*/
 `timescale 1ns / 1ps
 
-`define TRACE_REF_FILE "../../../../../../../cpu132_gettrace/golden_trace.txt"
+`define TRACE_REF_FILE "loooongson/soc_axi_func/testbench/golden_trace.txt"
 `define CONFREG_NUM_REG      soc_lite.u_confreg.num_data
 `define CONFREG_OPEN_TRACE   soc_lite.u_confreg.open_trace
 `define CONFREG_NUM_MONITOR  soc_lite.u_confreg.num_monitor
@@ -104,7 +104,8 @@ assign debug_wb_rf_wdata = soc_lite.debug_wb_rf_wdata;
 // open the trace file;
 integer trace_ref;
 initial begin
-    trace_ref = $fopen(`TRACE_REF_FILE, "r");
+    trace_ref = $fopen({`__FILE__, ".txt"}, "r");
+    $finish;
 end
 
 //get reference result in falling edge
@@ -118,6 +119,7 @@ reg [31:0] ref_wb_rf_wdata;
 always @(posedge cpu_clk)
 begin 
     #1;
+
     if(|debug_wb_rf_wen && debug_wb_rf_wnum!=5'd0 && !debug_end && `CONFREG_OPEN_TRACE)
     begin
         trace_cmp_flag=1'b0;
