@@ -46,19 +46,19 @@ module DivCore(
 			tmpB2 <= {PosiB,32'b0}+{PosiB,32'b0};
 			tmpB3 <= {PosiB,33'b0}+{PosiB,32'b0};
 		end
-		else if(T[15]&&(tmpA[47:16]<PosiB)) begin
+		else if(T[15]&&(tmpA[47:16]<tmpB1[63:32])) begin//如果移动的位数小于等于16，且左移了16位以后的tmpA小于B的绝对值
 			T <= (T>>16);
 			tmpA <= (tmpA<<16);
 		end
-		else if(T[7]&&(tmpA[45:24]<PosiB)) begin
+		else if(T[7]&&(tmpA[55:24]<tmpB1[63:32])) begin//如果移动的位数小于等于24，且左移了8位以后的tmpA小于B的绝对值
 			T <= (T>>8);
 			tmpA <= (tmpA<<8);
 		end
-		else if(T[3]&&(tmpA[59:28]<PosiB)) begin
+		else if(T[3]&&(tmpA[59:28]<tmpB1[63:32])) begin//如果移动的位数小于等于28，且左移了4位以后的tmpA小于B的绝对值
 			T <= (T>>4);
 			tmpA <= (tmpA<<4);
 		end
-		else if(T[0]) begin
+		else if(T[0]) begin//如果总共还没移够32位
 			T <= (T>>2);
 			tmpA <= (!sub3[66]) ? sub3 + 3:
 					(!sub2[66]) ? sub2 + 2:
