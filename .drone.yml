@@ -10,3 +10,60 @@ steps:
   - /opt/Xilinx/Vivado/2019.2/bin/vivado -mode batch -source scripts/run_simulation.tcl loooongson/soc_axi_func/run_vivado/mycpu_prj1/mycpu.xpr
   - grep '\-\-\-\-PASS!!!' loooongson/soc_axi_func/run_vivado/mycpu_prj1/mycpu.sim/sim_1/behav/xsim/simulate.log
 
+---
+
+kind: pipeline
+type: docker
+name: perf-test
+
+steps:
+- name: bitcount
+  image: vivado:2019.2
+  commands:
+  - /opt/Xilinx/Vivado/2019.2/bin/vivado -mode tcl loooongson/soc_axi_perf/run_vivado/mycpu_prj1/mycpu.xpr -source scripts/run_perf_test.tcl -tclargs bitcount
+  - grep 'bitcount PASS!' loooongson/soc_axi_perf/run_vivado/mycpu_prj1/mycpu.sim/sim_1/behav/xsim/simulate.log
+- name: stream copy
+  image: vivado:2019.2
+  commands:
+  - /opt/Xilinx/Vivado/2019.2/bin/vivado -mode tcl loooongson/soc_axi_perf/run_vivado/mycpu_prj1/mycpu.xpr -source scripts/run_perf_test.tcl -tclargs stream_copy
+  - grep 'stream copy PASS!' loooongson/soc_axi_perf/run_vivado/mycpu_prj1/mycpu.sim/sim_1/behav/xsim/simulate.log
+- name: dhrystone
+  image: vivado:2019.2
+  commands:
+  - /opt/Xilinx/Vivado/2019.2/bin/vivado -mode tcl loooongson/soc_axi_perf/run_vivado/mycpu_prj1/mycpu.xpr -source scripts/run_perf_test.tcl -tclargs dhrystone
+  - grep 'dhrystone PASS!' loooongson/soc_axi_perf/run_vivado/mycpu_prj1/mycpu.sim/sim_1/behav/xsim/simulate.log
+- name: stringsearch
+  image: vivado:2019.2
+  commands:
+  - /opt/Xilinx/Vivado/2019.2/bin/vivado -mode tcl loooongson/soc_axi_perf/run_vivado/mycpu_prj1/mycpu.xpr -source scripts/run_perf_test.tcl -tclargs stringsearch
+  - grep 'string search PASS!' loooongson/soc_axi_perf/run_vivado/mycpu_prj1/mycpu.sim/sim_1/behav/xsim/simulate.log
+- name: select_sort
+  image: vivado:2019.2
+  commands:
+  - /opt/Xilinx/Vivado/2019.2/bin/vivado -mode tcl loooongson/soc_axi_perf/run_vivado/mycpu_prj1/mycpu.xpr -source scripts/run_perf_test.tcl -tclargs select_sort
+  - grep 'select sort PASS!' loooongson/soc_axi_perf/run_vivado/mycpu_prj1/mycpu.sim/sim_1/behav/xsim/simulate.log
+- name: quick_sort
+  image: vivado:2019.2
+  commands:
+  - /opt/Xilinx/Vivado/2019.2/bin/vivado -mode tcl loooongson/soc_axi_perf/run_vivado/mycpu_prj1/mycpu.xpr -source scripts/run_perf_test.tcl -tclargs quick_sort
+  - grep 'quick sort PASS!' loooongson/soc_axi_perf/run_vivado/mycpu_prj1/mycpu.sim/sim_1/behav/xsim/simulate.log
+- name: bubble_sort
+  image: vivado:2019.2
+  commands:
+  - /opt/Xilinx/Vivado/2019.2/bin/vivado -mode tcl loooongson/soc_axi_perf/run_vivado/mycpu_prj1/mycpu.xpr -source scripts/run_perf_test.tcl -tclargs bubble_sort
+  - grep 'bubble sort PASS!' loooongson/soc_axi_perf/run_vivado/mycpu_prj1/mycpu.sim/sim_1/behav/xsim/simulate.log
+- name: sha
+  image: vivado:2019.2
+  commands:
+  - /opt/Xilinx/Vivado/2019.2/bin/vivado -mode tcl loooongson/soc_axi_perf/run_vivado/mycpu_prj1/mycpu.xpr -source scripts/run_perf_test.tcl -tclargs sha
+  - grep 'sha PASS!' loooongson/soc_axi_perf/run_vivado/mycpu_prj1/mycpu.sim/sim_1/behav/xsim/simulate.log
+- name: crc32
+  image: vivado:2019.2
+  commands:
+  - /opt/Xilinx/Vivado/2019.2/bin/vivado -mode tcl loooongson/soc_axi_perf/run_vivado/mycpu_prj1/mycpu.xpr -source scripts/run_perf_test.tcl -tclargs crc32
+  - grep 'crc32 PASS!' loooongson/soc_axi_perf/run_vivado/mycpu_prj1/mycpu.sim/sim_1/behav/xsim/simulate.log
+- name: coremark
+  image: vivado:2019.2
+  commands:
+  - /opt/Xilinx/Vivado/2019.2/bin/vivado -mode tcl loooongson/soc_axi_perf/run_vivado/mycpu_prj1/mycpu.xpr -source scripts/run_perf_test.tcl -tclargs coremark
+  - grep 'coremark PASS!' loooongson/soc_axi_perf/run_vivado/mycpu_prj1/mycpu.sim/sim_1/behav/xsim/simulate.log
