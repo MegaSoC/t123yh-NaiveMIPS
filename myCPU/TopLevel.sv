@@ -1,11 +1,12 @@
 `include "my_global.h"
+`include "def.svh"
 
 module mycpu_top(
     input [5:0] ext_int,
 
     input aclk,
     input aresetn,
-    
+
     //ar
     output [3 :0] arid         ,
     output [31:0] araddr       ,
@@ -51,8 +52,11 @@ module mycpu_top(
     output [31:0] debug_wb_pc,
     output [3:0] debug_wb_rf_wen,
     output [4:0] debug_wb_rf_wnum,
-    output [31:0] debug_wb_rf_wdata
+    output [31:0] debug_wb_rf_wdata,
+    output [31:0] I_PC_
 );
+
+    assign I_PC_=I_PC_Pass;
 
     //prepare longxin interface 
     wire dm_stall;
@@ -98,47 +102,11 @@ module mycpu_top(
                        (sh | lh | lhu) ? 2'b01 :
                                          2'b00 ;
 					   
-	assign wid = 4'b0;				   
-	wire [3 :0] arid_i         ;
-    wire [31:0] araddr_i       ;
-    wire [7 :0] arlen_i        ;
-    wire [2 :0] arsize_i       ;
-    wire [1 :0] arburst_i      ;
-    wire [1 :0] arlock_i        ;
-    wire [3 :0] arcache_i      ;
-    wire [2 :0] arprot_i       ;
-    wire        arvalid_i      ;
-    wire         arready_i      ;
-    //r           
-    wire  [3 :0] rid_i          ;
-    wire  [31:0] rdata_i        ;
-    wire  [1 :0] rresp_i        ;
-    wire         rlast_i        ;
-    wire         rvalid_i       ;
-    wire        rready_i       ;
-    //aw          
-    wire [3 :0] awid_i         ;
-    wire [31:0] awaddr_i       ;
-    wire [3 :0] awlen_i        ;
-    wire [2 :0] awsize_i       ;
-    wire [1 :0] awburst_i      ;
-    wire [1 :0] awlock_i      ;
-    wire [3 :0] awcache_i      ;
-    wire [2 :0] awprot_i       ;
-    wire        awvalid_i      ;
-    wire         awready_i      ;
-    //w          
-    wire [3 :0] wid_i          ;
-    wire [31:0] wdata_i        ;
-    wire [3 :0] wstrb_i        ;
-    wire        wlast_i        ;
-    wire        wvalid_i       ;
-    wire         wready_i       ;
-    //b           
-    wire  [3 :0] bid_i          ;
-    wire  [1 :0] bresp_i        ;
-    wire         bvalid_i       ;
-    wire        bready_i ;      
+	assign wid = 4'b0;	
+	
+    axi_req req_i;
+    axi_resp resp_i;
+    	   
  
     wire [3 :0] arid_d         ;
     wire [31:0] araddr_d       ;
@@ -467,7 +435,7 @@ module mycpu_top(
     wire data_alignment_err;
     wire [31:0] E_DataLSaddr;    
     wire E_MemReadEnable_Inter;
-    wire E_EstallClear ; //用来给E级做clear信号用，来自dcache�?????
+    wire E_EstallClear ; //用来给E级做clear信号用，来自dcache�???????
 
     ///***
     wire E_MemSaveType_Inter ;
@@ -786,6 +754,8 @@ module mycpu_top(
     output [OPTION_OPERAND_WIDTH-1:0] spr_bus_dat_o
     */
     );
+    
+    
      my_icache icache(
         .cache_reset(myaresetn),
         .reset(Clr) ,
@@ -808,46 +778,46 @@ module mycpu_top(
         .o_p_rddata(rdata_icache),
         .o_p_stall(icache_stall),
 	
-        .arid(arid_i),
-        .araddr(araddr_i)       ,
-        .arlen(arlen_i)         ,
-        .arsize(arsize_i)       ,
-        .arburst(arburst_i)     ,
-        .arlock(arlock_i)       ,
-        .arcache(arcache_i)     ,
-        .arprot(arprot_i)       ,
-        .arvalid(arvalid_i)     ,
-        .arready(arready_i)     ,
+        .arid(req_i.arid),
+        .araddr(req_i.araddr)       ,
+        .arlen(req_i.arlen)         ,
+        .arsize(req_i.arsize)       ,
+        .arburst(req_i.arburst)     ,
+        .arlock(req_i.arlock)       ,
+        .arcache(req_i.arcache)     ,
+        .arprot(req_i.arprot)       ,
+        .arvalid(req_i.arvalid)     ,
+        .arready(resp_i.arready)     ,
         //r           
-        .rid(rid_i)            ,
-        .rdata(rdata_i)        ,
-        .rresp(rresp_i)        ,
-        .rlast(rlast_i)        ,
-        .rvalid (rvalid_i)     ,
-        .rready(rready_i)      ,
+        .rid(resp_i.rid)            ,
+        .rdata(resp_i.rdata)        ,
+        .rresp(resp_i.rresp)        ,
+        .rlast(resp_i.rlast)        ,
+        .rvalid (resp_i.rvalid)     ,
+        .rready(req_i.rready)      ,
         //aw          
-        .awid(awid_i)          ,
-        .awaddr(awaddr_i)      ,
-        .awlen(awlen_i)        ,
-        .awsize(awsize_i)      ,
-        .awburst(awburst_i)    ,
-        .awlock(awlock_i)      ,
-        .awcache(awcache_i)    ,
-        .awprot(awprot_i)      ,
-        .awvalid(awvalid_i)    ,
-        .awready(awready_i)    ,
+        .awid(req_i.awid)          ,
+        .awaddr(req_i.awaddr)      ,
+        .awlen(req_i.awlen)        ,
+        .awsize(req_i.awsize)      ,
+        .awburst(req_i.awburst)    ,
+        .awlock(req_i.awlock)      ,
+        .awcache(req_i.awcache)    ,
+        .awprot(req_i.awprot)      ,
+        .awvalid(req_i.awvalid)    ,
+        .awready(resp_i.awready)    ,
         //w          
-        .wid(wid_i)            ,
-        .wdata(wdata_i)        ,
-        .wstrb(wstrb_i)        ,
-        .wlast(wlast_i)        ,
-        .wvalid(wvalid_i)      ,
-        .wready(wready_i)      ,
+        .wid(req_i.wid)            ,
+        .wdata(req_i.wdata)        ,
+        .wstrb(req_i.wstrb)        ,
+        .wlast(req_i.wlast)        ,
+        .wvalid(req_i.wvalid)      ,
+        .wready(resp_i.wready)      ,
         //b           
-        .bid(bid_i)            ,
-        .bresp(bresp_i)        ,
-        .bvalid(bvalid_i)      ,
-        .bready(bready_i)       
+        .bid(resp_i.bid)            ,
+        .bresp(resp_i.bresp)        ,
+        .bvalid(resp_i.bvalid)      ,
+        .bready(req_i.bready)       
     
     /*  
     // SPR interface
@@ -915,42 +885,42 @@ module mycpu_top(
     .S00_AXI_ARESET_OUT_N(rest_out),  // output wire S00_AXI_ARESET_OUT_N
     .S00_AXI_ACLK(Clk),                  // input wire S00_AXI_ACLK
     .S00_AXI_AWID(1'b0),                  // input wire [0 : 0] S00_AXI_AWID
-    .S00_AXI_AWADDR(awaddr_i),              // input wire [31 : 0] S00_AXI_AWADDR
-    .S00_AXI_AWLEN({4'b0,awlen_i}),                // input wire [7 : 0] S00_AXI_AWLEN
-    .S00_AXI_AWSIZE(awsize_i),              // input wire [2 : 0] S00_AXI_AWSIZE
-    .S00_AXI_AWBURST(awburst_i),            // input wire [1 : 0] S00_AXI_AWBURST
-    .S00_AXI_AWLOCK(awlock_i[0]),              // input wire S00_AXI_AWLOCK
-    .S00_AXI_AWCACHE(awcache_i),            // input wire [3 : 0] S00_AXI_AWCACHE
-    .S00_AXI_AWPROT(awprot_i),              // input wire [2 : 0] S00_AXI_AWPROT
+    .S00_AXI_AWADDR(req_i.awaddr),              // input wire [31 : 0] S00_AXI_AWADDR
+    .S00_AXI_AWLEN({4'b0,req_i.awlen}),                // input wire [7 : 0] S00_AXI_AWLEN
+    .S00_AXI_AWSIZE(req_i.awsize),              // input wire [2 : 0] S00_AXI_AWSIZE
+    .S00_AXI_AWBURST(req_i.awburst),            // input wire [1 : 0] S00_AXI_AWBURST
+    .S00_AXI_AWLOCK(req_i.awlock[0]),              // input wire S00_AXI_AWLOCK
+    .S00_AXI_AWCACHE(req_i.awcache),            // input wire [3 : 0] S00_AXI_AWCACHE
+    .S00_AXI_AWPROT(req_i.awprot),              // input wire [2 : 0] S00_AXI_AWPROT
     .S00_AXI_AWQOS(4'b0000),                // input wire [3 : 0] S00_AXI_AWQOS
-    .S00_AXI_AWVALID(awvalid_i),            // input wire S00_AXI_AWVALID
-    .S00_AXI_AWREADY(awready_i),            // output wire S00_AXI_AWREADY
-    .S00_AXI_WDATA(wdata_i),                // input wire [31 : 0] S00_AXI_WDATA
-    .S00_AXI_WSTRB(wstrb_i),                // input wire [3 : 0] S00_AXI_WSTRB
-    .S00_AXI_WLAST(wlast_i),                // input wire S00_AXI_WLAST
-    .S00_AXI_WVALID(wvalid_i),              // input wire S00_AXI_WVALID
-    .S00_AXI_WREADY(wready_i),              // output wire S00_AXI_WREADY
-    .S00_AXI_BID(bid_i[0]),                    // output wire [0 : 0] S00_AXI_BID
-    .S00_AXI_BRESP(bresp_i),                // output wire [1 : 0] S00_AXI_BRESP
-    .S00_AXI_BVALID(bvalid_i),              // output wire S00_AXI_BVALID
-    .S00_AXI_BREADY(bready_i),              // input wire S00_AXI_BREADY
-    .S00_AXI_ARID(arid_i[0]),                  // input wire [0 : 0] S00_AXI_ARID
-    .S00_AXI_ARADDR(araddr_i),              // input wire [31 : 0] S00_AXI_ARADDR
-    .S00_AXI_ARLEN(arlen_i),                // input wire [7 : 0] S00_AXI_ARLEN
-    .S00_AXI_ARSIZE(arsize_i),              // input wire [2 : 0] S00_AXI_ARSIZE
-    .S00_AXI_ARBURST(arburst_i),            // input wire [1 : 0] S00_AXI_ARBURST
-    .S00_AXI_ARLOCK(arlock_i[0]),              // input wire S00_AXI_ARLOCK
-    .S00_AXI_ARCACHE(arcache_i),            // input wire [3 : 0] S00_AXI_ARCACHE
-    .S00_AXI_ARPROT(arprot_i),              // input wire [2 : 0] S00_AXI_ARPROT
+    .S00_AXI_AWVALID(req_i.awvalid),            // input wire S00_AXI_AWVALID
+    .S00_AXI_AWREADY(resp_i.awready),            // output wire S00_AXI_AWREADY
+    .S00_AXI_WDATA(req_i.wdata),                // input wire [31 : 0] S00_AXI_WDATA
+    .S00_AXI_WSTRB(req_i.wstrb),                // input wire [3 : 0] S00_AXI_WSTRB
+    .S00_AXI_WLAST(req_i.wlast),                // input wire S00_AXI_WLAST
+    .S00_AXI_WVALID(req_i.wvalid),              // input wire S00_AXI_WVALID
+    .S00_AXI_WREADY(resp_i.wready),              // output wire S00_AXI_WREADY
+    .S00_AXI_BID(resp_i.bid[0]),                    // output wire [0 : 0] S00_AXI_BID
+    .S00_AXI_BRESP(resp_i.bresp),                // output wire [1 : 0] S00_AXI_BRESP
+    .S00_AXI_BVALID(resp_i.bvalid),              // output wire S00_AXI_BVALID
+    .S00_AXI_BREADY(req_i.bready),              // input wire S00_AXI_BREADY
+    .S00_AXI_ARID(req_i.arid[0]),                  // input wire [0 : 0] S00_AXI_ARID
+    .S00_AXI_ARADDR(req_i.araddr),              // input wire [31 : 0] S00_AXI_ARADDR
+    .S00_AXI_ARLEN(req_i.arlen),                // input wire [7 : 0] S00_AXI_ARLEN
+    .S00_AXI_ARSIZE(req_i.arsize),              // input wire [2 : 0] S00_AXI_ARSIZE
+    .S00_AXI_ARBURST(req_i.arburst),            // input wire [1 : 0] S00_AXI_ARBURST
+    .S00_AXI_ARLOCK(req_i.arlock[0]),              // input wire S00_AXI_ARLOCK
+    .S00_AXI_ARCACHE(req_i.arcache),            // input wire [3 : 0] S00_AXI_ARCACHE
+    .S00_AXI_ARPROT(req_i.arprot),              // input wire [2 : 0] S00_AXI_ARPROT
     .S00_AXI_ARQOS(4'b0011),                // input wire [3 : 0] S00_AXI_ARQOS
-    .S00_AXI_ARVALID(arvalid_i),            // input wire S00_AXI_ARVALID
-    .S00_AXI_ARREADY(arready_i),            // output wire S00_AXI_ARREADY
-    .S00_AXI_RID(rid_i),                    // output wire [0 : 0] S00_AXI_RID
-    .S00_AXI_RDATA(rdata_i),                // output wire [31 : 0] S00_AXI_RDATA
-    .S00_AXI_RRESP(rresp_i),                // output wire [1 : 0] S00_AXI_RRESP
-    .S00_AXI_RLAST(rlast_i),                // output wire S00_AXI_RLAST
-    .S00_AXI_RVALID(rvalid_i),              // output wire S00_AXI_RVALID
-    .S00_AXI_RREADY(rready_i),              // input wire S00_AXI_RREADY
+    .S00_AXI_ARVALID(req_i.arvalid),            // input wire S00_AXI_ARVALID
+    .S00_AXI_ARREADY(resp_i.arready),            // output wire S00_AXI_ARREADY
+    .S00_AXI_RID(resp_i.rid),                    // output wire [0 : 0] S00_AXI_RID
+    .S00_AXI_RDATA(resp_i.rdata),                // output wire [31 : 0] S00_AXI_RDATA
+    .S00_AXI_RRESP(resp_i.rresp),                // output wire [1 : 0] S00_AXI_RRESP
+    .S00_AXI_RLAST(resp_i.rlast),                // output wire S00_AXI_RLAST
+    .S00_AXI_RVALID(resp_i.rvalid),              // output wire S00_AXI_RVALID
+    .S00_AXI_RREADY(req_i.rready),              // input wire S00_AXI_RREADY
     .S01_AXI_ARESET_OUT_N(rest_out1),  // output wire S01_AXI_ARESET_OUT_N
     .S01_AXI_ACLK(Clk),                  // input wire S01_AXI_ACLK
     .S01_AXI_AWID(1'b0),                  // input wire [0 : 0] S01_AXI_AWID
