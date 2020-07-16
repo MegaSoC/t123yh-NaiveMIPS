@@ -42,17 +42,17 @@ module ALU(
 								(addiu|addu)	?	unsignAddAns:
 													signedAddAns;
 	//////////////////BitCal Family/////////////////////////////////////
-	wire	BC_Family	=	((ori|Or)|	
-							(And|Andi))|
-							((Xor|Xori)|	
-							(Nor|lui));
+	wire	BC_Family	=	((ori|my_Or)|	
+							(my_And|Andi))|
+							((my_Xor|Xori)|	
+							(my_Nor|lui));
 	wire	[31:0]	BC_A	=	A,
 					BC_B	=	(ori|Andi|Xori)	?	Imm32	:	B;
-	wire	[31:0]	BC_Ans	=	(Xor|Xori)	?	BC_A^BC_B:
-								(ori|Or)	?	BC_A|BC_B:
-								(And|Andi)	?	BC_A&BC_B:
+	wire	[31:0]	BC_Ans	=	(my_Xor|Xori)	?	BC_A^BC_B:
+								(ori|my_Or)	?	BC_A|BC_B:
+								(my_And|Andi)	?	BC_A&BC_B:
 								(lui)		?	Imm32:
-												~(BC_A|BC_B);//Nor
+												~(BC_A|BC_B);//my_Nor
 	//////////////////Shamt	Family/////////////////////////////////////
 	wire	sllType   =   sll|sllv,
 				srlType	=	srl|srlv,

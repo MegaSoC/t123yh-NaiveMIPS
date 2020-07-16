@@ -24,7 +24,7 @@ module exception(
     data_invalid,
     inst_invalid,
     eret,
-    break,
+    my_break,
     syscall,
     unknown_inst,
     in_delayslot,
@@ -52,7 +52,7 @@ input wire data_dirty;
 input wire data_invalid;
 input wire inst_invalid;
 input wire eret;
-input wire break;
+input wire my_break;
 input wire syscall;
 input wire unknown_inst;
 input wire in_delayslot;
@@ -93,7 +93,7 @@ assign E_now_exp = (allow_int & interrupt_flag != 8'b0) |
                    inst_miss | data_miss |
                    inst_invalid | data_invalid |
                    inst_illegal | data_illegal | 
-                   syscall | break | unknown_inst| overflow | eret ;
+                   syscall | my_break | unknown_inst| overflow | eret ;
 ///***
 always @(posedge clk) begin
     clear_exl <= 1'b0;
@@ -176,7 +176,7 @@ always @(posedge clk) begin
         epc <= in_delayslot ? (pc - 32'h4) : pc;
         wr_exp <= 1'b1;
     end
-    else if (break) begin //Breakpoint exception
+    else if (my_break) begin //Breakpoint exception
         exp_code <= `EX_BP; 
         flush <= 1'b1;
         exception_new_pc <= exception_base + 32'h180;

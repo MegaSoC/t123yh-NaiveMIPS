@@ -57,12 +57,12 @@
 `define INSTRBUS_WIDTH  67
 `define InstrWireSetWithOutNop   lb,lbu,lh,lhu,lw,sb,sh,sw,\
 						          addi,addiu,add,addu,sub,subu,\
-						          lui,ori,And,Or,Xor,Nor,Andi,Xori,\
+						          lui,ori,my_And,my_Or,my_Xor,my_Nor,Andi,Xori,\
 						          beq,bne,blez,bgtz,bltz,bgez,bltzal,bgezal,j,jal,jr,jalr,\
 						          mult,multu,div,divu,mfhi,mthi,mflo,mtlo,\
 						          sll,srl,sra,sllv,srlv,srav,\
 						          slt,slti,sltu,sltiu,mfc0,mtc0,eret,\
-						          break, syscall, tlbp, tlbr, tlbwi, tlbwr, cache,lwl,lwr,swl,swr
+						          my_break, syscall, tlbp, tlbr, tlbwi, tlbwr, cache,lwl,lwr,swl,swr
 `define INSTR_SET `InstrWireSetWithOutNop,nop
  
 `endif

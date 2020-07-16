@@ -630,7 +630,7 @@ module mycpu_top(
         .data_dirty(data_exp_dirty),
 
         .eret(eret),
-        .break(break),
+        .my_break(my_break),
         .syscall(syscall),
         .unknown_inst(unknown_inst),
         .in_delayslot(E_in_delayslot),

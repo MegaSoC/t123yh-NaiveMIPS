@@ -39,10 +39,10 @@ module DecodeUnit(
 			lui=	(OpCode==6'hf);
 	
 	wire	ori=	(OpCode==6'hd),
-			And=	(OpCode==6'h0 && Funct==6'h24),
-			Or=		(OpCode==6'h0 && Funct==6'h25),
-			Xor=	(OpCode==6'h0 && Funct==6'h26),
-			Nor=	(OpCode==6'h0 && Funct==6'h27),
+			my_And=	(OpCode==6'h0 && Funct==6'h24),
+			my_Or=		(OpCode==6'h0 && Funct==6'h25),
+			my_Xor=	(OpCode==6'h0 && Funct==6'h26),
+			my_Nor=	(OpCode==6'h0 && Funct==6'h27),
 			Andi=	(OpCode==6'hc),
 			Xori=	(OpCode==6'he);
 	wire	beq=	(OpCode==6'h4),
@@ -80,7 +80,7 @@ module DecodeUnit(
 	wire	mfc0=	(OpCode==6'b010000 && MipsInstr[25:21]==5'b00000),
 			mtc0=	(OpCode==6'b010000 && MipsInstr[25:21]==5'b00100),
 			eret=	(MipsInstr==32'h42000018);
-	wire    break=  (OpCode==6'h0 && Funct==6'hd),
+	wire    my_break=  (OpCode==6'h0 && Funct==6'hd),
 			syscall=(OpCode==6'h0 && Funct==6'hc);
 
 	wire	bltzal=	(OpCode==6'b000001 && MipsInstr[20:16]==5'b10000),
@@ -98,7 +98,7 @@ module DecodeUnit(
              swl = (MipsInstr[31:26]==6'b101010),
              swr = (MipsInstr[31:26]==6'b101110);
 	assign RegWriteEnable= ~nop & (addi | addiu | add | addu | sub | subu |
-								   ori | lui | Or | And | Xor | Nor | Andi |Xori |
+								   ori | lui | my_Or | my_And | my_Xor | my_Nor | Andi |Xori |
 								   lw | lh | lhu | lb | lbu |
 								   jal | jalr |
 								   mfhi | mflo |
@@ -111,7 +111,7 @@ module DecodeUnit(
 						  lw | lhu | lh | lbu | lb | slti | sltiu | mfc0|lwl|lwr)    ? Rt:
 						 (add | addu | sub | subu | mfhi | mflo | 
 						  sll | srl | sra | sllv | srlv | srav | slt |
-						  sltu | And | Or | Xor | Nor | jalr)				 ? Rd:
+						  sltu | my_And | my_Or | my_Xor | my_Nor | jalr)				 ? Rd:
 						 (jal | bltzal | bgezal)							 ? 5'd31:
 																			   Rd;
 	
