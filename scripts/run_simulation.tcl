@@ -1,5 +1,6 @@
  update_compile_order -fileset sources_1
 
+generate_target simulation [get_ips *]
 set simulations [get_fileset $env(SIMULATION)]
 
 if { [llength simulations] != 0} {
