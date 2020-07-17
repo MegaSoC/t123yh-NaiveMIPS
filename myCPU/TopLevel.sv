@@ -435,7 +435,7 @@ module mycpu_top(
     wire data_alignment_err;
     wire [31:0] E_DataLSaddr;    
     wire E_MemReadEnable_Inter;
-    wire E_EstallClear ; //用来给E级做clear信号用，来自dcache�???????
+    wire E_EstallClear ; //用来给E级做clear信号用，来自dcache�????????
 
     ///***
     wire E_MemSaveType_Inter ;
@@ -754,7 +754,31 @@ module mycpu_top(
     output [OPTION_OPERAND_WIDTH-1:0] spr_bus_dat_o
     */
     );
+     /*wire [31:0] new_icache_start_pc,new_icache_end_pc;
     
+    wire [511:0] instr_for_debug;
+    wire icache_valid,icache_ready,icache_stall_realmem;
+    
+    new_icache icache16(
+        .i_clk(Clk),
+        .i_rst(Clr),
+        .i_out_num(5'd1),
+        .i_flush(1'b0),
+        .i_uncached(~((!inst_uncached)& 1'b1)),
+        .i_phy_addr(inst_sram_addr),
+        .i_npc(D_NewPC_Pass),
+        .o_inn_stall(icache_stall_realmem),
+        .o_mdata_start_pc(new_icache_start_pc),
+        .o_mdata_final_pc(new_icache_end_pc),
+        .o_mdata_instr(instr_for_debug),
+        .o_mvalid(icache_valid),
+        .i_mready(1'b1),
+        
+        .axi_bus_req(req_i),
+        .axi_bus_resp(resp_i)
+    );
+    assign rdata_icache = instr_for_debug[31:0];
+    assign icache_stall = icache_stall_realmem | (!icache_valid);*/
     
      my_icache icache(
         .cache_reset(myaresetn),
