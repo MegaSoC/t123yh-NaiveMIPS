@@ -110,9 +110,10 @@ reg[31:0] cp0_reg_Cause;
 reg[31:0] cp0_reg_EPC;
 
 reg timer_int;
+wire [7:0] Cause_IP = {hardware_int, cp0_reg_Cause[9:8]};
 
 assign allow_int = cp0_reg_Status[2:0] == 3'b001 & !en_exp_i; //maybe bug
-assign interrupt_flag = cp0_reg_Status[15:8] & cp0_reg_Cause[15:8]; //bug
+assign interrupt_flag = cp0_reg_Status[15:8] & Cause_IP; //bug
 assign in_exl = cp0_reg_Status[1];
 assign epc = cp0_reg_EPC;
 
@@ -179,8 +180,7 @@ always @(*) begin
         `CP0_Cause: begin
             data_o[31:30] <= cp0_reg_Cause[31:30]; //
             data_o[30:16] <= 15'b0;
-            data_o[15:10] <= hardware_int;
-            data_o[9:8]   <= cp0_reg_Cause[9:8];
+            data_o[15:8] <= Cause_IP;
             data_o[7]     <= 1'b0;
             data_o[6:2]   <= cp0_reg_Cause[6:2];
             data_o[1:0]   <= 2'b0;
