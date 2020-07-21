@@ -113,7 +113,7 @@ reg timer_int;
 wire [7:0] Cause_IP = {hardware_int, cp0_reg_Cause[9:8]};
 
 assign allow_int = cp0_reg_Status[2:0] == 3'b001 & !en_exp_i; //maybe bug
-assign interrupt_flag = cp0_reg_Status[15:8] & Cause_IP; //bug
+assign interrupt_flag = cp0_reg_Status[15:8] & Cause_IP;
 assign in_exl = cp0_reg_Status[1];
 assign epc = cp0_reg_EPC;
 
