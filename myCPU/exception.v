@@ -103,7 +103,7 @@ always @(posedge clk) begin
         exp_code <= `EX_INTERRUPT;
         flush <= 1'b1;
         exception_new_pc <= exception_base + 32'h180;
-        epc <= in_delayslot ? mm_pc : mm_pc + 32'h4; //soft_int pc+4 hardware_int has bug
+        epc <= in_delayslot ? pc - 32'h4 : pc; //soft_int pc+4 hardware_int has bug
         wr_exp <= 1'b1;
     end
     else if (data_dirty & data_we) begin //TLB modification exception
