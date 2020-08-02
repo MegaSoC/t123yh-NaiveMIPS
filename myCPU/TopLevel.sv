@@ -48,7 +48,7 @@ module mycpu_top(
     input  [1 :0] bresp        ,
     input         bvalid       ,
     output        bready       ,
-    //debug相关接口
+    //debugç›¸å…³æŽ¥å�£
     output [31:0] debug_wb_pc,
     output [3:0] debug_wb_rf_wen,
     output [4:0] debug_wb_rf_wnum,
@@ -102,7 +102,7 @@ module mycpu_top(
                        (sh | lh | lhu) ? 2'b01 :
                                          2'b00 ;
 					   
-	assign wid = 4'b0;	
+	assign wid = awid;	
 	
     axi_req req_i;
     axi_resp resp_i;
@@ -255,7 +255,7 @@ module mycpu_top(
         .inst_addr_ok(inst_sram_addr_ok),
         .inst_data_ok(inst_sram_data_ok), //todo
         
-        .data_req( data_uncached &(read|write) & !E_now_exp ), //读写内存请求
+        .data_req( data_uncached &(read|write) & !E_now_exp ), //è¯»å†™å†…å­˜è¯·æ±‚
         .data_wr(|data_sram_wen) , //
         .data_size(data_size), // ?
         .data_wdata(data_sram_wdata),
@@ -361,7 +361,7 @@ module mycpu_top(
 	wire [4:0] D_Shamt;
 	wire [15:0] D_Imm16;
 	wire [`INSTRBUS_WIDTH-1:0] D_InstrBus;
-	wire [31:0]	D_PC,M_PC;
+	wire [31:0]	D_PC,M_PC,D_EPC;
 	wire [3:0] E_T,D_T;
 	wire E_WriteRegEnable,D_WriteRegEnable;
 	wire [4:0] E_RegId,D_RegId;
@@ -390,6 +390,7 @@ module mycpu_top(
         .W_PC(M_PC),
 		.D_NewPC_Pass(D_NewPC_Pass),
         .D_PC(D_PC),
+        .D_EPC(D_EPC),
         .D_RsID(D_RsID),
         .D_RtID(D_RtID),
         .D_RdID(D_RdID),
@@ -425,7 +426,7 @@ module mycpu_top(
         // .icache_stall(icache_stall)
     );
     
-    wire [31:0] E_PC;
+    wire [31:0] E_PC, E_EPC;
 	wire [31:0] E_WriteMemData;
 	wire [4:0] E_RtID,E_RdID;
 	wire [3:0] E_MemWriteEnable;
@@ -435,7 +436,7 @@ module mycpu_top(
     wire data_alignment_err;
     wire [31:0] E_DataLSaddr;    
     wire E_MemReadEnable_Inter;
-    wire E_EstallClear ; //用来给E级做clear信号用，来自dcache�????????
+    wire E_EstallClear ; //ç”¨æ�¥ç»™Eçº§å�šclearä¿¡å�·ç”¨ï¼Œæ�¥è‡ªdcacheï¿????????
 
     ///***
     wire E_MemSaveType_Inter ;
@@ -447,6 +448,7 @@ module mycpu_top(
         .exp_flush(exp_flush),
         .data_sram_data_ok(data_sram_data_ok),
         .D_PC(D_PC),
+        .D_EPC(D_EPC),
         .D_RsID(D_RsID),
         .D_RtID(D_RtID),
         .D_RdID(D_RdID),
@@ -463,6 +465,7 @@ module mycpu_top(
         .M_RegId(M_RegId),
         .M_Data(M_Data),
         .E_PC(E_PC),
+        .E_EPC(E_EPC),
         .E_WriteMemData(E_WriteMemData),
         .E_RtID(E_RtID),
         .E_RdID(E_RdID),
@@ -474,7 +477,7 @@ module mycpu_top(
 		.E_MemWriteEnable(E_MemWriteEnable),
         .E_MemFamily(E_MemFamily),
         .E_InstrBus(E_InstrBus),
-        .E_OverFlow(E_OverFlow), // 怪�?�的
+        .E_OverFlow(E_OverFlow), // æ€ªï¿½?ï¿½çš„
         .E_data_alignment_err(data_alignment_err),
         .dm_stall(dm_stall),
         .E_XALU_Busy(E_XALU_Busy),
@@ -546,7 +549,7 @@ module mycpu_top(
         .M_T(M_T),
         .M_WriteRegEnableExted(M_WriteRegEnableExted)
     );
-    //exception 有问题，会让异常进入写回
+    //exception æœ‰é—®é¢˜ï¼Œä¼šè®©å¼‚å¸¸è¿›å…¥å†™å›ž
     assign M_PC = exp_flush ? 32'h0 : M_PC_post;
     assign M_Data = exp_flush ? 32'h0 : M_Data_post;
     assign M_RegId = exp_flush ? 5'h0 : M_RegId_post;
@@ -585,6 +588,7 @@ module mycpu_top(
         
         //input
         .clk(Clk),
+        .E_EPC(E_EPC),
         .pc(E_PC),
         .mm_pc(M_PC_post),
         .data_vaddr(E_Data), //
@@ -612,6 +616,16 @@ module mycpu_top(
         .inst_uncached(inst_uncached)
     );
 
+    reg[5:0] hardware_int_sample;
+    
+    always @(posedge Clk) begin
+        if (Clr) begin
+            hardware_int_sample <= 6'b0;
+        end else begin
+            hardware_int_sample <= ext_int;
+        end
+    end
+
     cp0 cp0(
         //output
         .epc(cp0_epc),
@@ -622,11 +636,11 @@ module mycpu_top(
         // input
         .clk(Clk),
         .rst(Clr),
-        .rd_addr(E_RdID), //只有mfc0
+        .rd_addr(E_RdID), //å�ªæœ‰mfc0
         .we(mtc0), // TODO: more writenable
         .wr_addr(E_RegId), //TODO
         .data_i(data2cp0),
-        .hardware_int(ext_int),
+        .hardware_int(hardware_int_sample),
         .clear_exl(clear_exl),
         .en_exp_i(cp0_wr_exp),
         .exp_bd(E_in_delayslot),

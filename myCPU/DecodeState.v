@@ -17,6 +17,7 @@ module DecodeState(
 	input	[31:0]	W_PC,
     output  [31:0]  D_NewPC_Pass,///pass through  
 	output	reg	[31:0]	D_PC,
+    output  reg [31:0]  D_EPC,
 	output	reg [4:0]	D_RsID,
 	output	reg [4:0]	D_RtID,
     output	reg [4:0]	D_RdID,
@@ -121,7 +122,7 @@ module DecodeState(
     end
     assign is_branch = |{beq,bne,blez,bgtz,bltz,bgez,bltzal,bgezal,j,jal,jr,jalr};
     
-    wire MultCalFamily_Inter = (mult|multu|div|divu);
+    wire MultCalFamily_Inter = (mult|multu|div|divu|mul);
 	reg	D_MultCalFamily;
     
     wire    [3:0]   T_Inter;
@@ -145,11 +146,12 @@ module DecodeState(
 
     always @ (posedge Clk)  begin
         if( Clr | exp_flush |
-            (D_stall_Pass  &!dm_stall) |
+            (D_stall_Pass & !dm_stall) |
             (!dm_stall & I_nextNotReady) ) 
            begin //todo: ke neng cuo,xu yao jing jian
 			// if (exp_flush)
             D_PC <= 0; // soft_int epc
+            D_EPC <= Clr? 0 : D_EPC;
 			D_RsID <= 0;
 			D_RtID <= 0;
 			D_RsData <= 0;
@@ -168,6 +170,7 @@ module DecodeState(
 		end///***
 		else if (!dm_stall  &  !I_nextNotReady     ) begin
 			D_PC	<= I_PC;
+            D_EPC   <= D_is_branch? I_PC - 4 : I_PC;
 			D_RsID 	<= Rs_Inter;
 			D_RtID 	<= Rt_Inter;
             D_RdID  <= Rd_Inter;

@@ -54,7 +54,7 @@
 // TagLo TagHi
 `define CP0_ErrorEPC 5'D30
 
-`define INSTRBUS_WIDTH  67
+`define INSTRBUS_WIDTH  68
 `define InstrWireSetWithOutNop   lb,lbu,lh,lhu,lw,sb,sh,sw,\
 						          addi,addiu,add,addu,sub,subu,\
 						          lui,ori,my_And,my_Or,my_Xor,my_Nor,Andi,Xori,\
@@ -62,7 +62,7 @@
 						          mult,multu,div,divu,mfhi,mthi,mflo,mtlo,\
 						          sll,srl,sra,sllv,srlv,srav,\
 						          slt,slti,sltu,sltiu,mfc0,mtc0,eret,\
-						          my_break, syscall, tlbp, tlbr, tlbwi, tlbwr, cache,lwl,lwr,swl,swr
+						          my_break, syscall, tlbp, tlbr, tlbwi, tlbwr, cache,lwl,lwr,swl,swr,mul
 `define INSTR_SET `InstrWireSetWithOutNop,nop
  
 `endif

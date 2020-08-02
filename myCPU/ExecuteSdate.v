@@ -6,6 +6,7 @@ module ExecuteSdate(
     input   exp_flush,
     input   data_sram_data_ok,
 	input	[31:0]	D_PC,
+    input   [31:0]  D_EPC,
     input   [4:0]   D_RsID,
     input   [4:0]   D_RtID,
     input   [4:0]   D_RdID,
@@ -23,7 +24,8 @@ module ExecuteSdate(
     input   [4:0]   M_RegId,
     input   [31:0]  M_Data,
 
-	output reg	[31:0]	E_PC,
+	output reg [31:0]	E_PC,
+    output reg [31:0]   E_EPC,
     output reg [31:0]   E_WriteMemData,
     output reg [4:0]    E_RtID,
     output reg [4:0]    E_RdID,
@@ -64,10 +66,10 @@ module ExecuteSdate(
     );
 
     wire    [31:0]  MF_Rs = (D_RsID!=0 && D_RsID==E_RegId && E_T==0 && E_WriteRegEnable) ?   E_Data:
-                            (D_RsID!=0 && M_WriteRegEnable && M_T==0 && M_RegId==D_RsID)			?   M_Data:
+                            (D_RsID!=0 && M_WriteRegEnable && M_T==0 && M_RegId==D_RsID) ?   M_Data:
                                                                                              D_RsData;
     wire    [31:0]  MF_Rt = (D_RtID!=0 && D_RtID==E_RegId && E_T==0 && E_WriteRegEnable) ?	 E_Data:
-                            (D_RtID!=0 && M_WriteRegEnable && M_T==0 &&M_RegId==D_RtID)			?   M_Data://M级结束（实际上是W级了），那么T必定�???
+                            (D_RtID!=0 && M_WriteRegEnable && M_T==0 && M_RegId==D_RtID) ?   M_Data://M级结束（实际上是W级了），那么T必定�???
                                                                                              D_RtData;
     ////////////////////////////////////////
     wire    [31:0]  C_Inter;
@@ -137,6 +139,7 @@ module ExecuteSdate(
 
 	initial begin
 		E_PC <= 0;
+        E_EPC <= 0;
 		E_WriteMemData <= 0;
 		E_RtID <= 0;
 		E_T <= 0;
@@ -152,6 +155,7 @@ module ExecuteSdate(
     always @ (posedge Clk) begin
         if(Clr | exp_flush | E_now_exp  | E_EstallClear  ) begin  ///
 			E_PC <= 0; // fetch_alignment_err
+            E_EPC <= Clr? 0 : D_EPC;
 			E_WriteMemData <= 0;
 			E_RtID <= 0;
 			E_T <= 0;
@@ -169,8 +173,12 @@ module ExecuteSdate(
             E_inst_illegal <= 0;
             E_inst_invalid <= 0;
 		end
+        else if (mul) begin
+            
+        end
 		else if (!dm_stall) begin
 			E_PC <= D_PC;
+            E_EPC <= D_EPC;
 			E_WriteMemData <= MF_Rt;// MF_Rt; //TODO: bug
 			E_RtID <= D_RtID;
             E_RdID <= D_RdID;

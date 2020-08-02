@@ -60,7 +60,7 @@ module cpu_axi_interface
     //ar
     output [3 :0] arid         ,
     output [31:0] araddr       ,
-    output [3 :0] arlen        , //modified
+    output [7 :0] arlen        , //modified
     output [2 :0] arsize       ,
     output [1 :0] arburst      ,
     output [1 :0] arlock        ,
@@ -78,7 +78,7 @@ module cpu_axi_interface
     //aw          
     output [3 :0] awid         ,
     output [31:0] awaddr       ,
-    output [3 :0] awlen        , //modified
+    output [7 :0] awlen        , //modified
     output [2 :0] awsize       ,
     output [1 :0] awburst      ,
     output [1 :0] awlock       ,

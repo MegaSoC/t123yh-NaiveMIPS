@@ -12,6 +12,7 @@ module exception(
     exception_new_pc,
     //input
     clk,
+    E_EPC,
     pc,
     mm_pc,
     data_vaddr,
@@ -40,9 +41,10 @@ module exception(
     ///***
 );
 input wire clk;
-input wire[31:0] pc;
-input wire[31:0] mm_pc;
-input wire[31:0] data_vaddr;
+input wire [31:0] E_EPC;
+input wire [31:0] pc;
+input wire [31:0] mm_pc;
+input wire [31:0] data_vaddr;
 input wire data_we;
 input wire data_miss;
 input wire inst_miss;
@@ -103,14 +105,14 @@ always @(posedge clk) begin
         exp_code <= `EX_INTERRUPT;
         flush <= 1'b1;
         exception_new_pc <= exception_base + 32'h180;
-        epc <= in_delayslot ? pc - 32'h4 : pc; //soft_int pc+4 hardware_int has bug
+        epc <= E_EPC; //soft_int pc+4 hardware_int has bug
         wr_exp <= 1'b1;
     end
     else if (data_dirty & data_we) begin //TLB modification exception
         exp_code <= `EX_MOD; 
         flush <= 1'b1;
         exception_new_pc <= exception_base + 32'h180; //reduce
-        epc <= in_delayslot ? (pc - 32'h4) : pc; //can reduce
+        epc <= E_EPC; //can reduce
         wr_exp <= 1'b1; //can reduce
         badvaddr_we <= 1'b1;
         badvaddr <= data_vaddr;
@@ -119,7 +121,7 @@ always @(posedge clk) begin
         exp_code <= `EX_TLBL; 
         flush <= 1'b1;
         exception_new_pc <= exception_base + 32'h0; //reduce
-        epc <= in_delayslot ? (pc - 32'h4) : pc; //can reduce
+        epc <= E_EPC; //can reduce
         wr_exp <= 1'b1; //can reduce
         badvaddr_we <= 1'b1;
         badvaddr <= pc;
@@ -128,7 +130,7 @@ always @(posedge clk) begin
         exp_code <= data_we ? `EX_TLBS : `EX_TLBL; 
         flush <= 1'b1;
         exception_new_pc <= exception_base + 32'h0; //reduce
-        epc <= in_delayslot ? (pc - 32'h4) : pc; //can reduce
+        epc <= E_EPC; //can reduce
         wr_exp <= 1'b1; //can reduce
         badvaddr_we <= 1'b1;
         badvaddr <= data_vaddr;
@@ -137,7 +139,7 @@ always @(posedge clk) begin
         exp_code <= `EX_TLBL; 
         flush <= 1'b1;
         exception_new_pc <= exception_base + 32'h180; //reduce
-        epc <= in_delayslot ? (pc - 32'h4) : pc; //can reduce
+        epc <= E_EPC; //can reduce
         wr_exp <= 1'b1; //can reduce
         badvaddr_we <= 1'b1;
         badvaddr <= pc;
@@ -146,7 +148,7 @@ always @(posedge clk) begin
         exp_code <= data_we ? `EX_TLBS : `EX_TLBL; 
         flush <= 1'b1;
         exception_new_pc <= exception_base + 32'h180; //reduce
-        epc <= in_delayslot ? (pc - 32'h4) : pc; //can reduce
+        epc <= E_EPC; //can reduce
         wr_exp <= 1'b1; //can reduce
         badvaddr_we <= 1'b1;
         badvaddr <= data_vaddr;
@@ -157,7 +159,7 @@ always @(posedge clk) begin
         exp_code <= `EX_ADEL;
         flush <= 1'b1;
         exception_new_pc <= exception_base + 32'h180;
-        epc <= in_delayslot ? (pc - 32'h4) : pc;
+        epc <= E_EPC;
         wr_exp <= 1'b1;
     end
     else if (data_illegal) begin //Address error exception (store)
@@ -166,35 +168,35 @@ always @(posedge clk) begin
         exp_code <= data_we ? `EX_ADES : `EX_ADEL; 
         flush <= 1'b1;
         exception_new_pc <= exception_base + 32'h180;
-        epc <= in_delayslot ? (pc - 32'h4) : pc;
+        epc <= E_EPC;
         wr_exp <= 1'b1;
     end
     else if (syscall) begin //Syscall exception
         exp_code <= `EX_SYS; 
         flush <= 1'b1;
         exception_new_pc <= exception_base + 32'h180;
-        epc <= in_delayslot ? (pc - 32'h4) : pc;
+        epc <= E_EPC;
         wr_exp <= 1'b1;
     end
     else if (my_break) begin //Breakpoint exception
         exp_code <= `EX_BP; 
         flush <= 1'b1;
         exception_new_pc <= exception_base + 32'h180;
-        epc <= in_delayslot ? (pc - 32'h4) : pc;
+        epc <= E_EPC;
         wr_exp <= 1'b1;
     end
     else if (unknown_inst) begin //Reserved instruction exception
         exp_code <= `EX_RI; 
         flush <= 1'b1;
         exception_new_pc <= exception_base + 32'h180;
-        epc <= in_delayslot ? (pc - 32'h4) : pc;
+        epc <= E_EPC;
         wr_exp <= 1'b1;
     end
     else if (overflow) begin //Arithmetic Overflow exception
         exp_code <= `EX_OV; 
         flush <= 1'b1;
         exception_new_pc <= exception_base + 32'h180;
-        epc <= in_delayslot ? (pc - 32'h4) : pc;
+        epc <= E_EPC;
         wr_exp <= 1'b1;
     end
 //    else if (Tr) begin //Trap exception

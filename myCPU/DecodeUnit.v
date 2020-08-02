@@ -94,14 +94,17 @@ module DecodeUnit(
 	wire    cache = (OpCode==6'b101111);
 
     wire    lwl = (MipsInstr[31:26]==6'b100010),
-             lwr = (MipsInstr[31:26]==6'b100110),
-             swl = (MipsInstr[31:26]==6'b101010),
-             swr = (MipsInstr[31:26]==6'b101110);
+            lwr = (MipsInstr[31:26]==6'b100110),
+            swl = (MipsInstr[31:26]==6'b101010),
+            swr = (MipsInstr[31:26]==6'b101110);
+
+	wire    mul = (OpCode == 6'b011100 && MipsInstr[10:0] == 11'b10);
+
 	assign RegWriteEnable= ~nop & (addi | addiu | add | addu | sub | subu |
 								   ori | lui | my_Or | my_And | my_Xor | my_Nor | Andi |Xori |
 								   lw | lh | lhu | lb | lbu |
 								   jal | jalr |
-								   mfhi | mflo |
+								   mfhi | mflo | mul |
 								   sll | srl | sra | sllv | srlv | srav |
 								   slt | slti | sltu | sltiu |
 								   mfc0 |
@@ -109,7 +112,7 @@ module DecodeUnit(
 								   lwl|lwr);
 	assign	WriteRegId = (addi | addiu | ori | Xori | Andi | lui | 
 						  lw | lhu | lh | lbu | lb | slti | sltiu | mfc0|lwl|lwr)    ? Rt:
-						 (add | addu | sub | subu | mfhi | mflo | 
+						 (add | addu | sub | subu | mfhi | mflo | mul |
 						  sll | srl | sra | sllv | srlv | srav | slt |
 						  sltu | my_And | my_Or | my_Xor | my_Nor | jalr)				 ? Rd:
 						 (jal | bltzal | bgezal)							 ? 5'd31:
