@@ -26,7 +26,7 @@ proc findFiles { basedir pattern } {
     }
     return $fileList
 }
-import_files  -force $cpupath/src
-import_files  -force -quiet [findFiles $cpupath/ip_cores *.xci]
+add_files  -force $cpupath/src
+add_files  -force -quiet [findFiles $cpupath/ip_cores *.xci]
 # import_files  -force -quiet [findFiles $Doc_Dir/$doc_name/src/mycpu *.bd]
 upgrade_ip [get_ips  *]
