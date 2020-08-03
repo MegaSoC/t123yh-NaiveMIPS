@@ -67,7 +67,7 @@ module simple_bram
       .enable(we) ,
       .offset(waddr[2:0]) ,
       .out(cpu_we_out) ,
-      .var(byte_ben) 
+      .v(byte_ben) 
   );
 
   assign final_wea = hit_write ?  {32{we}} : cpu_we_out ;
@@ -109,16 +109,16 @@ assign dataout = ({32{hot_wire[0]}} & datain[ 31:  0]) |
                  ({32{hot_wire[7]}} & datain[255: 224]) ;
 endmodule
 
-module expand(enable,offset,out,var);
+module expand(enable,offset,out,v);
 input   enable;
 input  [  2:0] offset; //word offset
 output [ 31:0] out;
-input [3:0]var;
+input [3:0]v;
 
 genvar i;
 generate
     for(i=0;i<= 3'b111;i=i+1)begin
-        assign out[i*4+3:i*4] = ((offset == i) & enable )?  var:4'b0;
+        assign out[i*4+3:i*4] = ((offset == i) & enable )?  v:4'b0;
     end
 endgenerate
 
