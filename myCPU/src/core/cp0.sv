@@ -110,21 +110,8 @@ module cp0(
     assign allow_int = cp0_reg_Status[2:0] == 3'b001 & !en_exp_i;     assign interrupt_flag = cp0_reg_Status[15:8] & Cause_IP;
     assign in_exl = cp0_reg_Status[1];
     assign epc = cp0_reg_EPC;
-
-    initial begin
-        cp0_reg_Index <= 32'b0;
-        cp0_reg_EntryLo0 <= 32'b0;
-        cp0_reg_EntryLo1 <= 32'b0;
-        cp0_reg_PageMask <= `INIT_PAGEMASKK;
-                cp0_reg_Count <= 32'b0;
-        cp0_reg_EntryHi <= 32'b0;
-        cp0_reg_Compare <= 32'b0;
-        cp0_reg_Status <= `INIT_STATUS;
-        cp0_reg_Cause <= 32'b0;
-        cp0_reg_EPC <= 32'b0;
-    end
     wire[31:0] prober_result;
-            always @(*) begin
+            always_ff @(*) begin
         if (rst) begin
             data_o <= 32'h0;
         end
@@ -182,7 +169,7 @@ module cp0(
     reg[89:0] tlb0[0:1];
     reg[89:0] tlb1[0:1];
     wire[0:0] tlbEntryIndex;
-        always @(posedge clk) begin
+        always_ff @(posedge clk) begin
         if (rst) begin
             cp0_reg_Index <= 32'b0;
             cp0_reg_EntryLo0 <= 32'b0;
@@ -240,6 +227,7 @@ module cp0(
                     end
                 endcase
             end
+            else begin
             if (en_exp_i) begin
                 if (exp_badvaddr_we)
                     cp0_reg_BadVAddr <= exp_badvaddr;
@@ -263,6 +251,7 @@ module cp0(
             if (tlbp) begin
                 cp0_reg_Index[31] <= prober_result[31];
                 cp0_reg_Index[0:0] <= prober_result[0:0];
+            end
             end
         end
     end
@@ -363,7 +352,7 @@ module cp0(
 
 
     integer i;
-    always @(posedge clk) begin
+    always_ff @(posedge clk) begin
 
         if (rst) begin
             for(i=0; i<2; i=i+1) begin
