@@ -713,7 +713,7 @@ module mycpu_top(
 	*/
 	    .i_p_wrdata(data_sram_wdata),
         .o_p_rddata(rdata_dcache),
-        .o_p_stall(not_hit),
+        .stall(not_hit),
         ///***
         .o_p_EstallClear(E_EstallClear),
         ///***
