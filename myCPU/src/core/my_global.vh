@@ -1,6 +1,6 @@
-`ifdef global.vh
+`ifdef MYGLOBAL
 `else
-`define global.vh
+`define MYGLOBAL
 
 `timescale 1ns / 1ps
 
