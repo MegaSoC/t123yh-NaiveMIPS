@@ -37,25 +37,25 @@ module my_icache
     parameter OPTION_DCACHE_LIMIT_WIDTH = 32
     )
    (
-   input wire cache_reset,
-    input wire reset ,
-    input wire clk,
-   // input wire exp_flush,
+   input logic cache_reset,
+    input logic reset ,
+    input logic clk,
+   // input logic exp_flush,
     //todo:first
     //exchange with cpu
-    input  wire [31:0] i_p_addr,
-    input  wire [6:0]  i_p_tag_bit_raddr, 
-    input  wire [31:0] i_p_addrAfterTrans, 
-	input  wire [3:0]  i_p_byte_en,
-    input wire dm_stall,
-	input  wire        i_p_read,
-	input  wire        i_p_write,  
+    input  logic [31:0] i_p_addr,
+    input  logic [6:0]  i_p_tag_bit_raddr, 
+    input  logic [31:0] i_p_addrAfterTrans, 
+	input  logic [3:0]  i_p_byte_en,
+    input logic dm_stall,
+	input  logic        i_p_read,
+	input  logic        i_p_write,  
 	
-    input  wire        i_p_hitwriteback,
-	input  wire        i_p_hitinvalidate,
-	input  wire [31:0] i_p_wrdata,
-	output wire [31:0] o_p_rddata,
-	output wire        o_p_stall,
+    input  logic        i_p_hitwriteback,
+	input  logic        i_p_hitinvalidate,
+	input  logic [31:0] i_p_wrdata,
+	output logic [31:0] o_p_rddata,
+	output logic        o_p_stall,
     output      [3 :0] arid    ,
     output logic  [31:0] araddr  ,
     output [7 :0] arlen        ,
@@ -65,7 +65,7 @@ module my_icache
     output [3 :0] arcache      ,
     output [2 :0] arprot       ,
     output logic    arvalid      ,
-    input  wire   arready      ,
+    input  logic   arready      ,
     //r           
     input  [3 :0] rid          ,
     input  [31:0] rdata        ,
@@ -99,7 +99,7 @@ module my_icache
     
     
     // SPR interface
-    input wire [31:0]     spr_bus_addr_i ,
+    input logic [31:0]     spr_bus_addr_i ,
     input 			      spr_bus_we_i   ,
     input 			      spr_bus_stb_i  ,
     input [OPTION_OPERAND_WIDTH-1:0]  spr_bus_dat_i,
@@ -171,82 +171,83 @@ module my_icache
 
    // FSM state signals
    logic [4:0] 			      state;
-   wire				      idle;
-   wire				      read;
-   wire				      write;
-   wire				      refill;
+   logic				      idle;
+   logic				      read;
+   logic				      write;
+   logic				      refill;
 
    logic [WAY_WIDTH-1:OPTION_DCACHE_BLOCK_WIDTH] invalidate_adr;
-   wire [31:0] 			      next_refill_adr;
-   wire 			      refill_done;
-   wire 			      refill_hit;
+   logic [31:0] 			      next_refill_adr;
+   logic 			      refill_done;
+   logic 			      refill_hit;
    logic [(1<<(OPTION_DCACHE_BLOCK_WIDTH-2))-1:0] refill_valid;
    logic [(1<<(OPTION_DCACHE_BLOCK_WIDTH-2))-1:0] refill_valid_r;
-   wire				      invalidate;
+   logic				      invalidate;
 
    // The index we read and write from tag memory
-   wire [OPTION_DCACHE_SET_WIDTH-1:0]  tag_windex;
+   logic [OPTION_DCACHE_SET_WIDTH-1:0]  tag_windex;
    
    // The data from the tag memory
-   wire [TAGMEM_WIDTH-1:0] 	          tag_dout;
-   wire [TAG_LRU_WIDTH_BITS-1:0]      tag_lru_out;
-   wire [TAGMEM_WAY_WIDTH-1:0] 	      tag_way_out [OPTION_DCACHE_WAYS-1:0];
+   logic [TAGMEM_WIDTH-1:0] 	          tag_dout;
+   logic [TAG_LRU_WIDTH_BITS-1:0]      tag_lru_out;
+   logic [TAGMEM_WAY_WIDTH-1:0] 	      tag_way_out [OPTION_DCACHE_WAYS-1:0];
 
    // The data to the tag memory
-   wire [TAGMEM_WIDTH-1:0] 	      tag_din;
-   wire [TAG_LRU_WIDTH_BITS-1:0]       tag_lru_in;
-   wire [TAGMEM_WAY_WIDTH-1:0] 	      tag_way_in [OPTION_DCACHE_WAYS-1:0];
+   logic [TAGMEM_WIDTH-1:0] 	      tag_din;
+   logic [TAG_LRU_WIDTH_BITS-1:0]       tag_lru_in;
+   logic [TAGMEM_WAY_WIDTH-1:0] 	      tag_way_in [OPTION_DCACHE_WAYS-1:0];
 
    logic [TAGMEM_WAY_WIDTH-1:0] 	      tag_way_save[OPTION_DCACHE_WAYS-1:0];
 
    // Whether to write to the tag memory in this cycle
-   wire 				      tag_we;
+   logic 				      tag_we;
 //    assign tag_we = ( !dm_stall & !o_p_stall ) | ( state==`LOAD_OVER );
    assign tag_we = ( |way_hit ) ;
    // This is the tag we need to write to the tag memory during refill
-   wire [TAG_WIDTH-1:0] 	      tag_wtag;
+   logic [TAG_WIDTH-1:0] 	      tag_wtag;
 
    // This is the tag we check against
-   wire [TAG_WIDTH-1:0] 	      tag_tag;
+   logic [TAG_WIDTH-1:0] 	      tag_tag;
 
    // Access to the way memories
-   wire [WAY_WIDTH-3:0] 	      way_raddr[OPTION_DCACHE_WAYS-1:0];
-   wire [WAY_WIDTH-3:0] 	      way_waddr[OPTION_DCACHE_WAYS-1:0];
-   wire [OPTION_OPERAND_WIDTH-1:0]    way_din[OPTION_DCACHE_WAYS-1:0];
-   wire [OPTION_OPERAND_WIDTH-1:0]    way_dout[OPTION_DCACHE_WAYS-1:0];
+   logic [WAY_WIDTH-3:0] 	      way_raddr[OPTION_DCACHE_WAYS-1:0];
+   logic [WAY_WIDTH-3:0] 	      way_waddr[OPTION_DCACHE_WAYS-1:0];
+   logic [OPTION_OPERAND_WIDTH-1:0]    way_din[OPTION_DCACHE_WAYS-1:0];
+   logic [OPTION_OPERAND_WIDTH-1:0]    way_dout[OPTION_DCACHE_WAYS-1:0];
    
-   wire [OPTION_OPERAND_WIDTH*8-1:0]    way_dout_all[OPTION_DCACHE_WAYS-1:0];
+   logic [OPTION_OPERAND_WIDTH*8-1:0]    way_dout_all[OPTION_DCACHE_WAYS-1:0];
    //useless in icache
-   wire [OPTION_DCACHE_WAYS-1:0]       way_we;
+   logic [OPTION_DCACHE_WAYS-1:0]       way_we;
 
    // Does any way hit?
-   wire 			      hit;
-   wire [OPTION_DCACHE_WAYS-1:0]      way_hit;
-   wire [OPTION_DCACHE_WAYS-1:0]  load_bus_we = tag_lru_out ? 2'b10: 2'b01 ;
+   logic 			      hit;
+   logic [OPTION_DCACHE_WAYS-1:0]      way_hit;
+   logic [OPTION_DCACHE_WAYS-1:0]  load_bus_we;
+   assign load_bus_we = tag_lru_out ? 2'b10: 2'b01 ;
    
    
    // This is the least recently used value before access the memory.
    // Those are one hot encoded.
-   wire [OPTION_DCACHE_WAYS-1:0]      lru;
+   logic [OPTION_DCACHE_WAYS-1:0]      lru;
 
    // Register that stores the LRU value from lru
     logic queue;
     assign way_we =( state==`LOAD_OVER )? load_bus_we : 2'b00;
 
    // Intermediate signals to ease debugging
-   wire [TAG_WIDTH-1:0]               check_way_tag [OPTION_DCACHE_WAYS-1:0];
-   wire                               check_way_match [OPTION_DCACHE_WAYS-1:0];
-   wire                               check_way_valid [OPTION_DCACHE_WAYS-1:0];
-   wire                               check_way_dirty [OPTION_DCACHE_WAYS-1:0];
+   logic [TAG_WIDTH-1:0]               check_way_tag [OPTION_DCACHE_WAYS-1:0];
+   logic                               check_way_match [OPTION_DCACHE_WAYS-1:0];
+   logic                               check_way_valid [OPTION_DCACHE_WAYS-1:0];
+   logic                               check_way_dirty [OPTION_DCACHE_WAYS-1:0];
    
-    wire [`TAG_WIDTH-1:0]     cache_addr_cpu_tag;
+    logic [`TAG_WIDTH-1:0]     cache_addr_cpu_tag;
 	logic  [`TAG_WIDTH-1:0]    cache_addr_mem_tag; //��tag�ĵ�ַ��������һ�ıȶ�
 	
-	wire [`INDEX_WIDTH-1:0]  cache_addr_idx;
-	wire [`OFFSET_WIDTH-1:0] cache_addr_cpu_off;
+	logic [`INDEX_WIDTH-1:0]  cache_addr_idx;
+	logic [`OFFSET_WIDTH-1:0] cache_addr_cpu_off;
 	logic  [`OFFSET_WIDTH-1:0] cache_addr_access_off;//���������ڴ�rom��ȡ����ʱ������
 	logic  [`OFFSET_WIDTH-1:0] cache_addr_mem_off;
-	wire [1:0]               cache_addr_dropoff;
+	logic [1:0]               cache_addr_dropoff;
 	
 	assign {
 		cache_addr_cpu_tag,  cache_addr_idx,
@@ -254,10 +255,10 @@ module my_icache
 	} = i_p_addr;// 这个是NPC
     assign tag_tag = i_p_addrAfterTrans[31:12];
     logic  [31:0] dbus_addr_pre;
-    wire [`TAG_WIDTH-1:0]    cache_addr_cpu_tag_pre;
-    wire [`INDEX_WIDTH-1:0]  cache_addr_idx_pre;
-    wire [`OFFSET_WIDTH-1:0] cache_addr_cpu_off_pre;
-    wire [1:0]               cache_addr_dropoff_pre;
+    logic [`TAG_WIDTH-1:0]    cache_addr_cpu_tag_pre;
+    logic [`INDEX_WIDTH-1:0]  cache_addr_idx_pre;
+    logic [`OFFSET_WIDTH-1:0] cache_addr_cpu_off_pre;
+    logic [1:0]               cache_addr_dropoff_pre;
     assign {
         cache_addr_cpu_tag_pre,  cache_addr_idx_pre,
         cache_addr_cpu_off_pre,  cache_addr_dropoff_pre
@@ -291,14 +292,16 @@ module my_icache
     endgenerate
 
   
-    wire [7:0] cs_a;
+    logic [7:0] cs_a;
     logic  [7:0] word_valid;
-    wire [7:0] cs_target;
-    wire missFillBuffer_wen = rvalid & rready;
-    wire cs_ok = (|(word_valid & cs_target)) ;
+    logic [7:0] cs_target;
+    logic missFillBuffer_wen;
+    assign missFillBuffer_wen = rvalid & rready;
+    logic cs_ok;
+    assign cs_ok = (|(word_valid & cs_target)) ;
     
     logic [OPTION_OPERAND_WIDTH*8-1:0] missFillBuffer;
-    wire [OPTION_OPERAND_WIDTH-1:0] load_from_ram_bus[7:0] ;
+    logic [OPTION_OPERAND_WIDTH-1:0] load_from_ram_bus[7:0] ;
 
     onehot_3s8 missFillOneHot(counter,cs_a);
     onehot_3s8 firstMiss(i_p_addrAfterTrans[4:2],cs_target);
@@ -339,7 +342,8 @@ module my_icache
 
    assign tag_lru_in = (state ==`LOAD_OVER) ? !tag_lru_out :   
                        (|way_hit)? way_hit[0] : 1'b0;
-   wire [31:0] wire_o_p_rddata = (i_p_addrAfterTrans[31:5]== araddr[31:5] &cs_ok )? load_from_ram_bus[i_p_addrAfterTrans[4:2]]:
+   logic [31:0] wire_o_p_rddata;
+   assign wire_o_p_rddata = (i_p_addrAfterTrans[31:5]== araddr[31:5] &cs_ok )? load_from_ram_bus[i_p_addrAfterTrans[4:2]]:
                                    way_hit[0]? way_dout[0]: way_dout[1];
 //    assign o_p_rddata = (i_p_addrAfterTrans[31:5]== araddr[31:5] &cs_ok )? load_from_ram_bus[i_p_addrAfterTrans[4:2]]:
 //                        { {32{way_hit[0]}}&way_dout[0] } | {{32{way_hit[1]}}&way_dout[1]} ;
