@@ -71,12 +71,12 @@ module ExecuteSdate(
         wire [31:0] C_Inter;
     wire D_OverFlow;
     ALU ALU(
-            .A(MF_Rs),
-            .B(MF_Rt),
+            .srca(MF_Rs),
+            .srcb(MF_Rt),
             .shamt(D_Shamt),
             .Imm16(D_Imm16),
             .InstrBus(D_InstrBus),
-            .C(C_Inter),
+            .aluresult(C_Inter),
             .PC(D_PC),
             .OverFlow(D_OverFlow)
         );
