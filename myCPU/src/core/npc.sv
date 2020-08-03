@@ -9,32 +9,32 @@ module NPC(
     input   [31:0] epc,
     output  [31:0]  npc
     );
-    logic    [25:0]  Imm26   =   instr[25:0];
-    logic    [15:0]  Imm16   =   instr[15:0];
-    logic	[5:0]	op	=	instr[31:26],
+    wire    [25:0]  Imm26   =   instr[25:0];
+    wire    [15:0]  Imm16   =   instr[15:0];
+    wire	[5:0]	op	=	instr[31:26],
 					func	=	instr[5:0];
-    logic    [31:0]  pc4 =   ipc+4;
+    wire    [31:0]  pc4 =   ipc+4;
     /////////////////////////////////////////////
-    logic    j=		(op==6'h2),
+    wire    j=		(op==6'h2),
 			jal=	(op==6'h3);
-    logic    j_type  =   j|jal;
-    logic    [31:0]  jpc   =   {ipc[31:28],Imm26,2'b00};
+    wire    j_type  =   j|jal;
+    wire    [31:0]  jpc   =   {ipc[31:28],Imm26,2'b00};
     /////////////////////////////////////////////
-	logic	jr=		(op==6'h0 && func==6'h8),
+	wire	jr=		(op==6'h0 && func==6'h8),
 			jalr=	(op==6'h0 && func==6'h9);
-    logic    jr_type =   jr|jalr;
-    logic    [31:0]  jrpc  =   rs;
+    wire    jr_type =   jr|jalr;
+    wire    [31:0]  jrpc  =   rs;
     /////////////////////////////////////////////
-    logic    beq=	(op==6'h4),
+    wire    beq=	(op==6'h4),
 			bne=	(op==6'h5),
 			blez=	(op==6'h6),
 			bgtz=	(op==6'h7),
 			bltz=	(instr[31:26]==6'h1 && instr[20:16]==6'h0),
 			bgez=	(instr[31:26]==6'h1 && instr[20:16]==6'h1);    
-    logic	bltzal=	(op==6'b000001 && instr[20:16]==5'b10000),
+    wire	bltzal=	(op==6'b000001 && instr[20:16]==5'b10000),
         	bgezal=	(op==6'b000001 && instr[20:16]==5'b10001);
-    logic    b_type =   (beq|bne|blez)|(bgtz|bltz|bgez)|(bltzal|bgezal);
-    logic    b_valid   =   beq             ?   rs==rt:
+    wire    b_type =   (beq|bne|blez)|(bgtz|bltz|bgez)|(bltzal|bgezal);
+    wire    b_valid   =   beq             ?   rs==rt:
                         bne             ?   rs!=rt:
                         blez            ?   rs<=rt:
                         bgtz            ?   rs>0:
@@ -42,7 +42,7 @@ module NPC(
                         bgez|bgezal     ?   rs>=0:
                                             0;
 
-    logic    [31:0]	bpc  =   ipc  +   {{14{Imm16[15]}},Imm16,2'b00};
+    wire    [31:0]	bpc  =   ipc  +   {{14{Imm16[15]}},Imm16,2'b00};
     /////////////////////////////////////////////
     assign  npc   =   exp_flush       ?   epc :
                         j_type          ?   jpc:
