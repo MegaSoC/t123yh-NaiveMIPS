@@ -21,10 +21,10 @@ module simple_bram
 
     input [DATA_WIDTH*8-1:0] din_all
     );
-  wire [DATA_WIDTH*2-1:0] ram_out[3:0];
-  wire [DATA_WIDTH*2-1:0] ram_in[3:0];
-  wire [31:0] cpu_we_out;
-  wire [31:0] final_wea ;//�?终的写使�?
+  logic [DATA_WIDTH*2-1:0] ram_out[3:0];
+  logic [DATA_WIDTH*2-1:0] ram_in[3:0];
+  logic [31:0] cpu_we_out;
+  logic [31:0] final_wea ;//�?终的写使�?
   //assign ram_in = din;
 
   assign dout_all ={ram_out[3],ram_out[2],ram_out[1],ram_out[0]};
@@ -32,19 +32,19 @@ module simple_bram
     ram_in[3],ram_in[2],ram_in[1],ram_in[0]
   } = (store)? {8{din[31:0]}} : din_all[DATA_WIDTH*8-1:0];
   
-  wire [ADDR_WIDTH-1:0] cur_addr;
+  logic [ADDR_WIDTH-1:0] cur_addr;
   assign cur_addr = (store| hit_write ) ? waddr : raddr;
 
   genvar s0;
   generate 
   for(s0=0;s0<4'd4 ;s0=s0+1) begin : way_banks
     blk_mem_gen_2 my_way (
-    .clka(clk),    // input wire clka
-    .ena(1'b1),      // input wire ena
-    .wea(final_wea[(s0+1)*8-1:s0*8]),      // input wire [ ] wea
-    .addra(cur_addr[9:3]),  // input wire [6 : 0] addra
-    .dina(ram_in[s0]),    // input wire [255 : 0] dina
-    .douta(ram_out[s0])  // output wire [255 : 0] douta
+    .clka(clk),    // input logic clka
+    .ena(1'b1),      // input logic ena
+    .wea(final_wea[(s0+1)*8-1:s0*8]),      // input logic [ ] wea
+    .addra(cur_addr[9:3]),  // input logic [6 : 0] addra
+    .dina(ram_in[s0]),    // input logic [255 : 0] dina
+    .douta(ram_out[s0])  // output logic [255 : 0] douta
     );
   end
   endgenerate
@@ -80,7 +80,7 @@ input  [255:0] datain;
 input  [  2:0] offset; //word offset
 output [ 31:0] dataout;
 
-wire [7:0] hot_wire ;
+logic [7:0] hot_wire ;
 assign hot_wire[0] = offset==3'b000;
 assign hot_wire[1] = offset==3'b001;
 assign hot_wire[2] = offset==3'b010;

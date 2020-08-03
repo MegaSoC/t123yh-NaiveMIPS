@@ -33,7 +33,7 @@ module my_tag_ram
     input [ADDR_WIDTH-1:0]  waddr,
     input [1:0] we,
     input [DATA_WIDTH-1:0]  din,
-    output wire [DATA_WIDTH-1:0] dout,
+    output logic [DATA_WIDTH-1:0] dout,
     input  rst  ,
     input refill ,
     
@@ -45,14 +45,14 @@ module my_tag_ram
    logic [2:0]     tag_bit[(1<<ADDR_WIDTH)-1:0];
     
    
-   wire [20:0] tag_way_in [1:0];
-   wire [20:0] tag_way_out [1:0];
+   logic [20:0] tag_way_in [1:0];
+   logic [20:0] tag_way_out [1:0];
    assign tag_way_in[0] = (!cache_reset| !we[0]) ? 21'b0 : din[20:0] ;
    assign tag_way_in[1] = (!cache_reset| !we[1]) ? 21'b0 : din[42:22] ;
   
     
-   wire [2:0] tag_bit_in;
-   wire [2:0] tag_bit_out;
+   logic [2:0] tag_bit_in;
+   logic [2:0] tag_bit_out;
  //  logic [4:0] tag_bit_out;   
    
     
@@ -62,7 +62,8 @@ module my_tag_ram
    logic  [ADDR_WIDTH-1:0] reg_initial_addr; 
    
    
-   wire [ADDR_WIDTH-1:0] tag_addr = !cache_reset? reg_initial_addr :
+   logic [ADDR_WIDTH-1:0] tag_addr;
+   assign tag_addr  = !cache_reset? reg_initial_addr :
                                      (refill | load_over )? waddr :
                                                   raddr ;
      logic [ADDR_WIDTH-1:0] tag_addr_pre ;
@@ -79,11 +80,11 @@ module my_tag_ram
    generate
       for(s0=0;s0<=1;s0=s0+1) begin :way_tags
          tag_ram_bram way_tag(
-            .clka(clk),    // input wire clka
-            .ena(1'b1),      // input wire ena
-            .wea( (refill& we[s0])  | !cache_reset),      // input wire [0 : 0] wea
-            .addra(tag_addr),  // input wire [6 : 0] addra
-            .dina(tag_way_in[s0]),    // input wire [19 : 0] dina
+            .clka(clk),    // input logic clka
+            .ena(1'b1),      // input logic ena
+            .wea( (refill& we[s0])  | !cache_reset),      // input logic [0 : 0] wea
+            .addra(tag_addr),  // input logic [6 : 0] addra
+            .dina(tag_way_in[s0]),    // input logic [19 : 0] dina
             .douta(tag_way_out[s0])  // output wire [19 : 0] douta
          );
       end
