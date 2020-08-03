@@ -61,14 +61,14 @@ module my_dcache
    output logic        o_p_stall,
    output logic        o_p_EstallClear,
    output [3 :0] arid         ,
-   output reg [31:0] araddr       ,
+   output logic [31:0] araddr       ,
    output [7 :0] arlen        ,
    output [2 :0] arsize       ,
    output [1 :0] arburst      ,
    output [1 :0] arlock        ,
    output [3 :0] arcache      ,
    output [2 :0] arprot       ,
-   output  reg    arvalid     ,
+   output  logic    arvalid     ,
    input   logic   arready     ,
    //r           
    input  [3 :0] rid          ,
@@ -79,27 +79,27 @@ module my_dcache
    output        rready       ,
    //aw          
    output [3 :0] awid         ,
-   output reg [31:0] awaddr   ,
+   output logic [31:0] awaddr   ,
    output [7 :0] awlen        ,
    output [2 :0] awsize       ,
    output [1 :0] awburst      ,
    output [1 :0] awlock       ,
    output [3 :0] awcache      ,
    output [2 :0] awprot       ,
-   output reg    awvalid      ,
+   output logic    awvalid      ,
    input         awready      ,
    //w          
    output [3 :0] wid          ,
    output [31:0] wdata        ,
    output [3 :0] wstrb        ,
-   output  reg   wlast        ,
-   output  reg   wvalid       ,
+   output  logic   wlast        ,
+   output  logic   wvalid       ,
    input         wready       ,
    //b           
    input  [3 :0] bid          ,
    input  [1 :0] bresp        ,
    input         bvalid       ,
-   output  reg   bready       ,
+   output  logic   bready       ,
    
    
    // SPR interface
@@ -164,12 +164,12 @@ module my_dcache
    // memory entries
    localparam TAG_LRU_MSB = TAGMEM_WIDTH - 1;
    localparam TAG_LRU_LSB = TAG_LRU_MSB - TAG_LRU_WIDTH + 1;
-  reg busyS ;
+  logic busyS ;
    // FSM state signals
-   reg [4:0] 			      state;
+   logic [4:0] 			      state;
    logic idle;
 
-   reg [WAY_WIDTH-1:OPTION_DCACHE_BLOCK_WIDTH] invalidate_adr;
+   logic [WAY_WIDTH-1:OPTION_DCACHE_BLOCK_WIDTH] invalidate_adr;
 
    logic				      invalidate;
 
@@ -216,10 +216,10 @@ module my_dcache
    logic [OPTION_DCACHE_WAYS-1:0]      lru;
 
    // Register that stores the LRU value from lru
-   reg [1:0]  reg_way_we;
-   reg [31:0] reg_wdata;
-   reg [31:0] reg_waddr;
-   reg [3:0]  reg_byte_en;
+   logic [1:0]  reg_way_we;
+   logic [31:0] reg_wdata;
+   logic [31:0] reg_waddr;
+   logic [3:0]  reg_byte_en;
    
    
    
@@ -234,7 +234,7 @@ module my_dcache
 
    logic m_canwrite_buffer;
    assign m_canwrite_buffer = i_p_addrAfterTrans[31:5] == missFillBuffer_addr[31:5] & state ==`LOAD; 
-   always @(posedge clk) begin
+   always_ff @(posedge clk) begin
          if(reset)begin
             reg_byte_en <=4'b0;
             reg_waddr<=32'b0;
@@ -288,8 +288,8 @@ module my_dcache
 
    logic do_store;
    assign do_store = |reg_way_we & |reg_byte_en ;
-   reg [31:0] missFillBuffer_addr;
-   reg reg_rewrite;
+   logic [31:0] missFillBuffer_addr;
+   logic reg_rewrite;
 
 
    assign tag_wtag = missFillBuffer_addr[31:12];
@@ -337,7 +337,7 @@ module my_dcache
       end
    endgenerate
    
-   reg  [OPTION_OPERAND_WIDTH*8-1:0] missFillBuffer;
+   logic  [OPTION_OPERAND_WIDTH*8-1:0] missFillBuffer;
    logic [31:0] load_from_ram_bus[7:0] ;
     
    genvar s0;
@@ -347,7 +347,7 @@ module my_dcache
         end
    endgenerate
    
-   reg  [2:0] counter;
+   logic  [2:0] counter;
    logic [7:0] cs_a;
    logic [7:0] word_valid;
    logic [7:0] cs_target;
@@ -357,13 +357,13 @@ module my_dcache
    assign missFillBuffer_wen = rvalid & rready;
    assign wdata = load_from_ram_bus[counter]; //填回cache时的地址
    
-   reg [31:0] reg_Missaddr   ;
+   logic [31:0] reg_Missaddr   ;
  
    
 
    logic [31:0] wire_o_p_rddata ;
-   reg reg_o_p;
-   reg [31:0] reg_o_p_rddata;
+   logic reg_o_p;
+   logic [31:0] reg_o_p_rddata;
 
 
    onehot_3s8 missFillOneHot(counter,cs_a);
@@ -374,7 +374,7 @@ module my_dcache
    
 
    
-   reg [31:0] protect_bit ;
+   logic [31:0] protect_bit ;
    logic [31:0] write_cs_m ;
    logic  [255:0] refill_bytes ;
    logic [31:0] refill_cs_a    ;
@@ -407,7 +407,7 @@ module my_dcache
    assign mFB_wen = write_cs_m  ;
 
    integer a0;
-   always @(posedge clk )begin
+   always_ff @(posedge clk )begin
       if(reset) begin
          missFillBuffer<=256'b0;
          reg_rewrite<=1'b0;
@@ -472,7 +472,7 @@ module my_dcache
    // invalidate acknowledgement. Meanwhile we continuously write the
    // tag memory which is no problem.
 
-   always @(posedge clk) begin
+   always_ff @(posedge clk) begin
       if (reset | !cache_reset ) begin
          wlast <=1'b0;
 	     state <= `IDLE;
@@ -653,8 +653,8 @@ endmodule
 
 module onehot_3s8(in,out);
 input [2:0] in ;
-output reg [7:0] out ;
-always @(*) begin
+output logic [7:0] out ;
+always_ff @(*) begin
     case(in)
                 3'b000:out=8'b00000001;
                 3'b001:out=8'b00000010;
