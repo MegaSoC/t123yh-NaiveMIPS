@@ -1,11 +1,10 @@
-`ifdef GLOBAL_H
+`ifdef global.vh
 `else
-`define GLOBAL_H
+`define global.vh
 
 `timescale 1ns / 1ps
 
-
-`define INSTRBUS_WIDTH  58
+`define INIT_PAGEMASKK 32'b0
 
 `define INIT_STATUS     32'H00400000
 `define INIT_PRID       32'H00004220
@@ -51,5 +50,15 @@
 `define CP0_PRId     5'D15
 `define CP0_ErrorEPC 5'D30
 
+`define INSTRBUS_WIDTH  68
+`define InstrWireSetWithOutNop   lb,lbu,lh,lhu,lw,sb,sh,sw,\
+						          addi,addiu,add,addu,sub,subu,\
+						          lui,ori,my_And,my_Or,my_Xor,my_Nor,Andi,Xori,\
+						          beq,bne,blez,bgtz,bltz,bgez,bltzal,bgezal,j,jal,jr,jalr,\
+						          mult,multu,div,divu,mfhi,mthi,mflo,mtlo,\
+						          sll,srl,sra,sllv,srlv,srav,\
+						          slt,slti,sltu,sltiu,mfc0,mtc0,eret,\
+						          my_break, syscall, tlbp, tlbr, tlbwi, tlbwr, cache,lwl,lwr,swl,swr,mul
+`define INSTR_SET `InstrWireSetWithOutNop,nop
  
 `endif

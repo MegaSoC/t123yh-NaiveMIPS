@@ -1,4 +1,4 @@
-`include "my_global.h"
+`include "my_global.vh"
 
 module ALU(
         input [31:0] A,

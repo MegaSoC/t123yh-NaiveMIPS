@@ -1,3 +1,0 @@
-# cpubone
-
-basic CPU

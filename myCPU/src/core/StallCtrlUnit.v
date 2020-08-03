@@ -1,4 +1,4 @@
-`include "my_global.h"
+`include "my_global.vh"
 
 module StallCtrlUnit(
         input [`INSTRBUS_WIDTH-1:0] InstrBus,

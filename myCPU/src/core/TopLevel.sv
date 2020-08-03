@@ -1,4 +1,4 @@
-`include "my_global.h"
+`include "my_global.vh"
 `include "def.svh"
 
 module mycpu_top(
