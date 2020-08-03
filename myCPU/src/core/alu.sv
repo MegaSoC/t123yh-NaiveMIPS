@@ -13,9 +13,11 @@ module ALU(
     logic `INSTR_SET;
     assign {`INSTR_SET} = InstrBus;
     logic [31:0] Imm32;
-    assign Imm32        = (ori|Andi|Xori) ? {{16'b0},Imm16}:
-         lui ? {Imm16,{16'b0}}:
-         {{16{Imm16[15]}},Imm16};
+    logic [2:0] extendop;
+    assign extendop[0] = (ori|Andi|Xori);
+    assign extendop[1] = lui;
+    assign extendop[2] = !(ori|Andi|Xori|lui);
+    assign Imm32 = ({{16'b0},Imm16}&{32{extendop[0]}}) | ({Imm16,{16'b0}}&{32{extendop[1]}}) | ({{16{Imm16[15]}},Imm16}&{32{extendop[2]}});
 
     logic normal;
     assign normal       = (addiu|addu|add|addi|lw|lwl|lwr|sw|swl|swr|lb|lbu|lh|lhu|sb|sh|subu|sub);
@@ -37,10 +39,13 @@ module ALU(
     assign   sub_o      = sub_tmp[32]!=sub_tmp[31];
     assign OverFlow     = ((addi | add) & add_o) |           (sub & sub_o);
     logic [31:0] normal_r;
-    assign  normal_r    = (subu) ? subu_r:
-         (sub) ? sub_r:
-         (addiu|addu) ? addu_r:
-         add_r;
+    logic [3:0] normal_op;
+    assign normal_op[0] = subu;
+    assign normal_op[1] = sub;
+    assign normal_op[2] = (addiu|addu);
+    assign normal_op[3] = !(subu|sub|addiu|addu);
+    assign normal_r = ({32{normal_op[0]}}&subu_r) | ({32{normal_op[1]}}&sub_r) | ({32{normal_op[2]}}&addu_r) | ({32{normal_op[3]}}&add_r); 
+
          
     logic i;
     assign  i           = (ori|my_Or|my_And|Andi|my_Xor|Xori| my_Nor|lui);
@@ -48,11 +53,14 @@ module ALU(
     assign  i_a         = srca;
     assign    i_b       = (ori|Andi|Xori) ? Imm32 : srcb;
     logic [31:0] i_r;
-    assign i_r          = (my_Xor|Xori) ? i_a^i_b:
-         (ori|my_Or) ? i_a|i_b:
-         (my_And|Andi) ? i_a&i_b:
-         (lui) ? Imm32:
-         ~(i_a|i_b);     
+
+    logic [4:0] i_op;
+    assign i_op[0] = (my_Xor|Xori);
+    assign i_op[1] = (my_Or|ori);
+    assign i_op[2] = (my_And|Andi);
+    assign i_op[3] = lui;
+    assign i_op[4] = !(my_Xor|Xori|my_Or|ori|my_And|Andi|lui);
+    assign i_r = ({32{i_op[0]}}&(i_a^i_b)) | ({32{i_op[1]}}&(i_a|i_b)) | ({32{i_op[2]}}&(i_a&i_b)) | ({32{i_op[3]}}&(Imm32)) | ({32{i_op[4]}}&(~(i_a|i_b)));
            
     logic s ;
     assign s            = (sll|sllv)|(srl|srlv)|(sra|srav);
@@ -70,12 +78,10 @@ module ALU(
     assign  cmp_a       = srca;
     assign     cmp_b    = (slti|sltiu) ? Imm32 : srcb;
     logic [31:0] cmp_r;
-    assign  cmp_r       = (slt|slti) ? ($signed(cmp_a)<$signed(cmp_b)):
-         ($unsigned(cmp_a)<$unsigned(cmp_b));
-         
-    assign aluresult    = normal ? normal_r:
-           i ? i_r:
-           s ? s_r:
-           cmp ? cmp_r:
-           (jal|jalr|bltzal|bgezal) ? (PC+8):
-           32'h17373507;endmodule
+    assign  cmp_r       = (slt|slti) ? ($signed(cmp_a)<$signed(cmp_b)):($unsigned(cmp_a)<$unsigned(cmp_b));
+
+    logic type_pc;
+    assign type_pc = (jal|jalr|bltzal|bgezal);
+
+    assign aluresult = ({32{normal}}&normal_r) | ({32{i}}&i_r) | ({32{s}}&s_r) | ({32{cmp}}&cmp_r) | ({32{type_pc}}&(PC+8));
+endmodule
