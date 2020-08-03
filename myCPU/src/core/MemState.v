@@ -5,7 +5,7 @@ module MemState(
         input   Clr,
         output   dm_stall,
         input   exp_flush,
-		input	[31:0]	E_PC,
+        input	[31:0]	E_PC,
         input   [31:0]  E_MemWriteData,
         input   [4:0]   E_RtID,
         input   [31:0]  E_Data,
@@ -22,8 +22,8 @@ module MemState(
         output wire  [3:0]   M_WriteRegEnableExted,
         output reg	[4:0]   M_RegId,
         output 		[31:0]  M_Data,
-		output reg	[31:0]	M_PC,
-		output reg  [3:0]  M_T,
+        output reg	[31:0]	M_PC,
+        output reg  [3:0]  M_T,
         input  wire [31:0]  data_sram_rdata,
         output wire [31:0]  data_sram_wdata,
         input wire data_sram_data_ok,
@@ -42,79 +42,79 @@ module MemState(
 
     ///////////////////转发//////////////////////////////
     wire    [31:0]  MF_Rt = (E_RtID!=0 && M_WriteRegEnable && M_RegId==E_RtID)	?   M_Data:
-																		              E_MemWriteData;
+            E_MemWriteData;
     wire    [1:0]   AddrOffset = E_Data[1:0];
     wire lb,lbu,lh,lhu,lw,lwl,lwr,swl,swr;
     assign {lb,lbu,lh,lhu,lw,lwl,lwr,swl,swr}=E_ExtType;
     assign data2cp0 = MF_Rt;
     assign data_sram_wdata = swl?(MF_Rt>>({(~AddrOffset),3'b0})):
-                                 (MF_Rt<<({AddrOffset,3'b0}));
+           (MF_Rt<<({AddrOffset,3'b0}));
     ////////////////////////////////////////////////////
     wire [31:0] MemReadData_Inter;
     assign MemReadData_Inter = (uncached)? data_sram_rdata: cache_rdata ;
-    
+
     DmStall dmstall(
-        .clk(Clk),
-        .data_sram_data_ok(data_sram_data_ok),
-        .InstrBus(E_InstrBus),
-        .dm_stall(dm_stall),
-        .read(read),
-        .write(write),
-        .uncached(uncached),
-        .o_p_stall(!hit)
-    );
+                .clk(Clk),
+                .data_sram_data_ok(data_sram_data_ok),
+                .InstrBus(E_InstrBus),
+                .dm_stall(dm_stall),
+                .read(read),
+                .write(write),
+                .uncached(uncached),
+                .o_p_stall(!hit)
+            );
     ////////////////////////////
     wire [31:0] Ans = E_MemFamily ? MemReadData_Inter:
-                      rd_cp0_value? cp0_reg_value:
-                                    E_Data;
+         rd_cp0_value? cp0_reg_value:
+         E_Data;
     wire [1:0]  Offset_Inter = E_Data[1:0];
 
 
     reg [1:0] M_Offset;
     reg [8:0] M_ExtType;
     reg [31:0] M_RawData;
-	reg		M_MemFamily;
+    reg		M_MemFamily;
 
-	initial begin
-		M_WriteRegEnable <= 0;
-		M_RegId <= 0;
-		M_Offset <= 0;
-		M_ExtType <= 0;
-		M_RawData <= 0;
-		M_MemFamily <= 0;
-		M_PC <= 0;
-	end
+    initial begin
+        M_WriteRegEnable <= 0;
+        M_RegId <= 0;
+        M_Offset <= 0;
+        M_ExtType <= 0;
+        M_RawData <= 0;
+        M_MemFamily <= 0;
+        M_PC <= 0;
+    end
     always @ (posedge Clk) begin
-		if(Clr | (exp_flush) /* | dm_stall */ ) begin
-			M_WriteRegEnable <= 0;
-			M_RegId <= 0;
-			M_Offset <= 0;
-			M_ExtType <= 0;
-			M_RawData <= 0;
-			M_MemFamily <= 0;
-			M_PC <= 0;
-			M_T<=0;
-		end
-		else if(!dm_stall ) begin //Estallclear 发生的唯�?情况�? w级为SW, E级为LW�? M级命�?
-			M_WriteRegEnable <= E_WriteRegEnable;
-			M_RegId <= E_RegId;
-			M_Offset <= Offset_Inter;
-			M_ExtType <= E_ExtType;
-			M_RawData <= Ans;
-			M_MemFamily <= E_MemFamily;
-			M_PC <= E_PC;
-			M_T<= E_T==0?0:E_T-1;
-		end
+        if(Clr | (exp_flush) /* | dm_stall */ ) begin
+            M_WriteRegEnable <= 0;
+            M_RegId <= 0;
+            M_Offset <= 0;
+            M_ExtType <= 0;
+            M_RawData <= 0;
+            M_MemFamily <= 0;
+            M_PC <= 0;
+            M_T<=0;
+        end
+        else if(!dm_stall ) begin //Estallclear 发生的唯�?情况�? w级为SW, E级为LW�? M级命�?
+            M_WriteRegEnable <= E_WriteRegEnable;
+            M_RegId <= E_RegId;
+            M_Offset <= Offset_Inter;
+            M_ExtType <= E_ExtType;
+            M_RawData <= Ans;
+            M_MemFamily <= E_MemFamily;
+            M_PC <= E_PC;
+            M_T<= E_T==0?0:E_T-1;
+        end
     end
 
-	wire [31:0] ExtMemData;
+    wire [31:0] ExtMemData;
     MemExtUnit MemExtUnit(
-        .RawMemData(M_RawData),
-        .Offset(M_Offset),
-        .ExtType(M_ExtType),
-        .ExtMemData(ExtMemData),
-        .M_WriteRegEnable(M_WriteRegEnable),
-        .M_WriteRegEnableExted(M_WriteRegEnableExted)
-        );
+                   .RawMemData(M_RawData),
+                   .Offset(M_Offset),
+                   .ExtType(M_ExtType),
+                   .ExtMemData(ExtMemData),
+                   .M_WriteRegEnable(M_WriteRegEnable),
+                   .M_WriteRegEnableExted(M_WriteRegEnableExted)
+               );
     assign M_Data = M_MemFamily ? ExtMemData:M_RawData;
 endmodule
