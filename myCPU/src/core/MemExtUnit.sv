@@ -13,11 +13,13 @@ module MemExtUnit(
     wire [31:0] OffsetedData = lwl ? ( RawMemData<<({Offset,3'b0})):
          ( RawMemData>>({Offset,3'b0}));
 
-    assign ExtMemData = lhu ? {16'b0,OffsetedData[15:0]}:
-           lh ? {{16{OffsetedData[15]}},OffsetedData[15:0]}:
-           lbu ? {24'b0,OffsetedData[7:0]}:
-           lb ? {{24{OffsetedData[7]}},OffsetedData[7:0]}:
-           OffsetedData;
+    logic normal;
+    assign normal = !(lb|lbu|lh|lhu);
+    assign ExtMemData = ({32{lhu}} & {16'b0,OffsetedData[15:0]})|
+           ({32{lh}} & {{16{OffsetedData[15]}},OffsetedData[15:0]})|
+           ({32{lbu}} & {24'b0,OffsetedData[7:0]})|
+           ({32{lb}} & {{24{OffsetedData[7]}},OffsetedData[7:0]})|
+           ({32{normal}} & OffsetedData);
     wire [3:0] WritePreExted = {4{M_WriteRegEnable}};
     assign M_WriteRegEnableExted = lwr ? WritePreExted>>Offset:
            lwl ? WritePreExted<<(~Offset):
