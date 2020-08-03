@@ -581,9 +581,9 @@ module my_dcache
          .dout_all(way_dout_all[i]),
          .dout			(way_dout[i]),
          // Inputs
-         .clk			(clk),
+         .i_clk			(clk),
          .raddr		(way_raddr[i][WAY_WIDTH-3:0]),
-         .re			(1'b1),
+         .i_re			(1'b1),
          .waddr		(way_waddr[i][WAY_WIDTH-3:0]),
          .we			(way_we[i]),
          .din			(way_din[i][31:0]),
