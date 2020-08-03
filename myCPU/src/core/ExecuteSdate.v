@@ -203,7 +203,7 @@ module ExecuteSdate(
             mul_inst_invalid <= D_inst_invalid;
         end
         else if (!dm_stall) begin
-            if(mul_in_xalu && !E_XALU_Busy && XALU.mul_ok)begin
+            if(mul_in_xalu && !E_XALU_Busy)begin
                 mul_in_xalu <= 1'b0;
                 E_PC <= mul_PC;
                 E_EPC <= mul_EPC;
