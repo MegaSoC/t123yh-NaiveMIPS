@@ -42,7 +42,7 @@ module my_tag_ram
 
     input load_over 
     );
-   reg [2:0]     tag_bit[(1<<ADDR_WIDTH)-1:0];
+   logic [2:0]     tag_bit[(1<<ADDR_WIDTH)-1:0];
     
    
    wire [20:0] tag_way_in [1:0];
@@ -53,24 +53,24 @@ module my_tag_ram
     
    wire [2:0] tag_bit_in;
    wire [2:0] tag_bit_out;
- //  reg [4:0] tag_bit_out;   
+ //  logic [4:0] tag_bit_out;   
    
     
     
    assign tag_bit_in =  {din[44:43],din[21]};
     
-   reg  [ADDR_WIDTH-1:0] reg_initial_addr; 
+   logic  [ADDR_WIDTH-1:0] reg_initial_addr; 
    
    
    wire [ADDR_WIDTH-1:0] tag_addr = !cache_reset? reg_initial_addr :
                                      (refill | load_over )? waddr :
                                                   raddr ;
-     reg [ADDR_WIDTH-1:0] tag_addr_pre ;
-     always @(posedge clk)begin
+     logic [ADDR_WIDTH-1:0] tag_addr_pre ;
+     always_ff @(posedge clk)begin
              tag_addr_pre <= tag_addr;
      end
      assign  tag_bit_out = tag_bit[ tag_addr_pre ] ; 
-//   always @(posedge clk)begin
+//   always_ff @(posedge clk)begin
 //      tag_bit_out <=tag_bit[tag_addr];
 //   end
 
@@ -92,7 +92,7 @@ module my_tag_ram
   
 
    integer i;
-   always @(posedge clk) begin
+   always_ff @(posedge clk) begin
       if(rst | !cache_reset )begin
          for(i=0;i<(1<<ADDR_WIDTH) ;i=i+1)
                tag_bit[i]<=3'b0;
@@ -109,8 +109,8 @@ module my_tag_ram
       end 
    end
    
-   // reg next_re ;
-   // always @(posedge clk )begin
+   // logic next_re ;
+   // always_ff @(posedge clk )begin
    //      if(rst) begin 
    //          next_re <=1'b0;
    //      end
@@ -130,7 +130,7 @@ module my_tag_ram
 
 
 
-   always @(posedge clk)begin
+   always_ff @(posedge clk)begin
       if(rst)begin
          reg_initial_addr <= 0;
       end
