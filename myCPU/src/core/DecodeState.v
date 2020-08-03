@@ -94,22 +94,22 @@ module DecodeState(
         .dm_stall(dm_stall)
     );
     
-    /////////////////////杞�鍙戝�??    
+    /////////////////////杞�鍙戝�???    
 	wire[31:0] MF_Rs = (Rs_Inter!=0 && Rs_Inter==E_RegId && E_T==0 && E_WriteRegEnable) ? E_Data:
                                                                                           RsData_Inter;
     wire[31:0] MF_Rt = (Rt_Inter!=0 && Rt_Inter==E_RegId && E_T==0 && E_WriteRegEnable) ? E_Data:
                                                                                           RtData_Inter;
     //////////////////////
     NPC NPC(
-        .MipsInstr(I_MipsInstr),
-        .RsData(MF_Rs),
-        .RtData(MF_Rt),
-        .PC(I_PC_Pass),
-        .NewPC(D_NewPC_Pass),
+        .instr(I_MipsInstr),
+        .rs(MF_Rs),
+        .rt(MF_Rt),
+        .ipc(I_PC_Pass),
+        .npc(D_NewPC_Pass),
 
         ///***
         .exp_flush( /* E_now_exp | */  exp_flush ),
-        .exception_new_pc(exception_new_pc)
+        .epc(exception_new_pc)
         ///***
     );
 
@@ -145,7 +145,7 @@ module DecodeState(
         .D_MultCalFamily(D_MultCalFamily),
         .exp_flush(exp_flush)
     );
-	//先禁止暂停，调试完别的再�??
+	//先禁止暂停，调试完别的再�???
 
     always @(posedge Clk ) begin
         if (Clr) begin
@@ -183,7 +183,7 @@ module DecodeState(
 			D_RsID 	<= Rs_Inter;
 			D_RtID 	<= Rt_Inter;
             D_RdID  <= Rd_Inter;
-			D_RsData <= MF_Rs; //这里之前不是转发�??
+			D_RsData <= MF_Rs; //这里之前不是转发�???
 			D_RtData <= MF_Rt;
 			D_Shamt	<= Shamt_Inter;
 			D_Imm16 <= Imm16_Inter;
