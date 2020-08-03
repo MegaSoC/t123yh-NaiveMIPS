@@ -43,8 +43,8 @@ module StallCtrlUnit(
     wire MultFamily;
     assign MultFamily = (mult|multu|div|divu|mfhi|mflo|mthi|mtlo|mul);
         wire Rt_stallByD = (D_WriteRegEnable && D_T>T_Rt && D_RegId==Rt);
-    wire stall_Rs = NeedRs && Rs!=5'b0 &&( (D_WriteRegEnable && D_T>T_Rs && D_RegId==Rs)|| (E_WriteRegEnable && E_T>T_Rs && E_RegId==Rs)),
-         stall_Rt = NeedRt && Rt!=5'b0 &&( Rt_stallByD|| (E_WriteRegEnable && E_T>T_Rt && E_RegId==Rt));
+    wire stall_Rs = NeedRs && Rs!=5'b0 &&( (D_WriteRegEnable && D_T>T_Rs && D_RegId==Rs)|| (Rs!=5'd0 && E_T>T_Rs && E_RegId==Rs)),
+         stall_Rt = NeedRt && Rt!=5'b0 &&( Rt_stallByD|| (Rt!=5'd0 && E_T>T_Rt && E_RegId==Rt));
 
     wire stall_XALU;
     assign stall_XALU = ((XALU_Busy&MultFamily)|(MultFamily&D_MultCalFamily));
