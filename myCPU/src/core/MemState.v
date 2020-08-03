@@ -80,7 +80,7 @@ module MemState(
         M_PC <= 0;
     end
     always @ (posedge Clk) begin
-        if(Clr | (exp_flush) /* | dm_stall */ ) begin
+        if(Clr | (exp_flush)  ) begin
             M_WriteRegEnable <= 0;
             M_RegId <= 0;
             M_Offset <= 0;

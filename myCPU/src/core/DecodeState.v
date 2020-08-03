@@ -100,7 +100,7 @@ module DecodeState(
             .ipc(I_PC_Pass),
             .npc(D_NewPC_Pass),
 
-                        .exp_flush( /* E_now_exp | */ exp_flush ),
+                        .exp_flush(  exp_flush ),
             .epc(exception_new_pc)
                     );
 

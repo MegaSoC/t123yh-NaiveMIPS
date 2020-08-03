@@ -289,8 +289,8 @@ module cp0(
          data_miss, inst_miss, data_dirt, data_valid, inst_valid;
     assign daddr_o = data_tlb_map ? daddr_tlb : daddr_direct;
     assign iaddr_o = inst_tlb_map ? iaddr_tlb : iaddr_direct;
-    assign data_uncached = data_mmu_uncached /*| !data_cached */ | icache_close | dcache_close;
-    assign inst_uncached = inst_mmu_uncached /*| !inst_cached */ | icache_close | dcache_close;
+    assign data_uncached = data_mmu_uncached  | icache_close | dcache_close;
+    assign inst_uncached = inst_mmu_uncached  | icache_close | dcache_close;
     assign data_exp_miss = data_tlb_map & data_miss;
     assign inst_exp_miss = inst_tlb_map & inst_miss;
     assign data_exp_dirty = (data_dirt & data_tlb_map);

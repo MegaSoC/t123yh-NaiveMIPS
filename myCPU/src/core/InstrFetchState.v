@@ -52,7 +52,7 @@ module InstrFetchState(
         I_Instr <= 0;
     end
     always @ (posedge Clk) begin
-        if (Clr | exp_flush /* | (!dm_stall & next_state!=`FETCH ) */ ) begin
+        if (Clr | exp_flush  ) begin
             I_PC <= 0;
             I_Instr <= 0;
             I_inst_miss <= 0;

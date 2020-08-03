@@ -13,7 +13,7 @@
 `define INIT_SRSMAP     32'H00000000
 `define INIT_INTCTRL    32'Hfc000000
  
- /*Exception encoding*/
+ 
  `define EX_INTERRUPT    6'D0
  `define EX_MOD          6'D1
  `define EX_TLBL         6'D2
@@ -28,7 +28,7 @@
  `define EX_FPE          6'D15
  `define EX_CACHEERR     6'D30
  
- /*Exception Entry Addr*/
+ 
  `define EX_ENTRY_RESET  32'Hbfc00000
  `define EX_ENTRY_BEV1   32'Hbfc00200
  `define EX_ENTRY_BEV0   32'H80000000
