@@ -1,3 +1,5 @@
+source [file join [file dirname [info script]] "import_files.tcl"]
+
 cd [get_property DIRECTORY [current_project]]
 
 generate_target simulation [get_ips *]

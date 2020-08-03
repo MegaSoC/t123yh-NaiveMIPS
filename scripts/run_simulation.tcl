@@ -1,4 +1,5 @@
- update_compile_order -fileset sources_1
+source [file join [file dirname [info script]] "import_files.tcl"]
+update_compile_order -fileset sources_1
 
 generate_target simulation [get_ips *]
 set simulations [get_fileset $env(SIMULATION)]
