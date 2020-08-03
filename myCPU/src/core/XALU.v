@@ -38,8 +38,6 @@ assign XALU_LO = LO;
 always @(posedge Clk) begin
     if (Clr) begin
         {HI, LO} <= 64'b0;
-        a_reg <= 32'd0;
-        b_reg <= 32'd0;
     end else if (mthi) begin
         HI <= XALU_A;
     end else if (mtlo) begin
@@ -66,6 +64,8 @@ always @(posedge Clk) begin
     if (Clr) begin
         ready   <= 1'b1;
         op_v    <= 3'b0;
+        a_reg <= 32'd0;
+        b_reg <= 32'd0;
     end 
     else if (XALU_Start) begin
         ready   <= 1'b0;
