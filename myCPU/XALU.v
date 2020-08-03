@@ -18,11 +18,7 @@ module XALU(
 
 	wire	`INSTR_SET;
 	assign	{`INSTR_SET}	=	InstrBus;
-	reg MulSel;
-	
-	assign {XALU_HI,XALU_LO} = MulSel ? {Mul_HI,Mul_LO}:
-										{Div_HI,Div_LO};
-	assign	XALU_Busy = MulSel ? Mul_Busy:Div_Busy; 	
+	reg MulSel;	
 	
 	initial begin
 		MulSel=0;
@@ -30,7 +26,7 @@ module XALU(
 	
 	
 	///***
-	wire XALU_Start = (!Intreq)&(mult|multu|div|divu);
+	wire XALU_Start = (!Intreq)&(mult|multu|div|divu|mul);
 	///***
 	
 	//////////////////////////////////////////////
@@ -48,7 +44,7 @@ module XALU(
 	
 	wire Div_Busy;
 	wire [31:0] Div_HI,Div_LO;
-	wire XALU_sign = (mult|div);
+	wire XALU_sign = (mult|div|mul);
 	wire [1:0] WriteEnable = {mthi,mtlo};
 	DivCore DivCore(
 		.Clk(Clk),
@@ -93,7 +89,7 @@ module XALU(
 	always@(posedge Clk) begin
 		
 		if(!Clr && XALU_Start) begin
-			if(mult) begin
+			if(mul|mult) begin
 				MulSel <= 1;	
 			end
 			if(multu) begin
@@ -109,5 +105,8 @@ module XALU(
 		
 	end
 	
+	assign {XALU_HI,XALU_LO} = MulSel ? {Mul_HI,Mul_LO}:
+										{Div_HI,Div_LO};
+	assign	XALU_Busy = MulSel ? Mul_Busy:Div_Busy; 
 	
 endmodule

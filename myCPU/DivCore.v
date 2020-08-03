@@ -35,7 +35,10 @@ module DivCore(
 		Busy_Buf <= 0;
 		
 	end
-	
+
+	wire [31:0] HI = Nega_Buf[1]	?	(-tmpA[63:32]):tmpA[63:32],
+				LO = (Nega_Buf[1]^Nega_Buf[0])	?	(-tmpA[31:0]):tmpA[31:0];
+				
 	wire [31:0] debug = tmpA[31:0];
 	always @ (posedge Clk) begin
 		if(start) begin
@@ -79,8 +82,7 @@ module DivCore(
 				(Busy_Buf==1'b1 && Busy==1'b0)	?	{HI,LO}:
 													C;
 	end
-	wire [31:0] HI = Nega_Buf[1]	?	(-tmpA[63:32]):tmpA[63:32],
-				LO = (Nega_Buf[1]^Nega_Buf[0])	?	(-tmpA[31:0]):tmpA[31:0];
+	
 	//assign C = tmpA;
 
 endmodule

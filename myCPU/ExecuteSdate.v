@@ -44,7 +44,7 @@ module ExecuteSdate(
     output reg          E_data_alignment_err,
     input              dm_stall,
 
-    output	E_XALU_Busy,
+    output	E_XALU_Busy_real,
     input               D_in_delayslot,
     output reg          E_in_delayslot,
 
@@ -64,12 +64,12 @@ module ExecuteSdate(
     output wire E_MemSaveType_Inter 
     ///***
     );
-
+    wire E_XALU_Busy;
     wire    [31:0]  MF_Rs = (D_RsID!=0 && D_RsID==E_RegId && E_T==0 && E_WriteRegEnable) ?   E_Data:
                             (D_RsID!=0 && M_WriteRegEnable && M_T==0 && M_RegId==D_RsID) ?   M_Data:
                                                                                              D_RsData;
     wire    [31:0]  MF_Rt = (D_RtID!=0 && D_RtID==E_RegId && E_T==0 && E_WriteRegEnable) ?	 E_Data:
-                            (D_RtID!=0 && M_WriteRegEnable && M_T==0 && M_RegId==D_RtID) ?   M_Data://M级结束（实际上是W级了），那么T必定�???
+                            (D_RtID!=0 && M_WriteRegEnable && M_T==0 && M_RegId==D_RtID) ?   M_Data://M级结束（实际上是W级了），那么T必定�????
                                                                                              D_RtData;
     ////////////////////////////////////////
     wire    [31:0]  C_Inter;
@@ -130,12 +130,15 @@ module ExecuteSdate(
        
    
     wire	[31:0]	Data_Inter = 	mfhi	?	XALU_HI:
-									mflo	?	XALU_LO:
+									(mflo|mul)	?	XALU_LO:
 												C_Inter;
     ///***
     assign E_calLSaddr = C_Inter;
 	///***
-
+    reg mul_in_xalu;
+    reg [31:0] mul_rd;
+    
+    assign E_XALU_Busy_real = E_XALU_Busy | mul_in_xalu;
 
 	initial begin
 		E_PC <= 0;
@@ -155,6 +158,7 @@ module ExecuteSdate(
     always @ (posedge Clk) begin
         if(Clr | exp_flush | E_now_exp  | E_EstallClear  ) begin  ///
 			E_PC <= 0; // fetch_alignment_err
+			mul_in_xalu <= 0;
             E_EPC <= Clr? 0 : D_EPC;
 			E_WriteMemData <= 0;
 			E_RtID <= 0;
@@ -174,9 +178,11 @@ module ExecuteSdate(
             E_inst_invalid <= 0;
 		end
         else if (mul) begin
-            
+            mul_in_xalu <= 1;
+            mul_rd <= D_RegId;
         end
 		else if (!dm_stall) begin
+		   
 			E_PC <= D_PC;
             E_EPC <= D_EPC;
 			E_WriteMemData <= MF_Rt;// MF_Rt; //TODO: bug
@@ -197,7 +203,6 @@ module ExecuteSdate(
             E_inst_miss <= D_inst_miss;
             E_inst_illegal <= D_inst_illegal;
             E_inst_invalid <= D_inst_invalid;
-
 		end
     end
 

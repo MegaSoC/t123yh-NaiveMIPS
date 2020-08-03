@@ -130,7 +130,7 @@ initial begin
     cp0_reg_Cause    <= 32'b0;
 	cp0_reg_EPC      <= 32'b0;
 end
-
+wire[31:0] prober_result;
 // read mfc0
 // have not random, no tlbwr
 always @(*) begin
@@ -195,6 +195,9 @@ always @(*) begin
     end
 end
 output reg dcache_close;
+reg[89:0] tlb0[0:1];
+reg[89:0] tlb1[0:1];
+wire[0:0] tlbEntryIndex;
 // write mtc0 tlb
 always @(posedge clk) begin
 	if (rst) begin
@@ -227,11 +230,6 @@ always @(posedge clk) begin
             end
             `CP0_EntryLo1: begin
                 cp0_reg_EntryLo1[25:0] <= data_i[25:0];
-            end
-            `CP0_PageMask: begin
-                ;
-                // CP0_PageMask is always 0, 4KB size page
-                // mips32
             end
             `CP0_Count: begin
 				cp0_reg_Count <= data_i;
@@ -333,6 +331,8 @@ wire[31:0] iaddr_direct;
 wire[31:0] daddr_direct;
 wire[31:0] daddr_tlb;
 wire[31:0] iaddr_tlb;
+wire data_tlb_map, inst_tlb_map, data_mmu_uncached, inst_mmu_uncached,
+     data_miss, inst_miss, data_dirt, data_valid, inst_valid;
 assign daddr_o = data_tlb_map ? daddr_tlb : daddr_direct;
 assign iaddr_o = inst_tlb_map ? iaddr_tlb : iaddr_direct;
 assign data_uncached = data_mmu_uncached /*| !data_cached  */ | icache_close | dcache_close;
@@ -363,9 +363,6 @@ mmu mmu(
     .user_mode(0),
     .cp0_kseg0_uncached(0)
 );
-
-reg[89:0] tlb0[0:1];
-reg[89:0] tlb1[0:1];
 
 tlb_map inst_map(
     .clk(clk),
@@ -457,7 +454,6 @@ tlb_map data_map(
     .matchWhich()
 );
 
-wire[31:0] prober_result;
 tlb_map prober(
     .clk(clk),
     .tlbEntry0(tlb1[0]),
@@ -503,7 +499,7 @@ tlb_map prober(
     .matchWhich(prober_result[0:0])
 );
 
-wire[0:0] tlbEntryIndex;
+
 assign tlbEntryIndex = cp0_reg_Index[0:0];
 
 

@@ -6,7 +6,6 @@
 
 //----------------------------------------------------------
 `define INIT_PAGEMASKK 32'b0
-`define INSTRBUS_WIDTH  58
 
 `define INIT_STATUS     32'H00400000
 `define INIT_PRID       32'H00004220

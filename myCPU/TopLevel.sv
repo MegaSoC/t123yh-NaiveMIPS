@@ -48,7 +48,7 @@ module mycpu_top(
     input  [1 :0] bresp        ,
     input         bvalid       ,
     output        bready       ,
-    //debugç›¸å…³æŽ¥å�£
+    //debugç›¸å�?�³æŽ¥å�£
     output [31:0] debug_wb_pc,
     output [3:0] debug_wb_rf_wen,
     output [4:0] debug_wb_rf_wnum,
@@ -56,8 +56,7 @@ module mycpu_top(
     output [31:0] I_PC_
 );
 
-    assign I_PC_=I_PC_Pass;
-
+    wire `INSTR_SET;
     //prepare longxin interface 
     wire dm_stall;
 	wire Clk = aclk;
@@ -84,6 +83,7 @@ module mycpu_top(
     wire[31:0] inst_sram_wdata;
     wire[31:0] inst_sram_addr;
     wire[31:0] inst_sram_rdata;
+    wire D_stall_Pass;
     assign inst_sram_wen = 4'b0;
     assign inst_sram_wdata = 32'b0;
     assign inst_sram_en = aresetn & (  !D_stall_Pass & !dm_stall  );
@@ -203,6 +203,7 @@ module mycpu_top(
     wire total_uncache;
     reg icache_close;
     wire dcache_close;
+    wire inst_sram_data_ok;
     reg[3:0] cache_timer;
     always @(posedge aclk) begin
         if (MyClr) begin
@@ -255,7 +256,7 @@ module mycpu_top(
         .inst_addr_ok(inst_sram_addr_ok),
         .inst_data_ok(inst_sram_data_ok), //todo
         
-        .data_req( data_uncached &(read|write) & !E_now_exp ), //è¯»å†™å†…å­˜è¯·æ±‚
+        .data_req( data_uncached &(read|write) & !E_now_exp ), //è¯»å†™å†�?�å­˜è¯·æ±�??
         .data_wr(|data_sram_wen) , //
         .data_size(data_size), // ?
         .data_wdata(data_sram_wdata),
@@ -316,7 +317,7 @@ module mycpu_top(
 
     
     wire exp_flush;
-	wire D_stall_Pass;
+
 	
     wire[31:0] exception_new_pc;
 	wire I_nextNotReady;
@@ -436,7 +437,7 @@ module mycpu_top(
     wire data_alignment_err;
     wire [31:0] E_DataLSaddr;    
     wire E_MemReadEnable_Inter;
-    wire E_EstallClear ; //ç”¨æ�¥ç»™Eçº§å�šclearä¿¡å�·ç”¨ï¼Œæ�¥è‡ªdcacheï¿????????
+    wire E_EstallClear ; //ç”¨æ�¥ç»™Eçº§å�šclearä¿¡å�·ç�?�¨ï¼Œæ�¥è‡ªdcacheï¿????????
 
     ///***
     wire E_MemSaveType_Inter ;
@@ -477,10 +478,10 @@ module mycpu_top(
 		.E_MemWriteEnable(E_MemWriteEnable),
         .E_MemFamily(E_MemFamily),
         .E_InstrBus(E_InstrBus),
-        .E_OverFlow(E_OverFlow), // æ€ªï¿½?ï¿½çš„
+        .E_OverFlow(E_OverFlow), // æ€ªï¿�??ï¿½çš�?
         .E_data_alignment_err(data_alignment_err),
         .dm_stall(dm_stall),
-        .E_XALU_Busy(E_XALU_Busy),
+        .E_XALU_Busy_real(E_XALU_Busy),
         .D_in_delayslot(D_in_delayslot),
         .E_in_delayslot(E_in_delayslot),
 
@@ -503,7 +504,7 @@ module mycpu_top(
     assign fetch_alignment_err = E_PC[1:0] != 2'b0;
     wire[31:0] cp0_reg_value;
     
-    wire `INSTR_SET;
+    
     assign {`INSTR_SET} = E_InstrBus;
     
     wire[31:0] M_PC_post, M_Data_post;
@@ -549,7 +550,7 @@ module mycpu_top(
         .M_T(M_T),
         .M_WriteRegEnableExted(M_WriteRegEnableExted)
     );
-    //exception æœ‰é—®é¢˜ï¼Œä¼šè®©å¼‚å¸¸è¿›å…¥å†™å›ž
+    //exception æœ‰é�?�®é¢˜ï¼Œä¼šè®©å¼�?�å¸¸è¿�?�å�?�¥å�?�™å›�?
     assign M_PC = exp_flush ? 32'h0 : M_PC_post;
     assign M_Data = exp_flush ? 32'h0 : M_Data_post;
     assign M_RegId = exp_flush ? 5'h0 : M_RegId_post;
@@ -636,7 +637,7 @@ module mycpu_top(
         // input
         .clk(Clk),
         .rst(Clr),
-        .rd_addr(E_RdID), //å�ªæœ‰mfc0
+        .rd_addr(E_RdID), //å�ªæœ�?�mfc0
         .we(mtc0), // TODO: more writenable
         .wr_addr(E_RegId), //TODO
         .data_i(data2cp0),
@@ -1078,6 +1079,6 @@ module mycpu_top(
     .M00_AXI_RREADY(ip_rready)              // input wire M00_AXI_RREADY
     );
 	
-	
+	assign I_PC_=I_PC_Pass;
 	
 endmodule

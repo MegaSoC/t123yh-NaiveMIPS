@@ -129,7 +129,7 @@ module my_icache
     assign wdata =32'b0;
 
     reg  [2:0] counter;
-    assign o_p_stall = ( i_p_read  &  ~hit ) | (state==`LOAD_OVER ) | ( rvalid & rready & rlast ) | queue  ;
+    
 
    // States
 
@@ -202,7 +202,7 @@ module my_icache
    // Whether to write to the tag memory in this cycle
    wire 				      tag_we;
 //    assign tag_we = ( !dm_stall & !o_p_stall ) | ( state==`LOAD_OVER );
-   assign tag_we = ( |way_hit ) ;
+
    // This is the tag we need to write to the tag memory during refill
    wire [TAG_WIDTH-1:0] 	      tag_wtag;
 
@@ -332,9 +332,6 @@ module my_icache
                 assign load_from_ram_bus[s0] = missFillBuffer[(s0+1)*OPTION_OPERAND_WIDTH-1:s0*OPTION_OPERAND_WIDTH];
             end
     endgenerate
-
-
-   assign hit = ((|way_hit )) | (i_p_addrAfterTrans[31:5] == araddr[31:5]  & cs_ok) | store ;
 
 
    assign tag_lru_in = (state ==`LOAD_OVER) ? !tag_lru_out :   
@@ -507,6 +504,7 @@ module my_icache
       .tag_bit_raddr    (i_p_tag_bit_raddr),
        .cache_reset    (cache_reset)
       );
-
-
+    assign tag_we = ( |way_hit ) ;
+    assign hit = ((|way_hit )) | (i_p_addrAfterTrans[31:5] == araddr[31:5]  & cs_ok) | store ;
+    assign o_p_stall = ( i_p_read  &  ~hit ) | (state==`LOAD_OVER ) | ( rvalid & rready & rlast ) | queue  ;
 endmodule

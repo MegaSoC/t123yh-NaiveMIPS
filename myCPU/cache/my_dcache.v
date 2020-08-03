@@ -231,7 +231,8 @@ module my_dcache
     
    ///***** store buffer
    
-
+   reg [31:0] missFillBuffer_addr;
+   reg reg_rewrite;
    wire m_canwrite_buffer = i_p_addrAfterTrans[31:5] == missFillBuffer_addr[31:5] & state ==`LOAD; 
    always @(posedge clk) begin
          if(reset)begin
@@ -286,8 +287,7 @@ module my_dcache
     
 
    wire do_store = |reg_way_we & |reg_byte_en ;
-   reg [31:0] missFillBuffer_addr;
-   reg reg_rewrite;
+   
 
 
    assign tag_wtag = missFillBuffer_addr[31:12];

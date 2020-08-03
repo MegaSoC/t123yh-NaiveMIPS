@@ -144,6 +144,14 @@ module DecodeState(
     );
 	//先禁止暂停，调试完别的再�??
 
+    always @(posedge Clk ) begin
+        if (Clr) begin
+            D_EPC <= 0;
+        end
+        else begin
+            D_EPC <= D_is_branch? I_PC - 4 : I_PC;
+        end
+    end
     always @ (posedge Clk)  begin
         if( Clr | exp_flush |
             (D_stall_Pass & !dm_stall) |
@@ -151,7 +159,6 @@ module DecodeState(
            begin //todo: ke neng cuo,xu yao jing jian
 			// if (exp_flush)
             D_PC <= 0; // soft_int epc
-            D_EPC <= Clr? 0 : D_EPC;
 			D_RsID <= 0;
 			D_RtID <= 0;
 			D_RsData <= 0;
@@ -170,7 +177,6 @@ module DecodeState(
 		end///***
 		else if (!dm_stall  &  !I_nextNotReady     ) begin
 			D_PC	<= I_PC;
-            D_EPC   <= D_is_branch? I_PC - 4 : I_PC;
 			D_RsID 	<= Rs_Inter;
 			D_RtID 	<= Rt_Inter;
             D_RdID  <= Rd_Inter;
