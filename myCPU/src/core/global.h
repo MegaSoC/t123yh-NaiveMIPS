@@ -4,7 +4,6 @@
 
 `timescale 1ns / 1ps
 
-//----------------------------------------------------------
 
 `define INSTRBUS_WIDTH  58
 
@@ -35,7 +34,6 @@
  `define EX_ENTRY_BEV1   32'Hbfc00200
  `define EX_ENTRY_BEV0   32'H80000000
  
-//                  number
 `define CP0_Index    5'D0
 `define CP0_Random   5'D1
 `define CP0_EntryLo0 5'D2
@@ -51,7 +49,6 @@
 `define CP0_Cause    5'D13
 `define CP0_EPC      5'D14
 `define CP0_PRId     5'D15
-// TagLo TagHi
 `define CP0_ErrorEPC 5'D30
 
  

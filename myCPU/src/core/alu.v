@@ -12,14 +12,12 @@ module ALU(
     );
     wire `INSTR_SET;
     assign {`INSTR_SET} = InstrBus;
-    ///////////////////Extention///////////////////////////////////
-    wire zeroExtend = ori|Andi|Xori;
+        wire zeroExtend = ori|Andi|Xori;
     wire [31:0] Imm32 = zeroExtend ? {{16'b0},Imm16}:
          lui ? {Imm16,{16'b0}}:
          {{16{Imm16[15]}},Imm16};
 
-    //////////////////Add\Sub Family///////////////////////////////////
-    wire AS_Family = ((addiu|addu)|
+        wire AS_Family = ((addiu|addu)|
                       (((add|addi)|(lw|lwl|lwr|sw|swl|swr|lb))|((lbu|lh|lhu)|(sb|sh))))|
          (subu|
           sub);
@@ -41,8 +39,7 @@ module ALU(
          (sub) ? signedSubAns:
          (addiu|addu) ? unsignAddAns:
          signedAddAns;
-    //////////////////BitCal Family/////////////////////////////////////
-    wire BC_Family = ((ori|my_Or)|
+        wire BC_Family = ((ori|my_Or)|
                       (my_And|Andi))|
          ((my_Xor|Xori)|
           (my_Nor|lui));
@@ -52,9 +49,7 @@ module ALU(
          (ori|my_Or) ? BC_A|BC_B:
          (my_And|Andi) ? BC_A&BC_B:
          (lui) ? Imm32:
-         ~(BC_A|BC_B);//my_Nor
-    //////////////////Shamt Family/////////////////////////////////////
-    wire sllType = sll|sllv,
+         ~(BC_A|BC_B);        wire sllType = sll|sllv,
          srlType = srl|srlv,
          sraType = sra|srav;
     wire ST_Family = sllType|srlType|sraType;
@@ -63,8 +58,7 @@ module ALU(
     wire [31:0] ST_Ans = sllType ? ST_B<<ST_A[4:0]:
          srlType ? ST_B>>ST_A[4:0]:
          $signed($signed(ST_B)>>>ST_A[4:0]);
-    /////////////////CMP Family////////////////////////////////////////
-    wire sltType = slt|slti,
+        wire sltType = slt|slti,
          sltuType = sltu|sltiu;
     wire CMP_Family = sltType|sltuType;
 
@@ -72,15 +66,12 @@ module ALU(
          CMP_B = (slti|sltiu) ? Imm32 : B;
     wire [31:0] CMP_Ans = sltType ? ($signed(CMP_A)<$signed(CMP_B)):
          ($unsigned(CMP_A)<$unsigned(CMP_B));
-    /////////////////JL Family/////////////////////////////////////////
-    wire JL_Family = jal|jalr|bltzal|bgezal;
+        wire JL_Family = jal|jalr|bltzal|bgezal;
     wire [31:0] JL_Ans = PC+8;
 
-    /////////////////OUT PUT///////////////////////////////////////////
-    assign C = AS_Family ? AS_Ans:
+        assign C = AS_Family ? AS_Ans:
            BC_Family ? BC_Ans:
            ST_Family ? ST_Ans:
            CMP_Family ? CMP_Ans:
            JL_Family ? JL_Ans:
-           32'h22222222;//DEBUG
-endmodule
+           32'h22222222;endmodule

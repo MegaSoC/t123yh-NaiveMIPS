@@ -14,18 +14,15 @@ module NPC(
     wire [5:0] op = instr[31:26],
          func = instr[5:0];
     wire [31:0] pc4 = ipc+4;
-    /////////////////////////////////////////////
-    wire j = (op==6'h2),
+        wire j = (op==6'h2),
          jal = (op==6'h3);
     wire j_type = j|jal;
     wire [31:0] jpc = {ipc[31:28],Imm26,2'b00};
-    /////////////////////////////////////////////
-    wire jr = (op==6'h0 && func==6'h8),
+        wire jr = (op==6'h0 && func==6'h8),
          jalr = (op==6'h0 && func==6'h9);
     wire jr_type = jr|jalr;
     wire [31:0] jrpc = rs;
-    /////////////////////////////////////////////
-    wire beq = (op==6'h4),
+        wire beq = (op==6'h4),
          bne = (op==6'h5),
          blez = (op==6'h6),
          bgtz = (op==6'h7),
@@ -43,8 +40,7 @@ module NPC(
          0;
 
     wire [31:0] bpc = ipc + {{14{Imm16[15]}},Imm16,2'b00};
-    /////////////////////////////////////////////
-    assign npc = exp_flush ? epc :
+        assign npc = exp_flush ? epc :
            j_type ? jpc:
            jr_type ? jrpc:
            (b_type & b_valid) ? bpc:

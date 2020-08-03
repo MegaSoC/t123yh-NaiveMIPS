@@ -16,8 +16,7 @@ module DecodeState(
         input [31:0] I_MipsInstr,
         input [3:0] W_T,
         input [31:0] W_PC,
-        output [31:0] D_NewPC_Pass,///pass through
-        output reg [31:0] D_PC,
+        output [31:0] D_NewPC_Pass,        output reg [31:0] D_PC,
         output reg [31:0] D_EPC,
         output reg [4:0] D_RsID,
         output reg [4:0] D_RtID,
@@ -50,14 +49,9 @@ module DecodeState(
         output reg D_inst_illegal,
         output reg D_inst_invalid,
 
-        ////***
-        // input I_inst_uncache ,
-        // input [31:0] I_cache_MipsInstr,
-        input I_nextNotReady,
-        // input E_now_exp,
-        input wire [31:0] exception_new_pc
-        ////****
-    );
+                                input I_nextNotReady,
+                input wire [31:0] exception_new_pc
+            );
 
     wire [25:0] Imm26_Inter;
     wire [15:0] Imm16_Inter;
@@ -94,24 +88,21 @@ module DecodeState(
             .dm_stall(dm_stall)
         );
 
-    /////////////////////杞�鍙戝�???
+    /////////////////////杞�鍙戝�???
     wire[31:0] MF_Rs = (Rs_Inter!=0 && Rs_Inter==E_RegId && E_T==0 && E_WriteRegEnable) ? E_Data:
         RsData_Inter;
     wire[31:0] MF_Rt = (Rt_Inter!=0 && Rt_Inter==E_RegId && E_T==0 && E_WriteRegEnable) ? E_Data:
         RtData_Inter;
-    //////////////////////
-    NPC NPC(
+        NPC NPC(
             .instr(I_MipsInstr),
             .rs(MF_Rs),
             .rt(MF_Rt),
             .ipc(I_PC_Pass),
             .npc(D_NewPC_Pass),
 
-            ///***
-            .exp_flush( /* E_now_exp | */ exp_flush ),
+                        .exp_flush( /* E_now_exp | */ exp_flush ),
             .epc(exception_new_pc)
-            ///***
-        );
+                    );
 
     wire `INSTR_SET;
     assign {`INSTR_SET} = InstrBus_Inter;
@@ -145,7 +136,7 @@ module DecodeState(
                       .D_MultCalFamily(D_MultCalFamily),
                       .exp_flush(exp_flush)
                   );
-    //先禁止暂停，调试完别的再�???
+    //先禁止暂停，调试完别的再�???
 
     always @(posedge Clk ) begin
         if (Clr) begin
@@ -159,10 +150,7 @@ module DecodeState(
         if( Clr | exp_flush |
                 (D_stall_Pass & !dm_stall) |
                 (!dm_stall & I_nextNotReady) )
-        begin //todo: ke neng cuo,xu yao jing jian
-            // if (exp_flush)
-            D_PC <= 0; // soft_int epc
-            D_RsID <= 0;
+        begin                         D_PC <= 0;             D_RsID <= 0;
             D_RtID <= 0;
             D_RsData <= 0;
             D_RtData <= 0;
@@ -177,19 +165,16 @@ module DecodeState(
             D_inst_miss <= 0;
             D_inst_illegal <= 0;
             D_inst_invalid <= 0;
-        end///***
-        else if (!dm_stall & !I_nextNotReady ) begin
+        end        else if (!dm_stall & !I_nextNotReady ) begin
             D_PC <= I_PC;
             D_RsID <= Rs_Inter;
             D_RtID <= Rt_Inter;
             D_RdID <= Rd_Inter;
-            D_RsData <= MF_Rs; //这里之前不是转发�???
+            D_RsData <= MF_Rs; //这里之前不是转发�???
             D_RtData <= MF_Rt;
             D_Shamt <= Shamt_Inter;
             D_Imm16 <= Imm16_Inter;
-            D_InstrBus <= InstrBus_Inter;//todo: mfr
-            //D_InstrBus <=
-            D_T <= T_Inter==4'b0 ? 4'b0 : T_Inter-1;
+            D_InstrBus <= InstrBus_Inter;                        D_T <= T_Inter==4'b0 ? 4'b0 : T_Inter-1;
             D_WriteRegEnable <= WriteRegEnable_Inter;
             D_RegId <= WriteRegId_Inter;
 

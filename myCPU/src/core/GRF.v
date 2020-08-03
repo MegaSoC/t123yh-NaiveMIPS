@@ -40,19 +40,14 @@ module GRF(
     assign OutData2[31:24] = (Addr2 == 0) ? 0:
            (WriteAddr == Addr2 && WriteEnable[3]) ? WriteData[31:24]:
            Reg[Addr2][31:24];
-    //加入了内部转发，省去了W级的转发问题
-    ////////////////////////////////////////////////////////
-    integer i;
-    ///////////////////////////////////////////////////////
-    always @ (posedge Clk) begin
+            integer i;
+        always @ (posedge Clk) begin
         if(Clr)begin
             for(i=0;i<32;i=i+1)
                 Reg[i]<=0;
         end
         else if(WriteEnable) begin
-            // if(!dm_stall)
-            // $display("Time:%d @%h: $%d <= %h, instr in ram is line(+2): %d",$time, PC, WriteAddr,WriteData,((PC&32'h000fffff)>>2)+3);
-            if(WriteEnable[0]!=0)
+                                    if(WriteEnable[0]!=0)
                 Reg[WriteAddr][7:0]<=WriteData[7:0];
             if(WriteEnable[1]!=0)
                 Reg[WriteAddr][15:8]<=WriteData[15:8];

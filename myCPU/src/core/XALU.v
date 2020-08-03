@@ -26,12 +26,9 @@ module XALU(
     end
 
 
-    ///***
-    wire XALU_Start = (!Intreq)&(mult|multu|div|divu|mul);
-    ///***
-
-    //////////////////////////////////////////////
-    /*module DivCore(
+        wire XALU_Start = (!Intreq)&(mult|multu|div|divu|mul);
+    
+        /*module DivCore(
     input Clk,
     input [31:0] A,
     input [31:0] B,
@@ -83,8 +80,7 @@ module XALU(
                  .WriteEnable(WriteEnable),
                  .Busy(Mul_Busy)
              );
-    /////////////////////////////////////////////
-
+    
 
 
     always@(posedge Clk) begin

@@ -11,31 +11,21 @@ module InstrFetchUnit(
         output reg [31:0] PC,
         output [31:0] im_pc ,
 
-        ///***
-        input en
-        ///***
-    );
-    /////////////////////////////////////
-    initial begin
+                input en
+            );
+        initial begin
         PC<= `TextAddr;
     end
-    /////////////////////////////////////
-
+    
     assign im_pc = PC;
-    // (is_exception) ? exception_new_pc :
-    // (stall) ? PC:
-    // NewPcAddr;
-
+            
     always @ (posedge Clk)begin
         if(Clr) begin
             PC<=`TextAddr;
         end
-        //
-        else if (stall) begin
+                else if (stall) begin
             PC<=PC;
-        end///***
-        else if (en) begin//正常的情况下
-            PC<=NewPcAddr;
+        end        else if (en) begin            PC<=NewPcAddr;
         end
     end
 

@@ -1,6 +1,5 @@
 module mmu(
-        //output
-        daddr_o,
+                daddr_o,
         iaddr_o,
         data_uncached,
         inst_uncached,
@@ -8,8 +7,7 @@ module mmu(
         inst_tlb_map,
         data_illegal,
         inst_illegal,
-        //input
-        clk,
+                clk,
         rst,
         daddr_i,
         iaddr_i,
@@ -41,42 +39,35 @@ module mmu(
     output wire inst_illegal;
 
     mmu_map data_mmu(
-                // output
-                .addr_o(daddr_o),
+                                .addr_o(daddr_o),
                 .invalid(data_illegal),
                 .using_tlb(data_tlb_map),
                 .uncached(data_uncached),
-                //input
-                .addr_i(daddr_i),
+                                .addr_i(daddr_i),
                 .cp0_kseg0_uncached(cp0_kseg0_uncached),
                 .en(data_en),
                 .um(user_mode)
             );
 
     mmu_map inst_mmu(
-                //output
-                .addr_o(iaddr_o),
+                                .addr_o(iaddr_o),
                 .invalid(inst_illegal),
                 .using_tlb(inst_tlb_map),
                 .uncached(inst_uncached),
-                //input
-                .addr_i(iaddr_i),
+                                .addr_i(iaddr_i),
                 .cp0_kseg0_uncached(cp0_kseg0_uncached),
                 .en(inst_en),
                 .um(user_mode)
             );
 
 
-endmodule // mmu
-
+endmodule 
 module mmu_map(
-        //output
-        addr_o,
+                addr_o,
         invalid,
         using_tlb,
         uncached,
-        //input
-        addr_i,
+                addr_i,
         en,
         um,
         cp0_kseg0_uncached
@@ -94,16 +85,13 @@ module mmu_map(
     output wire uncached;
 
 
-    assign invalid = (en & um & addr_i[31]); // 用户态访问非法地�?
+    assign invalid = (en & um & addr_i[31]); // 用户态访问非法地�?
 
     assign uncached = addr_i[31:29] == 3'b101 ? 1'b1 :
            addr_i[31:29] == 3'b100 ? cp0_kseg0_uncached :
            1'b0 ;
-    //assign uncached = 1'b;
-    assign addr_o = addr_i[31:29] == 3'b100 ? {3'b000 , addr_i[28:0]} : //kseg0
-           addr_i[31:29] == 3'b101 ? {3'b000 , addr_i[28:0]} : //kseg1
-           32'b0 ;
+        assign addr_o = addr_i[31:29] == 3'b100 ? {3'b000 , addr_i[28:0]} :            addr_i[31:29] == 3'b101 ? {3'b000 , addr_i[28:0]} :            32'b0 ;
     assign using_tlb = addr_i[31:29] == 3'b100 ? 1'b0 :
            addr_i[31:29] == 3'b101 ? 1'b0 :
            en ;
-endmodule // mmu_map
+endmodule 

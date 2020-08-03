@@ -19,8 +19,7 @@ module StallCtrlUnit(
     );
     wire `INSTR_SET;
     assign {`INSTR_SET} = InstrBus;
-    ///////////////////////////////////////////////////////////
-    wire NeedRs =(addi||addiu||add||addu||sub||subu||lw||lwl||lwr||sw||swl||swr||lb||lbu||lh||lhu||sb||sh||jr||jalr||mult||multu||div||divu||mthi||mtlo||
+        wire NeedRs =(addi||addiu||add||addu||sub||subu||lw||lwl||lwr||sw||swl||swr||lb||lbu||lh||lhu||sb||sh||jr||jalr||mult||multu||div||divu||mthi||mtlo||
                   sllv||srlv||srav||my_And||my_Or||my_Xor||my_Nor||ori||Andi||Xori||slt||sltu||slti||sltiu||
                   beq||bne||blez||bgtz||bltz||bgez||bltzal||bgezal||mul);
     wire NeedRt =(add||addu||sub||subu||sw||swl||swr||sb||sh||mult||multu||div||divu||sll||srl||sra||sllv||srlv||srav||
@@ -43,8 +42,7 @@ module StallCtrlUnit(
     assign T = Tnew;
     wire MultFamily;
     assign MultFamily = (mult|multu|div|divu|mfhi|mflo|mthi|mtlo|mul);
-    /////////////////////////////////////////////////////////////
-    wire Rt_stallByD = (D_WriteRegEnable && D_T>T_Rt && D_RegId==Rt);
+        wire Rt_stallByD = (D_WriteRegEnable && D_T>T_Rt && D_RegId==Rt);
     wire stall_Rs = NeedRs && Rs!=5'b0 &&( (D_WriteRegEnable && D_T>T_Rs && D_RegId==Rs)|| (E_WriteRegEnable && E_T>T_Rs && E_RegId==Rs)),
          stall_Rt = NeedRt && Rt!=5'b0 &&( Rt_stallByD|| (E_WriteRegEnable && E_T>T_Rt && E_RegId==Rt));
 

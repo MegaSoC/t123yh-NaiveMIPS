@@ -18,8 +18,7 @@ module DecodeUnit(
     assign Shamt = MipsInstr[10:6];
     assign Imm16 = MipsInstr[15:0];
     assign Imm26 = MipsInstr[25:0];
-    ////////////////////////////
-    wire [5:0] OpCode = MipsInstr[31:26],
+        wire [5:0] OpCode = MipsInstr[31:26],
          Funct = MipsInstr[5:0];
     wire lb= (OpCode==6'h20),
          lbu= (OpCode==6'h24),

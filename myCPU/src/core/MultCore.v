@@ -11,8 +11,7 @@ module MultCore(
         input [1:0] WriteEnable,
         output Busy
     );
-    //Unsigned Mult Only
-    wire [31:0] PosiA = (A[31]&sign)?-A:A,
+        wire [31:0] PosiA = (A[31]&sign)?-A:A,
          PosiB = (B[31]&sign)?-B:B;
     wire [63:0] A_Ext = {32'b0,PosiA},
          B_Ext = {32'b0,PosiB};

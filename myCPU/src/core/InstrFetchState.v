@@ -24,14 +24,12 @@ module InstrFetchState(
         output reg I_inst_miss,
         output reg I_inst_illegal,
         output reg I_inst_invalid,
-        ///***
-        input icache_stall,
+                input icache_stall,
         input uncache_inst,
         input wire [31:0] I_icache_rdata,
         output wire I_nextNotReady,
         input wire [31:0] inst_sram_addr
-        ///***
-    );
+            );
     wire [31:0] PC_Inter;
     assign I_PC_Pass = PC_Inter;
 
@@ -41,16 +39,14 @@ module InstrFetchState(
                        .Clk(Clk),
                        .Clr(Clr),
                        .is_exception(exp_flush),
-                       .stall(D_stall_Pass |dm_stall ), //todo: stall 与en信号冲突
-                       .exception_new_pc(exception_new_pc),
+                       .stall(D_stall_Pass |dm_stall ),                        .exception_new_pc(exception_new_pc),
                        .NewPcAddr(D_NewPC_Pass),
                        .PC(PC_Inter),
                        .im_pc(im_pc),
                        .en( next_state==`FETCH )
                    );
 
-    //////////////////////////////////////////////////////////////////////////////
-
+    
     initial begin
         I_PC <= 0;
         I_Instr <= 0;
@@ -63,11 +59,7 @@ module InstrFetchState(
             I_inst_illegal <= 0;
             I_inst_invalid <= 0;
         end
-        // else if (!D_stall_Pass & !dm_stall & (inst_sram_data_ok | !icache_stall) ) begin
-        // I_PC <= PC_Inter;
-        // I_Instr <= Instr_Inter;
-        // end
-        else if (next_state==`FETCH) begin
+                                        else if (next_state==`FETCH) begin
             I_PC <= PC_Inter;
             I_Instr <=(uncache_inst)? Instr_axi_Inter: I_icache_rdata;
             I_inst_miss <= inst_exp_miss;
@@ -110,5 +102,4 @@ module InstrFetchState(
     end
     end
     */
-    ///////////////////////////////////////////////////////////////////////////////
-endmodule
+    endmodule

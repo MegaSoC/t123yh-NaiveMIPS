@@ -56,23 +56,19 @@ module ExecuteSdate(
         output reg E_inst_illegal,
         output reg E_inst_invalid,
 
-        ///***
-        input wire E_now_exp,
+                input wire E_now_exp,
         output wire [31:0] E_calLSaddr,
         output wire E_MemReadEnable_Inter,
         input wire E_EstallClear,
         output wire E_MemSaveType_Inter
-        ///***
-    );
+            );
     wire E_XALU_Busy;
     wire [31:0] MF_Rs = (D_RsID!=0 && D_RsID==E_RegId && E_T==0 && E_WriteRegEnable) ? E_Data:
          (D_RsID!=0 && M_WriteRegEnable && M_T==0 && M_RegId==D_RsID) ? M_Data:
          D_RsData;
     wire [31:0] MF_Rt = (D_RtID!=0 && D_RtID==E_RegId && E_T==0 && E_WriteRegEnable) ? E_Data:
-         (D_RtID!=0 && M_WriteRegEnable && M_T==0 && M_RegId==D_RtID) ? M_Data://M级结束（实际上是W级了），那么T必定�????
-         D_RtData;
-    ////////////////////////////////////////
-    wire [31:0] C_Inter;
+         (D_RtID!=0 && M_WriteRegEnable && M_T==0 && M_RegId==D_RtID) ? M_Data:         D_RtData;
+        wire [31:0] C_Inter;
     wire D_OverFlow;
     ALU ALU(
             .A(MF_Rs),
@@ -122,8 +118,7 @@ module ExecuteSdate(
                     .E_MemSaveType_Inter(E_MemSaveType_Inter)
                 );
 
-    //////////////////////////////////////////////////////////////////////////////////////////
-    wire [3:0] E_T_Inter = (D_T > 0)?D_T-1:0;
+        wire [3:0] E_T_Inter = (D_T > 0)?D_T-1:0;
 
     wire `INSTR_SET;
     assign {`INSTR_SET} = D_InstrBus;
@@ -132,10 +127,8 @@ module ExecuteSdate(
     wire [31:0] Data_Inter = mfhi ? XALU_HI:
          (mflo|mul) ? XALU_LO:
          C_Inter;
-    ///***
-    assign E_calLSaddr = C_Inter;
-    ///***
-    reg mul_in_xalu;
+        assign E_calLSaddr = C_Inter;
+        reg mul_in_xalu;
 
     reg [31:0] mul_PC,mul_EPC,mul_WriteMemData;
     reg [4:0] mul_RtID,mul_RdID;
@@ -166,11 +159,8 @@ module ExecuteSdate(
         E_MemFamily <= 0;
         E_InstrBus <= 1;
     end
-    //32+4+1+5+5+4+1+32+1=85
-    always @ (posedge Clk) begin
-        if(Clr | exp_flush | E_now_exp | E_EstallClear ) begin ///
-            E_PC <= 0; // fetch_alignment_err
-            mul_in_xalu <= 0;
+        always @ (posedge Clk) begin
+        if(Clr | exp_flush | E_now_exp | E_EstallClear ) begin             E_PC <= 0;             mul_in_xalu <= 0;
             E_EPC <= Clr? 0 : D_EPC;
             E_WriteMemData <= 0;
             E_RtID <= 0;
@@ -194,8 +184,7 @@ module ExecuteSdate(
 
             mul_PC <= D_PC;
             mul_EPC <= D_EPC;
-            mul_WriteMemData <= MF_Rt;// MF_Rt; //TODO: bug
-            mul_RtID <= D_RtID;
+            mul_WriteMemData <= MF_Rt;            mul_RtID <= D_RtID;
             mul_RdID <= D_RdID;
             mul_T <= D_T ==4'b0 ? 4'b0 : D_T-1;
             mul_WriteRegEnable <= D_WriteRegEnable;
@@ -218,8 +207,7 @@ module ExecuteSdate(
                 mul_in_xalu <= 1'b0;
                 E_PC <= mul_PC;
                 E_EPC <= mul_EPC;
-                E_WriteMemData <= MF_Rt;// MF_Rt; //TODO: bug
-                E_RtID <= mul_RtID;
+                E_WriteMemData <= MF_Rt;                E_RtID <= mul_RtID;
                 E_RdID <= mul_RdID;
                 E_T <= mul_T;
                 E_WriteRegEnable <= mul_WriteRegEnable;
@@ -239,8 +227,7 @@ module ExecuteSdate(
             else begin
                 E_PC <= D_PC;
                 E_EPC <= D_EPC;
-                E_WriteMemData <= MF_Rt;// MF_Rt; //TODO: bug
-                E_RtID <= D_RtID;
+                E_WriteMemData <= MF_Rt;                E_RtID <= D_RtID;
                 E_RdID <= D_RdID;
                 E_T <= D_T ==4'b0 ? 4'b0 : D_T-1;
                 E_WriteRegEnable <= D_WriteRegEnable;

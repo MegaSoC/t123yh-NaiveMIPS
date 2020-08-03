@@ -1,5 +1,5 @@
 `include "my_global.h"
-//注意，这�?个模块里面实际上把WriteBack级给包括进来�?//在后续扩展中，很可能会在这个模块中加入内部流水级,也就是说，很可能这个模块是二级流�?
+//注意，这�?个模块里面实际上把WriteBack级给包括进来�?//在后续扩展中，很可能会在这个模块中加入内部流水级,也就是说，很可能这个模块是二级流�?
 module MemState(
         input Clk,
         input Clr,
@@ -35,13 +35,10 @@ module MemState(
         input [31:0] cache_rdata,
         output[31:0] data2cp0,
 
-        ///***
-        input wire EstallClear
-        ///***
-    );
+                input wire EstallClear
+            );
 
-    ///////////////////转发//////////////////////////////
-    wire [31:0] MF_Rt = (E_RtID!=0 && M_WriteRegEnable && M_RegId==E_RtID) ? M_Data:
+        wire [31:0] MF_Rt = (E_RtID!=0 && M_WriteRegEnable && M_RegId==E_RtID) ? M_Data:
          E_MemWriteData;
     wire [1:0] AddrOffset = E_Data[1:0];
     wire lb,lbu,lh,lhu,lw,lwl,lwr,swl,swr;
@@ -49,8 +46,7 @@ module MemState(
     assign data2cp0 = MF_Rt;
     assign data_sram_wdata = swl?(MF_Rt>>({(~AddrOffset),3'b0})):
            (MF_Rt<<({AddrOffset,3'b0}));
-    ////////////////////////////////////////////////////
-    wire [31:0] MemReadData_Inter;
+        wire [31:0] MemReadData_Inter;
     assign MemReadData_Inter = (uncached)? data_sram_rdata: cache_rdata ;
 
     DmStall dmstall(
@@ -63,8 +59,7 @@ module MemState(
                 .uncached(uncached),
                 .o_p_stall(!hit)
             );
-    ////////////////////////////
-    wire [31:0] Ans = E_MemFamily ? MemReadData_Inter:
+        wire [31:0] Ans = E_MemFamily ? MemReadData_Inter:
          rd_cp0_value? cp0_reg_value:
          E_Data;
     wire [1:0] Offset_Inter = E_Data[1:0];
@@ -95,7 +90,7 @@ module MemState(
             M_PC <= 0;
             M_T<=0;
         end
-        else if(!dm_stall ) begin //Estallclear 发生的唯�?情况�? w级为SW, E级为LW�? M级命�?
+        else if(!dm_stall ) begin //Estallclear 发生的唯�?情况�? w级为SW, E级为LW�? M级命�?
             M_WriteRegEnable <= E_WriteRegEnable;
             M_RegId <= E_RegId;
             M_Offset <= Offset_Inter;
