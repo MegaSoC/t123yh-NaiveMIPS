@@ -17,8 +17,8 @@ module XALU(
     );
 
 
-    wire    `INSTR_SET;
-    assign    {`INSTR_SET}    =    InstrBus;
+    wire `INSTR_SET;
+    assign {`INSTR_SET} = InstrBus;
     reg MulSel;
 
     initial begin
@@ -32,15 +32,15 @@ module XALU(
 
     //////////////////////////////////////////////
     /*module DivCore(
-       input    Clk,
-       input [31:0] A,
-       input [31:0] B,
-    input    start,
-       output    reg [63:0] C,
-    input    sign,
-    input    [1:0] WriteEnable,
-    output    Busy
-       );*/
+    input Clk,
+    input [31:0] A,
+    input [31:0] B,
+    input start,
+    output reg [63:0] C,
+    input sign,
+    input [1:0] WriteEnable,
+    output Busy
+    );*/
 
 
     wire Div_Busy;
@@ -60,16 +60,16 @@ module XALU(
 
 
     /*module MultCore(
-    input    Clk, 
-    input    [31:0]    A, 
-    input    [31:0]    B, 
-    output    [31:0]    HI,
-    output    [31:0]    LO,
-    input    start, 
-    input    sign,
-    input    [1:0] WriteEnable,
-    output    Busy
-       );*/
+    input Clk, 
+    input [31:0] A, 
+    input [31:0] B, 
+    output [31:0] HI,
+    output [31:0] LO,
+    input start, 
+    input sign,
+    input [1:0] WriteEnable,
+    output Busy
+    );*/
     wire [31:0] Mul_HI,Mul_LO;
     wire Mul_Busy;
     MultCore MultCore(
@@ -117,6 +117,6 @@ module XALU(
 
     assign {XALU_HI,XALU_LO} = MulSel ? {Mul_HI,Mul_LO}:
            {Div_HI,Div_LO};
-    assign    XALU_Busy = MulSel ? Mul_Busy:Div_Busy;
+    assign XALU_Busy = MulSel ? Mul_Busy:Div_Busy;
 
 endmodule

@@ -4,10 +4,10 @@
 // Company:
 // Engineer:
 //
-// Create Date:   17:59:46 07/05/2019
-// Design Name:   TopLevel
-// Module Name:   D:/LongSonCPU/SimpleCPU/src/CPU_TB.v
-// Project Name:  SimpleCPU
+// Create Date: 17:59:46 07/05/2019
+// Design Name: TopLevel
+// Module Name: D:/LongSonCPU/SimpleCPU/src/CPU_TB.v
+// Project Name: SimpleCPU
 // Target Device:
 // Tool versions:
 // Description:

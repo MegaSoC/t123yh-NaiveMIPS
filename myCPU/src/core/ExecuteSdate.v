@@ -1,56 +1,56 @@
 `include "my_global.h"
 
 module ExecuteSdate(
-        input   Clk,
-        input   Clr,
-        input   exp_flush,
-        input   data_sram_data_ok,
-        input    [31:0]    D_PC,
-        input   [31:0]  D_EPC,
-        input   [4:0]   D_RsID,
-        input   [4:0]   D_RtID,
-        input   [4:0]   D_RdID,
-        input   [31:0]  D_RsData,
-        input     [31:0]  D_RtData,
-        input   [4:0]   D_Shamt,
-        input   [15:0]  D_Imm16,
-        input    [`INSTRBUS_WIDTH-1:0]  D_InstrBus,
-        input     [3:0]   D_T,
-        input            D_WriteRegEnable,
-        input    [4:0]   D_RegId,
+        input Clk,
+        input Clr,
+        input exp_flush,
+        input data_sram_data_ok,
+        input [31:0] D_PC,
+        input [31:0] D_EPC,
+        input [4:0] D_RsID,
+        input [4:0] D_RtID,
+        input [4:0] D_RdID,
+        input [31:0] D_RsData,
+        input [31:0] D_RtData,
+        input [4:0] D_Shamt,
+        input [15:0] D_Imm16,
+        input [`INSTRBUS_WIDTH-1:0] D_InstrBus,
+        input [3:0] D_T,
+        input D_WriteRegEnable,
+        input [4:0] D_RegId,
 
-        input   [3:0]   M_T,
-        input           M_WriteRegEnable,
-        input   [4:0]   M_RegId,
-        input   [31:0]  M_Data,
+        input [3:0] M_T,
+        input M_WriteRegEnable,
+        input [4:0] M_RegId,
+        input [31:0] M_Data,
 
-        output reg [31:0]    E_PC,
-        output reg [31:0]   E_EPC,
-        output reg [31:0]   E_WriteMemData,
-        output reg [4:0]    E_RtID,
-        output reg [4:0]    E_RdID,
+        output reg [31:0] E_PC,
+        output reg [31:0] E_EPC,
+        output reg [31:0] E_WriteMemData,
+        output reg [4:0] E_RtID,
+        output reg [4:0] E_RdID,
 
-        output reg    [3:0]   E_T,
-        output reg            E_WriteRegEnable,
-        output reg    [4:0]    E_RegId,
-        output reg    [31:0]  E_Data,
+        output reg [3:0] E_T,
+        output reg E_WriteRegEnable,
+        output reg [4:0] E_RegId,
+        output reg [31:0] E_Data,
 
-        output reg    [8:0]   E_ExtType,
-        output reg    [3:0]   E_MemWriteEnable,
-        output reg    E_MemFamily,
+        output reg [8:0] E_ExtType,
+        output reg [3:0] E_MemWriteEnable,
+        output reg E_MemFamily,
 
-        output reg  [`INSTRBUS_WIDTH-1:0]  E_InstrBus,
-        output reg          E_OverFlow,
-        output reg          E_data_alignment_err,
-        input              dm_stall,
+        output reg [`INSTRBUS_WIDTH-1:0] E_InstrBus,
+        output reg E_OverFlow,
+        output reg E_data_alignment_err,
+        input dm_stall,
 
-        output    E_XALU_Busy_real,
-        input               D_in_delayslot,
-        output reg          E_in_delayslot,
+        output E_XALU_Busy_real,
+        input D_in_delayslot,
+        output reg E_in_delayslot,
 
-        input   D_inst_miss,
-        input   D_inst_illegal,
-        input   D_inst_invalid,
+        input D_inst_miss,
+        input D_inst_illegal,
+        input D_inst_invalid,
 
         output reg E_inst_miss,
         output reg E_inst_illegal,
@@ -60,19 +60,19 @@ module ExecuteSdate(
         input wire E_now_exp,
         output wire [31:0] E_calLSaddr,
         output wire E_MemReadEnable_Inter,
-        input  wire  E_EstallClear,
+        input wire E_EstallClear,
         output wire E_MemSaveType_Inter
         ///***
     );
     wire E_XALU_Busy;
-    wire    [31:0]  MF_Rs = (D_RsID!=0 && D_RsID==E_RegId && E_T==0 && E_WriteRegEnable) ?   E_Data:
-            (D_RsID!=0 && M_WriteRegEnable && M_T==0 && M_RegId==D_RsID) ?   M_Data:
-            D_RsData;
-    wire    [31:0]  MF_Rt = (D_RtID!=0 && D_RtID==E_RegId && E_T==0 && E_WriteRegEnable) ?     E_Data:
-            (D_RtID!=0 && M_WriteRegEnable && M_T==0 && M_RegId==D_RtID) ?   M_Data://M级结束（实际上是W级了），那么T必定�????
-            D_RtData;
+    wire [31:0] MF_Rs = (D_RsID!=0 && D_RsID==E_RegId && E_T==0 && E_WriteRegEnable) ? E_Data:
+         (D_RsID!=0 && M_WriteRegEnable && M_T==0 && M_RegId==D_RsID) ? M_Data:
+         D_RsData;
+    wire [31:0] MF_Rt = (D_RtID!=0 && D_RtID==E_RegId && E_T==0 && E_WriteRegEnable) ? E_Data:
+         (D_RtID!=0 && M_WriteRegEnable && M_T==0 && M_RegId==D_RtID) ? M_Data://M级结束（实际上是W级了），那么T必定�????
+         D_RtData;
     ////////////////////////////////////////
-    wire    [31:0]  C_Inter;
+    wire [31:0] C_Inter;
     wire D_OverFlow;
     ALU ALU(
             .A(MF_Rs),
@@ -87,7 +87,7 @@ module ExecuteSdate(
 
     wire [31:0] XALU_HI,
          XALU_LO;
-    wire        XALU_Busy_Inter;
+    wire XALU_Busy_Inter;
 
     XALU XALU(
              .Clk(Clk),
@@ -103,9 +103,9 @@ module ExecuteSdate(
 
     assign E_XALU_Busy = XALU_Busy_Inter;
 
-    wire    [8:0]   ExtType_Inter;
-    wire    [3:0]   MemWriteEnable_Inter;
-    wire    MemFamily_Inter;
+    wire [8:0] ExtType_Inter;
+    wire [3:0] MemWriteEnable_Inter;
+    wire MemFamily_Inter;
 
     wire[1:0] Offset;
     assign Offset = C_Inter[1:0];
@@ -123,15 +123,15 @@ module ExecuteSdate(
                 );
 
     //////////////////////////////////////////////////////////////////////////////////////////
-    wire    [3:0] E_T_Inter = (D_T > 0)?D_T-1:0;
+    wire [3:0] E_T_Inter = (D_T > 0)?D_T-1:0;
 
-    wire    `INSTR_SET;
-    assign    {`INSTR_SET} = D_InstrBus;
+    wire `INSTR_SET;
+    assign {`INSTR_SET} = D_InstrBus;
 
 
-    wire    [31:0]    Data_Inter =     mfhi    ?    XALU_HI:
-            (mflo|mul)    ?    XALU_LO:
-            C_Inter;
+    wire [31:0] Data_Inter = mfhi ? XALU_HI:
+         (mflo|mul) ? XALU_LO:
+         C_Inter;
     ///***
     assign E_calLSaddr = C_Inter;
     ///***
@@ -168,7 +168,7 @@ module ExecuteSdate(
     end
     //32+4+1+5+5+4+1+32+1=85
     always @ (posedge Clk) begin
-        if(Clr | exp_flush | E_now_exp  | E_EstallClear  ) begin  ///
+        if(Clr | exp_flush | E_now_exp | E_EstallClear ) begin ///
             E_PC <= 0; // fetch_alignment_err
             mul_in_xalu <= 0;
             E_EPC <= Clr? 0 : D_EPC;

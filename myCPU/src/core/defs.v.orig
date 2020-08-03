@@ -1,9 +1,0 @@
-//EXCEPTION TYPE
-`define EXCEPTION_TYPE_INT      5'd0
-`define EXCEPTION_TYPE_SYSCALL  5'd8
-`define EXCEPTION_TYPE_BP       5'd9 
-`define EXCEPTION_TYPE_RI       5'd10
-`define EXCEPTION_TYPE_OV       5'd12
-`define EXCEPTION_TYPE_ADEL     5'd4
-`define EXCEPTION_TYPE_ADES     5'd5
-`define EXCEPTION_RESERVE     5'd31

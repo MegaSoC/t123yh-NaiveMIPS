@@ -90,7 +90,7 @@ module mmu_map(
 
     output wire[31:0] addr_o;
     output wire invalid;
-    output wire  using_tlb;
+    output wire using_tlb;
     output wire uncached;
 
 

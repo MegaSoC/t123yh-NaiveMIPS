@@ -199,12 +199,12 @@ module exception(
             epc <= E_EPC;
             wr_exp <= 1'b1;
         end
-        //    else if (Tr) begin //Trap exception
-        //        exp_code <= `EX_TRAP;
-        //    end
-        //    else if (CacheErr) begin
-        //        exp_code <= `EX_CACHEERR;
-        //    end
+        // else if (Tr) begin //Trap exception
+        // exp_code <= `EX_TRAP;
+        // end
+        // else if (CacheErr) begin
+        // exp_code <= `EX_CACHEERR;
+        // end
         else if (eret) begin
             wr_exp <= 1'b0;
             clear_exl <= 1'b1;

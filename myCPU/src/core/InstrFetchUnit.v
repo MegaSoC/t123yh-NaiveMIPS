@@ -8,7 +8,7 @@ module InstrFetchUnit(
         input stall,
         input [31:0] exception_new_pc,
         input [31:0]NewPcAddr,
-        output reg    [31:0]    PC,
+        output reg [31:0] PC,
         output [31:0] im_pc ,
 
         ///***
@@ -23,8 +23,8 @@ module InstrFetchUnit(
 
     assign im_pc = PC;
     // (is_exception) ? exception_new_pc :
-    //                (stall) ? PC:
-    //                                 NewPcAddr;
+    // (stall) ? PC:
+    // NewPcAddr;
 
     always @ (posedge Clk)begin
         if(Clr) begin

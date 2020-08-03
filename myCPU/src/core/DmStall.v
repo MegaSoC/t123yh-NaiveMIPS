@@ -10,8 +10,8 @@ module DmStall(
         input wire o_p_stall,
         input wire uncached
     );
-    wire    `INSTR_SET;
-    assign    {`INSTR_SET}    =    InstrBus;
+    wire `INSTR_SET;
+    assign {`INSTR_SET} = InstrBus;
 
     wire lw_type = (lb|lbu|lh|lhu|lw) ;
     wire sw_type= (sb|sh|sw);
@@ -23,14 +23,14 @@ module DmStall(
 
     assign dm_stall = doesnt_ok ;
     /*
-     always @(posedge clk)
-     begin
+    always @(posedge clk)
+    begin
     if (data_sram_data_ok) begin
     stall <= 0;
     end
-         else if(lw_type | sw_type)  begin
+    else if(lw_type | sw_type) begin
     stall <= 1;
     end
-     end
+    end
     */
 endmodule
