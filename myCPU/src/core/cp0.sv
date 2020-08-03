@@ -117,19 +117,7 @@ module cp0(
         end
         else begin
             case (rd_addr)
-                `CP0_Index: begin
-                    data_o[31] <= cp0_reg_Index[31];
-                    data_o[30:1] <= 30'b0;
-                    data_o[0:0] <= cp0_reg_Index[0:0];
-                end
-                `CP0_EntryLo0: begin
-                    data_o[31:26] <= 6'b0;
-                    data_o[25:0] <= cp0_reg_EntryLo0[25:0];
-                end
-                `CP0_EntryLo1: begin
-                    data_o[31:26] <= 6'b0;
-                    data_o[25:0] <= cp0_reg_EntryLo1[25:0];
-                end
+                
                 `CP0_PageMask: begin
                     data_o <= `INIT_PAGEMASKK;                 end
                 `CP0_BadVAddr: begin
@@ -137,11 +125,6 @@ module cp0(
                 end
                 `CP0_Count: begin
                     data_o <= cp0_reg_Count >> 1;
-                end
-                `CP0_EntryHi: begin
-                    data_o[31:13] <= cp0_reg_EntryHi[31:13];
-                    data_o[12: 8] <= 5'b0;
-                    data_o[ 7: 0] <= cp0_reg_EntryHi[ 7: 0];
                 end
                 `CP0_Compare: begin
                     data_o <= cp0_reg_Compare;
@@ -191,21 +174,9 @@ module cp0(
             end
             if (we) begin
                 case(wr_addr)
-                    `CP0_Index: begin
-                        cp0_reg_Index[0:0] <= data_i[0:0];
-                    end
-                    `CP0_EntryLo0: begin
-                        cp0_reg_EntryLo0[25:0] <= data_i[25:0];
-                    end
-                    `CP0_EntryLo1: begin
-                        cp0_reg_EntryLo1[25:0] <= data_i[25:0];
-                    end
+                   
                     `CP0_Count: begin
                         cp0_reg_Count <= data_i;
-                    end
-                    `CP0_EntryHi: begin
-                        cp0_reg_EntryHi[31:13] <= data_i[31:13];
-                        cp0_reg_EntryHi[7:0] <= data_i[7:0];
                     end
                     `CP0_Compare: begin
                         cp0_reg_Compare <= data_i;
@@ -237,20 +208,6 @@ module cp0(
                 cp0_reg_Status[1] <= 1'b1;             end
             if (clear_exl) begin
                 cp0_reg_Status[1] <= 1'b0;
-            end
-            if (tlbr) begin
-                                cp0_reg_EntryHi[31:13] <= tlb1[tlbEntryIndex][89:71];
-                cp0_reg_EntryHi[7:0] <= tlb1[tlbEntryIndex][70:63];
-                cp0_reg_EntryLo0[25:6] <= tlb1[tlbEntryIndex][49:30];
-                cp0_reg_EntryLo0[5:1] <= tlb1[tlbEntryIndex][29:25];
-                cp0_reg_EntryLo0[0] <= tlb1[tlbEntryIndex][50];
-                cp0_reg_EntryLo1[25:6] <= tlb1[tlbEntryIndex][24:5];
-                cp0_reg_EntryLo1[5:1] <= tlb1[tlbEntryIndex][4:0];
-                cp0_reg_EntryLo1[0] <= tlb1[tlbEntryIndex][50];
-            end
-            if (tlbp) begin
-                cp0_reg_Index[31] <= prober_result[31];
-                cp0_reg_Index[0:0] <= prober_result[0:0];
             end
             end
         end
@@ -358,12 +315,6 @@ module cp0(
             for(i=0; i<2; i=i+1) begin
                 tlb0[i] <= 90'b0;
                 tlb1[i] <= 90'b0;
-            end
-        end else begin
-            if (tlbwi) begin
-                tlb0[tlbEntryIndex] <= cur_tlb;
-                tlb1[tlbEntryIndex] <= cur_tlb;
-                $display("index: %h, Hi: %h", tlbEntryIndex, cp0_reg_EntryHi);
             end
         end
     end
