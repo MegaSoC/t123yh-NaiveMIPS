@@ -15,18 +15,18 @@ module MultCore(
     wire [31:0] PosiA = (A[31]&sign)?-A:A,
          PosiB = (B[31]&sign)?-B:B;
     wire    [63:0]    A_Ext = {32'b0,PosiA},
-            B_Ext = {32'b0,PosiB};
+         B_Ext = {32'b0,PosiB};
     wire    [63:0]    Wire_0[31:0];
     reg        [63:0]    Buf_0[15:0],
-               Buf_1[7:0],
-               Buf_2[3:0],
-               Buf_3[1:0];
+         Buf_1[7:0],
+         Buf_2[3:0],
+         Buf_3[1:0];
 
     reg    [63:0]    C;
     reg [4:0]    T;
     wire [1:0] Nega;
     assign    Nega[1] = (A[31]&sign),
-              Nega[0]    = (B[31]&sign);
+           Nega[0]    = (B[31]&sign);
 
 
     reg [1:0] Nega_Buf;

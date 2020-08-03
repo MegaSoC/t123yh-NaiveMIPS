@@ -18,7 +18,7 @@ module DivCore(
     reg Busy_Buf;
     wire [1:0] Nega;
     assign    Nega[1] = (A[31]&sign),
-              Nega[0]    = (B[31]&sign);
+           Nega[0]    = (B[31]&sign);
     reg [1:0] Nega_Buf;
     wire Complete = ~T[0];
 

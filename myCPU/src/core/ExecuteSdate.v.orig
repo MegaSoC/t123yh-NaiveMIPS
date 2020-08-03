@@ -130,8 +130,8 @@ module ExecuteSdate(
 
 
     wire    [31:0]    Data_Inter =     mfhi    ?    XALU_HI:
-            (mflo|mul)    ?    XALU_LO:
-            C_Inter;
+         (mflo|mul)    ?    XALU_LO:
+         C_Inter;
     ///***
     assign E_calLSaddr = C_Inter;
     ///***
