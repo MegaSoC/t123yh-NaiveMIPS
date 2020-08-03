@@ -53,8 +53,8 @@ module new_simple_bram
 
 
   
-  reg [2:0] addr_pre ;
-  always @(posedge clk) begin
+  logic [2:0] addr_pre ;
+  always_ff @(posedge clk) begin
       addr_pre <= raddr[2:0];
   end
 

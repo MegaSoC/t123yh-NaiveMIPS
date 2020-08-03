@@ -40,7 +40,7 @@ module new2_my_tag_ram
     input [ADDR_WIDTH-1:0] tag_bit_raddr,
     input cache_reset 
     );
-   reg tag_bit[(1<<ADDR_WIDTH)-1:0];
+   logic tag_bit[(1<<ADDR_WIDTH)-1:0];
     
    
    wire [20:0] tag_way_in [1:0];
@@ -51,20 +51,20 @@ module new2_my_tag_ram
     
    wire  tag_bit_in;
    wire  tag_bit_out;
- //  reg [4:0] tag_bit_out;   
+ //  logic [4:0] tag_bit_out;   
    
     
     
    assign tag_bit_in =  {din[44]};
     
-   reg  [ADDR_WIDTH-1:0] reg_initial_addr; 
+   logic  [ADDR_WIDTH-1:0] reg_initial_addr; 
    wire [ADDR_WIDTH-1:0] cur_addr;
-   reg [ADDR_WIDTH-1:0] cur_addr_pre;
+   logic [ADDR_WIDTH-1:0] cur_addr_pre;
    
    assign cur_addr = !cache_reset? reg_initial_addr: 
                     (refill| select ) ? waddr : raddr ;
 
-   always @(posedge clk)begin
+   always_ff @(posedge clk)begin
        if(rst)begin
            reg_initial_addr <= 0;
        end
@@ -91,7 +91,7 @@ module new2_my_tag_ram
     
     
    integer i;
-   always @(posedge clk) begin
+   always_ff @(posedge clk) begin
       if(rst)begin
          for(i=0;i<(1<<ADDR_WIDTH) ;i=i+1)
                tag_bit[i]<=0;
