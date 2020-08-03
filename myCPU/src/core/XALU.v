@@ -11,6 +11,7 @@ module XALU(
     output [31:0] XALU_LO,
 
     output XALU_Busy,
+    output reg mul_ok,
 	input Intreq
 
     );
@@ -87,9 +88,15 @@ module XALU(
 	
 	
 	always@(posedge Clk) begin
+	   if(Clr)begin
+	       mul_ok <= 1'b1;
+	   end
 		
-		if(!Clr && XALU_Start) begin
+		else if(!Clr && XALU_Start) begin
 			if(mul|mult) begin
+			     if(mul)begin
+			         mul_ok <= 1'b0;
+			     end
 				MulSel <= 1;	
 			end
 			if(multu) begin
@@ -101,6 +108,9 @@ module XALU(
 			if(divu) begin
 				MulSel <= 0;
 			end
+		end
+		else if(!XALU_Busy) begin
+		  mul_ok <= 1'b1;
 		end
 		
 	end

@@ -69,7 +69,7 @@ module ExecuteSdate(
                             (D_RsID!=0 && M_WriteRegEnable && M_T==0 && M_RegId==D_RsID) ?   M_Data:
                                                                                              D_RsData;
     wire    [31:0]  MF_Rt = (D_RtID!=0 && D_RtID==E_RegId && E_T==0 && E_WriteRegEnable) ?	 E_Data:
-                            (D_RtID!=0 && M_WriteRegEnable && M_T==0 && M_RegId==D_RtID) ?   M_Data://M级结束（实际上是W级了），那么T必定�????
+                            (D_RtID!=0 && M_WriteRegEnable && M_T==0 && M_RegId==D_RtID) ?   M_Data://M级结束（实际上是W级了），那么T必定�????
                                                                                              D_RtData;
     ////////////////////////////////////////
     wire    [31:0]  C_Inter;
@@ -135,8 +135,20 @@ module ExecuteSdate(
     ///***
     assign E_calLSaddr = C_Inter;
 	///***
-    reg mul_in_xalu;
-    reg [31:0] mul_rd;
+	reg mul_in_xalu;
+    
+            reg [31:0] mul_PC,mul_EPC,mul_WriteMemData;
+            reg [4:0] mul_RtID,mul_RdID;
+            reg [3:0] mul_T;
+            reg mul_WriteRegEnable;
+            reg [4:0] mul_RegId;
+            reg [31:0] mul_Data;
+            reg [8:0] mul_ExtType;
+            reg [3:0] mul_MemWriteEnable;
+            reg mul_MemFamily,mul_OverFlow,mul_data_alignment_err,mul_in_delayslot,mul_inst_miss,mul_inst_illegal,mul_inst_invalid;
+            reg [`INSTRBUS_WIDTH-1:0] mul_InstrBus;
+            
+			
     
     assign E_XALU_Busy_real = E_XALU_Busy | mul_in_xalu;
 
@@ -177,12 +189,54 @@ module ExecuteSdate(
             E_inst_illegal <= 0;
             E_inst_invalid <= 0;
 		end
-        else if (mul) begin
+        else if (mul && !mul_in_xalu) begin
             mul_in_xalu <= 1;
-            mul_rd <= D_RegId;
+            
+            mul_PC <= D_PC;
+            mul_EPC <= D_EPC;
+			mul_WriteMemData <= MF_Rt;// MF_Rt; //TODO: bug
+			mul_RtID <= D_RtID;
+            mul_RdID <= D_RdID;
+			mul_T <= D_T ==4'b0 ? 4'b0 : D_T-1;
+			mul_WriteRegEnable <= D_WriteRegEnable;
+			mul_RegId <= D_RegId;
+			mul_Data <= Data_Inter;
+			mul_ExtType <= ExtType_Inter;
+			mul_MemWriteEnable <= MemWriteEnable_Inter;
+			mul_MemFamily <= MemFamily_Inter;
+            mul_InstrBus <= D_InstrBus;
+            mul_OverFlow <= D_OverFlow;
+            mul_data_alignment_err <= D_store_alignment_err | D_load_alignment_err;
+            mul_in_delayslot <= D_in_delayslot;
+
+            mul_inst_miss <= D_inst_miss;
+            mul_inst_illegal <= D_inst_illegal;
+            mul_inst_invalid <= D_inst_invalid;
         end
 		else if (!dm_stall) begin
-		   
+		   if(mul_in_xalu && !E_XALU_Busy && XALU.mul_ok)begin
+		   mul_in_xalu <= 1'b0;
+		      E_PC <= mul_PC;
+            E_EPC <= mul_EPC;
+			E_WriteMemData <= MF_Rt;// MF_Rt; //TODO: bug
+			E_RtID <= mul_RtID;
+            E_RdID <= mul_RdID;
+			E_T <= mul_T;
+			E_WriteRegEnable <= mul_WriteRegEnable;
+			E_RegId <= mul_RegId;
+			E_Data <= XALU_LO;
+			E_ExtType <= mul_ExtType;
+			E_MemWriteEnable <= mul_MemWriteEnable;
+			E_MemFamily <= mul_MemFamily;
+            E_InstrBus <= mul_InstrBus;
+            E_OverFlow <= mul_OverFlow;
+            E_data_alignment_err <= mul_data_alignment_err;
+            E_in_delayslot <= mul_in_delayslot;
+
+             E_inst_illegal <= mul_inst_illegal;
+            E_inst_invalid <= mul_inst_invalid;
+		   end
+		   else begin
 			E_PC <= D_PC;
             E_EPC <= D_EPC;
 			E_WriteMemData <= MF_Rt;// MF_Rt; //TODO: bug
@@ -203,6 +257,7 @@ module ExecuteSdate(
             E_inst_miss <= D_inst_miss;
             E_inst_illegal <= D_inst_illegal;
             E_inst_invalid <= D_inst_invalid;
+            end
 		end
     end
 

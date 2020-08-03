@@ -3,6 +3,7 @@
 module DecodeState(
     input   Clk,
     input   Clr,
+    input is_mul,
     input   dm_stall,
     input   exp_flush,
     input   inst_sram_data_ok,
@@ -124,6 +125,8 @@ module DecodeState(
     
     wire MultCalFamily_Inter = (mult|multu|div|divu|mul);
 	reg	D_MultCalFamily;
+	wire D_stall_Pass1;
+	assign D_stall_Pass = D_stall_Pass1 | is_mul;
     
     wire    [3:0]   T_Inter;
     StallCtrlUnit StallCtrlUnit(
@@ -136,7 +139,7 @@ module DecodeState(
         .E_T(E_T),
         .E_WriteRegEnable(E_WriteRegEnable),
         .E_RegId(E_RegId),
-        .stall(D_stall_Pass),
+        .stall(D_stall_Pass1),
         .T(T_Inter),
         .XALU_Busy(E_XALU_Busy),
         .D_MultCalFamily(D_MultCalFamily),
