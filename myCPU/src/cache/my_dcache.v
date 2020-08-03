@@ -29,7 +29,7 @@
 `define LOAD       5'b00010
 `define LOAD_OVER  5'b00100
 `define LOAD_OVER1  5'b00110
-`define STORE      5'b10000 //疑惑状态
+`define STORE      5'b10000
 module my_dcache
   #(
     parameter OPTION_OPERAND_WIDTH = 32,
@@ -46,21 +46,20 @@ module my_dcache
    //exchange with cpu
    input  wire [31:0] i_p_addr,
    input  wire [6:0]  i_p_tag_bit_raddr,
-   input  wire [31:0] i_p_addrAfterTrans,//经过mmu转换，和i_p_addr同时进入cache
+   input  wire [31:0] i_p_addrAfterTrans,
    input  wire        i_p_nextIsRead, 
    input  wire        i_p_nextIsLS, 
    input wire         i_p_nextIsSave,
    input  wire [3:0]  i_p_byte_en,
    input  wire        i_p_read,
    
-   input  wire        i_p_write,  //猜测：往内存中写东西
-   //input  wire        i_p_hitwriteback,
-  // input  wire        i_p_hitinvalidate,
-   input  wire  [31:0] i_p_wrdata,//向内存写的数据
+   input  wire        i_p_write,  
+   input  wire        i_p_hitwriteback,
+   input  wire        i_p_hitinvalidate,
+   input  wire  [31:0] i_p_wrdata,
    output wire [31:0] o_p_rddata,
    output wire        o_p_stall,
    output wire        o_p_EstallClear,
-   //ar
    output [3 :0] arid         ,
    output reg [31:0] araddr       ,
    output [7 :0] arlen        ,
@@ -276,10 +275,10 @@ module my_dcache
     ///todo
    assign tag_tag = i_p_addrAfterTrans[31:12] ;
     
-   wire [`TAG_WIDTH-1:0]    cache_addr_cpu_tag_pre;//无用
+   wire [`TAG_WIDTH-1:0]    cache_addr_cpu_tag_pre;
    wire [`INDEX_WIDTH-1:0]  cache_addr_idx_pre;
-   wire [`OFFSET_WIDTH-1:0] cache_addr_cpu_off_pre;//无用
-   wire [1:0]               cache_addr_dropoff_pre;//无用
+   wire [`OFFSET_WIDTH-1:0] cache_addr_cpu_off_pre;
+   wire [1:0]               cache_addr_dropoff_pre;
    assign {
         cache_addr_cpu_tag_pre,  cache_addr_idx_pre,
         cache_addr_cpu_off_pre,  cache_addr_dropoff_pre
@@ -422,7 +421,7 @@ module my_dcache
          end
          for(a0 = 0 ; a0 < 32 ; a0 = a0 + 1) begin
             if(mFB_wen[a0]  | (protect_bit[a0]==1'b0  & refill_cs_a[a0]==1'b1 )) begin
-               missFillBuffer[ (a0*8+7)-:8] <= refill_bytes[(a0*8+7)-:8];//？？？
+               missFillBuffer[ (a0*8+7)-:8] <= refill_bytes[(a0*8+7)-:8];
             end
          end
       end
@@ -551,7 +550,7 @@ module my_dcache
           end
          `LOAD_OVER1: begin 
             protect_bit<=32'b0;
-            if(  check_way_dirty[tag_lru_out] ) begin //检查脏位，看是否需要写回
+            if(  check_way_dirty[tag_lru_out] ) begin
                awaddr<= {tag_way_out[tag_lru_out][19:0],missFillBuffer_addr[11:5],5'b0}  ;
                state<=`WRITEBACK;
                awvalid <=1'b1;

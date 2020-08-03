@@ -60,14 +60,7 @@ module my_tag_ram
    assign tag_bit_in =  {din[44:43],din[21]};
     
    reg  [ADDR_WIDTH-1:0] reg_initial_addr; 
-   always @(posedge clk)begin
-      if(rst)begin
-         reg_initial_addr <= 0;
-      end
-      else if(!cache_reset) begin
-         reg_initial_addr<=reg_initial_addr+1;
-      end
-   end   
+   
    
    wire [ADDR_WIDTH-1:0] tag_addr = !cache_reset? reg_initial_addr :
                                      (refill | load_over )? waddr :
@@ -137,7 +130,14 @@ module my_tag_ram
 
 
 
-   
+   always @(posedge clk)begin
+      if(rst)begin
+         reg_initial_addr <= 0;
+      end
+      else if(!cache_reset) begin
+         reg_initial_addr<=reg_initial_addr+1;
+      end
+   end
     
 
 endmodule

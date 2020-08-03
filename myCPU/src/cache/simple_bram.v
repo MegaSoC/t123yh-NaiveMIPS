@@ -16,7 +16,7 @@ module simple_bram
     output [DATA_WIDTH*8-1:0] dout_all,
 
     input hit_write,    //回填的写使能
-    input [3:0] byte_ben,  //0
+    input [3:0] byte_ben,
     input store ,
 
     input [DATA_WIDTH*8-1:0] din_all
@@ -24,7 +24,7 @@ module simple_bram
   wire [DATA_WIDTH*2-1:0] ram_out[3:0];
   wire [DATA_WIDTH*2-1:0] ram_in[3:0];
   wire [31:0] cpu_we_out;
-  wire [31:0] final_wea ;//�?终的写使�?
+  wire [31:0] final_wea ;//�?终的写使�?
   //assign ram_in = din;
 
   assign dout_all ={ram_out[3],ram_out[2],ram_out[1],ram_out[0]};
@@ -34,8 +34,6 @@ module simple_bram
   
   wire [ADDR_WIDTH-1:0] cur_addr;
   assign cur_addr = (store| hit_write ) ? waddr : raddr;
-  assign final_wea = hit_write ?  {32{we}} : cpu_we_out ;
-
 
   genvar s0;
   generate 
@@ -58,7 +56,6 @@ module simple_bram
   always @(posedge clk) begin
       addr_pre <= raddr[2:0];
   end
-  //第一个周期进地址，第二个周期地址读出来，然后选择，所以这里用寄存器保存一个周期
 
   load_data_sel user_load(
     .datain(dout_all),
@@ -69,10 +66,11 @@ module simple_bram
   expand cpu_8_1(
       .enable(we) ,
       .offset(waddr[2:0]) ,
-      .out(cpu_we_out) , //永远是0
+      .out(cpu_we_out) ,
       .var(byte_ben) 
   );
 
+  assign final_wea = hit_write ?  {32{we}} : cpu_we_out ;
     
     
 endmodule

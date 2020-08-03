@@ -43,20 +43,19 @@ module my_icache
    // input wire exp_flush,
     //todo:first
     //exchange with cpu
-    input  wire [31:0] i_p_addr, //npc
-    input  wire [6:0]  i_p_tag_bit_raddr, //现在的pc
-    input  wire [31:0] i_p_addrAfterTrans, //mmu转换过的pc
-	input  wire [3:0]  i_p_byte_en, //0
+    input  wire [31:0] i_p_addr,
+    input  wire [6:0]  i_p_tag_bit_raddr, 
+    input  wire [31:0] i_p_addrAfterTrans, 
+	input  wire [3:0]  i_p_byte_en,
     input wire dm_stall,
-	input  wire        i_p_read, //此指令是否经过cached，是1，否0
-	input  wire        i_p_write,  //0
+	input  wire        i_p_read,
+	input  wire        i_p_write,  
 	
-    //input  wire        i_p_hitwriteback,
-	//input  wire        i_p_hitinvalidate,
-	input  wire [31:0] i_p_wrdata, //无用信号
-	output wire [31:0] o_p_rddata, //从icache读出的结果
-	output wire        o_p_stall, //出现异常暂停
-    //ar
+    input  wire        i_p_hitwriteback,
+	input  wire        i_p_hitinvalidate,
+	input  wire [31:0] i_p_wrdata,
+	output wire [31:0] o_p_rddata,
+	output wire        o_p_stall,
     output      [3 :0] arid    ,
     output reg  [31:0] araddr  ,
     output [7 :0] arlen        ,
@@ -100,18 +99,18 @@ module my_icache
     
     
     // SPR interface
-    //input wire [31:0]     spr_bus_addr_i ,
-    //input 			      spr_bus_we_i   ,
-    //input 			      spr_bus_stb_i  ,
-    input [OPTION_OPERAND_WIDTH-1:0]  spr_bus_dat_i//？？？外面怎么被注释掉了
+    input wire [31:0]     spr_bus_addr_i ,
+    input 			      spr_bus_we_i   ,
+    input 			      spr_bus_stb_i  ,
+    input [OPTION_OPERAND_WIDTH-1:0]  spr_bus_dat_i,
 
-    //output [OPTION_OPERAND_WIDTH-1:0] spr_bus_dat_o
+    output [OPTION_OPERAND_WIDTH-1:0] spr_bus_dat_o
     
     );
     assign arid =4'b1111;
     assign arburst = 2'b10;
     assign rready  =1'b1;
-    assign arsize = 3'b010;  //4bytes
+    assign arsize = 3'b010;
     assign awsize = 3'b010;
     assign arlen  =  7'b0111;
     assign awlen  =  7'b0111;
@@ -129,8 +128,8 @@ module my_icache
     assign awaddr =32'b0;
     assign wdata =32'b0;
 
-    reg  [2:0] counter;                   
-    assign o_p_stall = ( i_p_read  &  ~hit ) | (state==`LOAD_OVER ) | ( rvalid & rready & rlast ) | queue  ;//???
+    reg  [2:0] counter;
+    assign o_p_stall = ( i_p_read  &  ~hit ) | (state==`LOAD_OVER ) | ( rvalid & rready & rlast ) | queue  ;
 
    // States
 
@@ -149,27 +148,26 @@ module my_icache
 
    // The tag memory contains entries with OPTION_DCACHE_WAYS parts of
    // each TAGMEM_WAY_WIDTH. Each of those is tag and a valid flag.
-   localparam TAGMEM_WAY_WIDTH = TAG_WIDTH + 2; //22
-   localparam TAGMEM_WAY_VALID = TAGMEM_WAY_WIDTH - 2;//20
-   localparam TAGMEM_WAY_DIRTY = TAGMEM_WAY_WIDTH - 1;//21
+   localparam TAGMEM_WAY_WIDTH = TAG_WIDTH + 2;
+   localparam TAGMEM_WAY_VALID = TAGMEM_WAY_WIDTH - 2;
+   localparam TAGMEM_WAY_DIRTY = TAGMEM_WAY_WIDTH - 1;
    
    // Additionally, the tag memory entry contains an LRU value. The
    // width of this is 0 for OPTION_DCACHE_LIMIT_WIDTH==1
-   localparam TAG_LRU_WIDTH = OPTION_DCACHE_WAYS*(OPTION_DCACHE_WAYS-1) >> 1; //1,计算方式不明
+   localparam TAG_LRU_WIDTH = OPTION_DCACHE_WAYS*(OPTION_DCACHE_WAYS-1) >> 1;
 
    // We have signals for the LRU which are not used for one way
    // caches. To avoid signal width [-1:0] this generates [0:0]
    // vectors for them, which are removed automatically then.
-   localparam TAG_LRU_WIDTH_BITS = (OPTION_DCACHE_WAYS >= 2) ? TAG_LRU_WIDTH : 1;//???
+   localparam TAG_LRU_WIDTH_BITS = (OPTION_DCACHE_WAYS >= 2) ? TAG_LRU_WIDTH : 1;
 
    // Compute the total sum of the entry elements
-   localparam TAGMEM_WIDTH = TAGMEM_WAY_WIDTH * OPTION_DCACHE_WAYS + TAG_LRU_WIDTH;//???
+   localparam TAGMEM_WIDTH = TAGMEM_WAY_WIDTH * OPTION_DCACHE_WAYS + TAG_LRU_WIDTH;
 
    // For convenience we define the position of the LRU in the tag
    // memory entries
    localparam TAG_LRU_MSB = TAGMEM_WIDTH - 1;
    localparam TAG_LRU_LSB = TAG_LRU_MSB - TAG_LRU_WIDTH + 1;
-   //以上两个代表代表着lru位
 
    // FSM state signals
    reg [4:0] 			      state;
@@ -184,7 +182,7 @@ module my_icache
    wire 			      refill_hit;
    reg [(1<<(OPTION_DCACHE_BLOCK_WIDTH-2))-1:0] refill_valid;
    reg [(1<<(OPTION_DCACHE_BLOCK_WIDTH-2))-1:0] refill_valid_r;
-   wire				      invalidate;//？？？迷惑变量
+   wire				      invalidate;
 
    // The index we read and write from tag memory
    wire [OPTION_DCACHE_SET_WIDTH-1:0]  tag_windex;
@@ -198,7 +196,7 @@ module my_icache
    wire [TAGMEM_WIDTH-1:0] 	      tag_din;
    wire [TAG_LRU_WIDTH_BITS-1:0]       tag_lru_in;
    wire [TAGMEM_WAY_WIDTH-1:0] 	      tag_way_in [OPTION_DCACHE_WAYS-1:0];
-   //向tagmem里写的内容，只有load_over阶段才有用
+
    reg [TAGMEM_WAY_WIDTH-1:0] 	      tag_way_save[OPTION_DCACHE_WAYS-1:0];
 
    // Whether to write to the tag memory in this cycle
@@ -224,7 +222,7 @@ module my_icache
    // Does any way hit?
    wire 			      hit;
    wire [OPTION_DCACHE_WAYS-1:0]      way_hit;
-   wire [OPTION_DCACHE_WAYS-1:0]  load_bus_we = tag_lru_out ? 2'b10: 2'b01 ;//根据lru算法选择写回哪行
+   wire [OPTION_DCACHE_WAYS-1:0]  load_bus_we = tag_lru_out ? 2'b10: 2'b01 ;
    
    
    // This is the least recently used value before access the memory.
@@ -232,8 +230,8 @@ module my_icache
    wire [OPTION_DCACHE_WAYS-1:0]      lru;
 
    // Register that stores the LRU value from lru
-    reg queue; //cache是否因miss而向内存访问数据
-    assign way_we =( state==`LOAD_OVER )? load_bus_we : 2'b00;//根据lru算法得出重填时填哪一路
+    reg queue;
+    assign way_we =( state==`LOAD_OVER )? load_bus_we : 2'b00;
 
    // Intermediate signals to ease debugging
    wire [TAG_WIDTH-1:0]               check_way_tag [OPTION_DCACHE_WAYS-1:0];
@@ -241,14 +239,14 @@ module my_icache
    wire                               check_way_valid [OPTION_DCACHE_WAYS-1:0];
    wire                               check_way_dirty [OPTION_DCACHE_WAYS-1:0];
    
-    wire [`TAG_WIDTH-1:0]     cache_addr_cpu_tag;//无用
+    wire [`TAG_WIDTH-1:0]     cache_addr_cpu_tag;
 	reg  [`TAG_WIDTH-1:0]    cache_addr_mem_tag; //��tag�ĵ�ַ��������һ�ıȶ�
 	
-	wire [`INDEX_WIDTH-1:0]  cache_addr_idx; 
-	wire [`OFFSET_WIDTH-1:0] cache_addr_cpu_off;//无用
+	wire [`INDEX_WIDTH-1:0]  cache_addr_idx;
+	wire [`OFFSET_WIDTH-1:0] cache_addr_cpu_off;
 	reg  [`OFFSET_WIDTH-1:0] cache_addr_access_off;//���������ڴ�rom��ȡ����ʱ������
 	reg  [`OFFSET_WIDTH-1:0] cache_addr_mem_off;
-	wire [1:0]               cache_addr_dropoff;//无用
+	wire [1:0]               cache_addr_dropoff;
 	
 	assign {
 		cache_addr_cpu_tag,  cache_addr_idx,
@@ -281,7 +279,7 @@ module my_icache
             assign check_way_match[i] = (check_way_tag[i] == tag_tag);
             assign check_way_valid[i] = tag_way_out[i][TAGMEM_WAY_VALID];
             assign check_way_dirty[i] = tag_way_out[i][TAGMEM_WAY_DIRTY];
-            assign way_hit[i] = check_way_valid[i] & check_way_match[i] & !queue ;//queue:???
+            assign way_hit[i] = check_way_valid[i] & check_way_match[i] & !queue ;
 
             // Multiplex the way entries in the tag memory
             assign tag_din[(i+1)*TAGMEM_WAY_WIDTH-1:i*TAGMEM_WAY_WIDTH] = tag_way_in[i];
@@ -294,12 +292,12 @@ module my_icache
 
   
     wire [7:0] cs_a;
-    reg  [7:0] word_valid;//需要重填，向内存请求发送8个字时已经发送了多少个
-    wire [7:0] cs_target;//造成cachemiss的那个字
+    reg  [7:0] word_valid;
+    wire [7:0] cs_target;
     wire missFillBuffer_wen = rvalid & rready;
-    wire cs_ok = (|(word_valid & cs_target)) ;//需要重填时，是否已经发送了8个字其中需要的那个，即造成cache miss的那个字
+    wire cs_ok = (|(word_valid & cs_target)) ;
     
-    reg [OPTION_OPERAND_WIDTH*8-1:0] missFillBuffer;//需要重填时先把8个字填到这个buffer，再统一写道bram中
+    reg [OPTION_OPERAND_WIDTH*8-1:0] missFillBuffer;
     wire [OPTION_OPERAND_WIDTH-1:0] load_from_ram_bus[7:0] ;
 
     onehot_3s8 missFillOneHot(counter,cs_a);
@@ -345,13 +343,13 @@ module my_icache
                                    way_hit[0]? way_dout[0]: way_dout[1];
 //    assign o_p_rddata = (i_p_addrAfterTrans[31:5]== araddr[31:5] &cs_ok )? load_from_ram_bus[i_p_addrAfterTrans[4:2]]:
 //                        { {32{way_hit[0]}}&way_dout[0] } | {{32{way_hit[1]}}&way_dout[1]} ;
-   reg store ;//命中cache的同时有意外导致需要暂停
-   reg [31:0] reg_o_p_rdata;//猜测是回填命中后为了延后一个周期输出的
+   reg store ;
+   reg [31:0] reg_o_p_rdata;
    always @(posedge clk) begin
         if(reset /* | exp_flush */) begin
             store <=1'b0;
         end
-        else if(/* (way_hit!=2'b0 )*/ hit & (dm_stall|o_p_stall)  & !store ) begin //命中但后面出问题了需要暂停，所以把结果先保存在寄存器上
+        else if(/* (way_hit!=2'b0 )*/ hit & (dm_stall|o_p_stall)  & !store ) begin
             store<=1'b1;
             reg_o_p_rdata <=wire_o_p_rddata;
         end
@@ -375,14 +373,14 @@ module my_icache
    // An invalidate request is either a block flush or a block invalidate
     assign tag_windex  =    (state ==`LOAD_OVER     ) ? araddr[WAY_WIDTH-1:OPTION_DCACHE_BLOCK_WIDTH] :
                             ((|way_hit) & i_p_read  ) ? i_p_addrAfterTrans[11:5] :  0 ;
-    //重填时往tagmem里写的地址
+
    integer w1;
    always @(posedge clk) begin
         if (reset | !cache_reset ) begin
             araddr<=32'b0;
             wlast <=1'b0;
             state <= `IDLE;
-              <=0;
+            arvalid <=0;
             wvalid<=0;
             awvalid <=1'b0;
             bready <=1'b0;
@@ -409,10 +407,10 @@ module my_icache
                 if(arvalid & arready ) begin
                     arvalid <=1'b0;
                 end
-                if( !hit  & !queue & i_p_addrAfterTrans[31:5]!=araddr[31:5] ) begin//load中找到有效字之后本该是0的，结果load还没结束，又miss了
+                if( !hit  & !queue & i_p_addrAfterTrans[31:5]!=araddr[31:5] ) begin
                     queue<=1'b1 ;
                 end 
-                else if(i_p_addrAfterTrans[31:5]== araddr[31:5] & cs_ok & queue) begin//load中找到有效字后（cs_ok拉高）后置queue0
+                else if(i_p_addrAfterTrans[31:5]== araddr[31:5] & cs_ok & queue) begin
                     queue<=1'b0;
                 end
                 if(rvalid & rready) begin
@@ -423,7 +421,7 @@ module my_icache
                 end
             end
             `LOAD_OVER: begin 
-                if(queue & !hit ) begin //
+                if(queue & !hit ) begin
                     araddr<={i_p_addrAfterTrans[31:2] , 2'b0 };
                     counter<=i_p_addrAfterTrans[4:2];
                     arvalid<=1'b1;
