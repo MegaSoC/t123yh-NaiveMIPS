@@ -69,7 +69,7 @@ module simple_bram
       .enable(we) ,
       .offset(waddr[2:0]) ,
       .out(cpu_we_out) ,
-      .var(byte_ben) 
+      .v(byte_ben) 
   );
 
   assign final_wea = hit_write ?  {32{we}} : cpu_we_out ;

@@ -521,7 +521,7 @@ module my_dcache
    logic cs_ok = (|(word_valid & cs_target)) ;
 
    logic   m_buffer_hit =  i_p_addrAfterTrans[31:5] == missFillBuffer_addr[31:5] ;
-   assign hit = (|way_hit) | ( i_p_write  & m_buffer_hit & cache_state== LOAD  ) | (i_p_read & m_buffer_hit & cs_ok & cache_state ==`LOAD ) | reg_o_p ;
+   assign hit = (|way_hit) | ( i_p_write  & m_buffer_hit & cache_state == LOAD  ) | (i_p_read & m_buffer_hit & cs_ok & cache_state ==LOAD ) | reg_o_p ;
    
 
    assign tag_lru_in =( cache_state == LOAD_OVER1 )   ? !tag_lru_out  :

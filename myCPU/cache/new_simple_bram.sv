@@ -27,7 +27,7 @@ module new_simple_bram
   logic [DATA_WIDTH*2-1:0] ram_in[3:0];
   logic [31:0] wea_out;
   logic [31:0] cpu_we_out;
-  logic [31:0] final_wea ;//最终的写使能
+  logic [31:0] final_wea ;//�?终的写使�?
   //assign ram_in = din;
 
   assign dout_all ={ram_out[3],ram_out[2],ram_out[1],ram_out[0]};
@@ -70,7 +70,7 @@ module new_simple_bram
       .enable(we) ,
       .offset(waddr[2:0]) ,
       .out(cpu_we_out) ,
-      .var(byte_ben) 
+      .v(byte_ben) 
   );
 
   assign final_wea = hit_write ?  {32{we}} : cpu_we_out ; 
