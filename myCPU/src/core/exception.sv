@@ -27,6 +27,9 @@ module exception(
     input wire icache_stall,
             
     output reg flush,
+    output reg vice_flush1,
+    output reg vice_flush2,
+    output reg vice_flush3,
     output reg wr_exp,
     output reg clear_exl,
     output reg[4:0] exp_code,
@@ -46,6 +49,9 @@ module exception(
 
     initial begin
         flush                <= 1'b0;
+        vice_flush1                <= 1'b0;
+        vice_flush2                <= 1'b0;
+        vice_flush3                <= 1'b0;
     end
     assign E_now_exp         = (allow_int & interrupt_flag != 8'b0) |
            (data_dirty & data_we) |
@@ -60,6 +66,9 @@ module exception(
         if (allow_int & interrupt_flag != 8'b0) begin             
             exp_code         <= `EX_INTERRUPT;
             flush            <= 1'b1;
+            vice_flush1                <= 1'b1;
+            vice_flush2                <= 1'b1;
+            vice_flush3                <= 1'b1;
             exception_new_pc <= exception_base + 32'h180;
             epc              <= E_EPC;             
             wr_exp           <= 1'b1;
@@ -67,6 +76,9 @@ module exception(
         else if (data_dirty & data_we) begin             
             exp_code         <= `EX_MOD;
             flush            <= 1'b1;
+            vice_flush1                <= 1'b1;
+            vice_flush2                <= 1'b1;
+            vice_flush3                <= 1'b1;
             exception_new_pc <= exception_base + 32'h180;             
             epc              <= E_EPC;             
             wr_exp           <= 1'b1;             
@@ -76,6 +88,9 @@ module exception(
         else if (inst_miss) begin             
             exp_code         <= `EX_TLBL;
             flush            <= 1'b1;
+            vice_flush1                <= 1'b1;
+            vice_flush2                <= 1'b1;
+            vice_flush3                <= 1'b1;
             exception_new_pc <= exception_base + 32'h0;             
             epc              <= E_EPC;             
             wr_exp           <= 1'b1;             
@@ -85,6 +100,9 @@ module exception(
         else if (data_miss) begin
             exp_code         <= data_we ? `EX_TLBS : `EX_TLBL;
             flush            <= 1'b1;
+            vice_flush1                <= 1'b1;
+            vice_flush2                <= 1'b1;
+            vice_flush3                <= 1'b1;
             exception_new_pc <= exception_base + 32'h0;             
             epc              <= E_EPC;             
             wr_exp           <= 1'b1;             
@@ -94,6 +112,9 @@ module exception(
         else if (inst_invalid) begin
             exp_code         <= `EX_TLBL;
             flush            <= 1'b1;
+            vice_flush1                <= 1'b1;
+            vice_flush2                <= 1'b1;
+            vice_flush3                <= 1'b1;
             exception_new_pc <= exception_base + 32'h180;            
             epc              <= E_EPC;             
             wr_exp           <= 1'b1;             
@@ -103,6 +124,9 @@ module exception(
         else if (data_invalid) begin
             exp_code         <= data_we ? `EX_TLBS : `EX_TLBL;
             flush            <= 1'b1;
+            vice_flush1                <= 1'b1;
+            vice_flush2                <= 1'b1;
+            vice_flush3                <= 1'b1;
             exception_new_pc <= exception_base + 32'h180;             
             epc              <= E_EPC;             
             wr_exp           <= 1'b1;             
@@ -114,6 +138,9 @@ module exception(
             badvaddr_we      <= 1'b1;
             exp_code         <= `EX_ADEL;
             flush            <= 1'b1;
+            vice_flush1                <= 1'b1;
+            vice_flush2                <= 1'b1;
+            vice_flush3                <= 1'b1;
             exception_new_pc <= exception_base + 32'h180;
             epc              <= E_EPC;
             wr_exp           <= 1'b1;
@@ -123,6 +150,9 @@ module exception(
             badvaddr_we      <= 1'b1;
             exp_code         <= data_we ? `EX_ADES : `EX_ADEL;
             flush            <= 1'b1;
+            vice_flush1                <= 1'b1;
+            vice_flush2                <= 1'b1;
+            vice_flush3                <= 1'b1;
             exception_new_pc <= exception_base + 32'h180;
             epc              <= E_EPC;
             wr_exp           <= 1'b1;
@@ -130,6 +160,9 @@ module exception(
         else if (syscall) begin             
             exp_code         <= `EX_SYS;
             flush            <= 1'b1;
+            vice_flush1                <= 1'b1;
+            vice_flush2                <= 1'b1;
+            vice_flush3                <= 1'b1;
             exception_new_pc <= exception_base + 32'h180;
             epc              <= E_EPC;
             wr_exp           <= 1'b1;
@@ -137,6 +170,9 @@ module exception(
         else if (my_break) begin             
             exp_code         <= `EX_BP;
             flush            <= 1'b1;
+            vice_flush1                <= 1'b1;
+            vice_flush2                <= 1'b1;
+            vice_flush3                <= 1'b1;
             exception_new_pc <= exception_base + 32'h180;
             epc              <= E_EPC;
             wr_exp           <= 1'b1;
@@ -144,6 +180,9 @@ module exception(
         else if (unknown_inst) begin             
             exp_code         <= `EX_RI;
             flush            <= 1'b1;
+            vice_flush1                <= 1'b1;
+            vice_flush2                <= 1'b1;
+            vice_flush3                <= 1'b1;
             exception_new_pc <= exception_base + 32'h180;
             epc              <= E_EPC;
             wr_exp           <= 1'b1;
@@ -151,6 +190,9 @@ module exception(
         else if (overflow) begin             
             exp_code         <= `EX_OV;
             flush            <= 1'b1;
+            vice_flush1                <= 1'b1;
+            vice_flush2                <= 1'b1;
+            vice_flush3                <= 1'b1;
             exception_new_pc <= exception_base + 32'h180;
             epc              <= E_EPC;
             wr_exp           <= 1'b1;
@@ -160,12 +202,18 @@ module exception(
             clear_exl        <= 1'b1;
             exception_new_pc <= epc_in;
             flush            <= 1'b1;
+            vice_flush1                <= 1'b1;
+            vice_flush2                <= 1'b1;
+            vice_flush3                <= 1'b1;
         end
         else begin
             exp_code         <= 0;
             wr_exp           <= 1'b0;
             if (inst_sram_data_ok | (!icache_stall & !inst_uncached))begin 
                 flush        <= 1'b0;
+                vice_flush1                <= 1'b0;
+            vice_flush2                <= 1'b0;
+            vice_flush3                <= 1'b0;
             end
         end
     end

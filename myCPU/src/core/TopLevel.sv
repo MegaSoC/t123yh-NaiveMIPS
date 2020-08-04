@@ -295,6 +295,7 @@ module mycpu_top(
 
 
     wire exp_flush;
+    wire exp_flush_vice1,exp_flush_vice2,exp_flush_vice3;
 
 
     wire[31:0] exception_new_pc;
@@ -308,7 +309,7 @@ module mycpu_top(
       .clk(Clk),
       .reset(MyClr),
       .dmStall(dm_stall),
-      .expFlush(exp_flush),
+      .expFlush(exp_flush_vice3),
       .instSramValid(inst_sram_data_ok),
       .dStall(D_stall_Pass),
       .dNpc(D_NewPC_Pass),
@@ -352,7 +353,7 @@ module mycpu_top(
       .Clr(MyClr),
       .is_mul(my_e.mul_in_xalu),
       .dm_stall(dm_stall),
-      .exp_flush(exp_flush),
+      .exp_flush(exp_flush_vice2),
       .inst_sram_data_ok(inst_sram_data_ok),
       .W_T(M_T),
       .W_WriteRegEnable(M_WriteRegEnableExted),
@@ -410,7 +411,7 @@ module mycpu_top(
     E my_e(
      .Clk(Clk),
      .Clr(MyClr),
-     .exp_flush(exp_flush),
+     .exp_flush(exp_flush_vice1),
      .data_sram_data_ok(data_sram_data_ok),
      .D_PC(D_PC),
      .D_EPC(D_EPC),
@@ -538,6 +539,9 @@ module mycpu_top(
 
     exception exception(
       .flush(exp_flush),
+      .vice_flush1(exp_flush_vice1),
+      .vice_flush2(exp_flush_vice2),
+      .vice_flush3(exp_flush_vice3),
       .wr_exp(cp0_wr_exp),
       .clear_exl(clear_exl),
       .exp_code(exp_code),
