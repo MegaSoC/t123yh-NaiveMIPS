@@ -68,55 +68,55 @@ module my_tag_ram
    //    end
    // endgenerate
 
-   generate
-      for(s0=0;s0<=1;s0=s0+1) begin :way_tags
-      xpm_memory_dpdistram #(
-	   	// Common module parameters
-	   	.MEMORY_SIZE(21*128),
-	   	.CLOCKING_MODE("common_clock"),
-	   	.USE_MEM_INIT(0),
-	   	.MESSAGE_CONTROL(0),
+   // generate
+   //    for(s0=0;s0<=1;s0=s0+1) begin :way_tags
+   //    xpm_memory_dpdistram #(
+	//    	// Common module parameters
+	//    	.MEMORY_SIZE(21*128),
+	//    	.CLOCKING_MODE("common_clock"),
+	//    	.USE_MEM_INIT(0),
+	//    	.MESSAGE_CONTROL(0),
 
-	   	// Port A module parameters
-	   	.WRITE_DATA_WIDTH_A(21),
-	   	.READ_DATA_WIDTH_A(21),
-	   	.READ_RESET_VALUE_A("0"),
-	   	.READ_LATENCY_A(0),
+	//    	// Port A module parameters
+	//    	.WRITE_DATA_WIDTH_A(21),
+	//    	.READ_DATA_WIDTH_A(21),
+	//    	.READ_RESET_VALUE_A("0"),
+	//    	.READ_LATENCY_A(0),
 
-	   	// Port B module parameters
-	   	.READ_DATA_WIDTH_B(21),
-	   	.READ_RESET_VALUE_B("0"),
-	   	.READ_LATENCY_B(0)
-	   ) xpm_mem (
-	   	.clka           ( clk ),
-	   	.rsta           ( rst ),
-	   	.ena            ( 1'b1  ),
-	   	.regcea         ( 1'b0  ),
-	   	.wea            ( (refill& we[s0])  | !cache_reset),  
-	   	.addra          ( tag_addr ),
-	   	.dina           ( tag_way_in[s0]  ),  
-	   	.douta          ( ),
+	//    	// Port B module parameters
+	//    	.READ_DATA_WIDTH_B(21),
+	//    	.READ_RESET_VALUE_B("0"),
+	//    	.READ_LATENCY_B(0)
+	//    ) xpm_mem (
+	//    	.clka           ( clk ),
+	//    	.rsta           ( rst ),
+	//    	.ena            ( 1'b1  ),
+	//    	.regcea         ( 1'b0  ),
+	//    	.wea            ( (refill& we[s0])  | !cache_reset),  
+	//    	.addra          ( tag_addr ),
+	//    	.dina           ( tag_way_in[s0]  ),  
+	//    	.douta          ( ),
 
-	   	.clkb           ( clk ),
-	   	.rstb           ( rst ),
-	   	.enb            ( 1'b1  ), 
-	   	.regceb         ( 1'b0  ),
-	   	.addrb          ( tag_addr ),
-	   	.doutb          ( tag_way_out[s0] )
-	   );     
-      end
-   endgenerate
+	//    	.clkb           ( clk ),
+	//    	.rstb           ( rst ),
+	//    	.enb            ( 1'b1  ), 
+	//    	.regceb         ( 1'b0  ),
+	//    	.addrb          ( tag_addr ),
+	//    	.doutb          ( tag_way_out[s0] )
+	//    );     
+   //    end
+   // endgenerate
 
 
    integer i;
    always_ff @(posedge clk) begin
       if(rst | !cache_reset )begin
-         tag_reg_out <= 0;
+         //tag_reg_out <= 0;
          for(i=0;i<(1<<ADDR_WIDTH) ;i=i+1)
                tag_bit[i]<=3'b0;
       end 
       else begin
-         tag_reg_out <= tag_way_out;
+         //tag_reg_out <= tag_way_out;
          for(i =0;i<2;i=i+1) begin
                 if(we[i]) begin
                   tag_bit[waddr][i] <= tag_bit_in[i];
@@ -130,7 +130,7 @@ module my_tag_ram
    
    assign dout =
    {
-      tag_bit_out[2:1] ,tag_reg_out[1],tag_bit_out[0],tag_reg_out[0] 
+      tag_bit_out[2:1] ,tag_way_out[1],tag_bit_out[0],tag_way_out[0] 
    };
 
    always_ff @(posedge clk)begin
