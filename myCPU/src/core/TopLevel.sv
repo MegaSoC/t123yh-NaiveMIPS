@@ -287,29 +287,29 @@ module mycpu_top(
     wire inst_exp_miss;
     wire inst_exp_illegal;
     wire inst_exp_invalid;
-    InstrFetchState InstrFetchState(
-                        .Clk(Clk),
-                        .Clr(MyClr),
-                        .dm_stall(dm_stall),
-                        .exp_flush(exp_flush),
-                        .inst_sram_data_ok(inst_sram_data_ok),
-                        .D_stall_Pass(D_stall_Pass),
-                        .D_NewPC_Pass(D_NewPC_Pass),
-                        .Instr_axi_Inter(inst_sram_rdata),
-                        .inst_exp_miss(inst_exp_miss),
-                        .inst_exp_illegal(inst_exp_illegal),
-                        .inst_exp_invalid(inst_exp_invalid),
-                        .I_PC(I_PC),
-                        .I_PC_Pass(I_PC_Pass),
-                        .I_Instr(I_Instr),
-                        .im_pc(im_pc),
-                        .I_inst_miss(I_inst_miss),
-                        .I_inst_illegal(I_inst_illegal),
-                        .I_inst_invalid(I_inst_invalid),
-                                                .icache_stall(icache_stall),
-                        .uncache_inst(inst_uncached),
-                        .I_icache_rdata(rdata_icache),
-                        .I_nextNotReady(I_nextNotReady)
+    assign im_pc = I_PC_Pass;
+    I my_i(
+                        .clk(Clk),
+                        .reset(MyClr),
+                        .dmStall(dm_stall),
+                        .expFlush(exp_flush),
+                        .instSramValid(inst_sram_data_ok),
+                        .dStall(D_stall_Pass),
+                        .dNpc(D_NewPC_Pass),
+                        .instSramData(inst_sram_rdata),
+                        .instMiss(inst_exp_miss),
+                        .instIllegal(inst_exp_illegal),
+                        .instInvalid(inst_exp_invalid),
+                        .iPcReg(I_PC),
+                        .iPcWire(I_PC_Pass),
+                        .iInstr(I_Instr),
+                        .iInstMiss(I_inst_miss),
+                        .iInstIllegal(I_inst_illegal),
+                        .iInstInvalid(I_inst_invalid),
+                        .icacheStall(icache_stall),
+                        .instUncached(inst_uncached),
+                        .iIcacheRdata(rdata_icache),
+                        .iNextNotReady(I_nextNotReady)
                                             );
 
     wire M_WriteRegEnable;
