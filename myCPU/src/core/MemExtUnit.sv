@@ -4,10 +4,13 @@ module MemExtUnit(
         input [31:0] RawMemData,
         input [1:0] Offset,
         input [8:0] ExtType,
+        input M_MemFamily,
         output [31:0] ExtMemData,
+        output [31:0] M_Data,
         input M_WriteRegEnable,
         output [3:0] M_WriteRegEnableExted
     );
+    assign M_Data = M_MemFamily ? ExtMemData:M_RawData;
     wire lb,lbu,lh,lhu,lw,lwl,lwr,swl,swr;
     assign {lb,lbu,lh,lhu,lw,lwl,lwr,swl,swr}=ExtType;
     logic [31:0] lwld,alwld;

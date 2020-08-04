@@ -1,5 +1,5 @@
 `include "my_global.vh"
-//注意，这�?个模块里面实际上把WriteBack级给包括进来�?//在后续扩展中，很可能会在这个模块中加入内部流水级,也就是说，很可能这个模块是二级流�?
+//注意，这�??个模块里面实际上把WriteBack级给包括进来�??//在后续扩展中，很可能会在这个模块中加入内部流水级,也就是说，很可能这个模块是二级流�??
 module MemState(
         input Clk,
         input Clr,
@@ -90,7 +90,7 @@ module MemState(
             M_PC <= 0;
             M_T<=0;
         end
-        else if(!dm_stall ) begin //Estallclear 发生的唯�?情况�? w级为SW, E级为LW�? M级命�?
+        else if(!dm_stall ) begin //Estallclear 发生的唯�??情况�?? w级为SW, E级为LW�?? M级命�??
             M_WriteRegEnable <= E_WriteRegEnable;
             M_RegId <= E_RegId;
             M_Offset <= Offset_Inter;
@@ -107,9 +107,11 @@ module MemState(
                    .RawMemData(M_RawData),
                    .Offset(M_Offset),
                    .ExtType(M_ExtType),
+                   .M_MemFamily(M_MemFamily),
                    .ExtMemData(ExtMemData),
+                   .M_Data(M_Data),
                    .M_WriteRegEnable(M_WriteRegEnable),
                    .M_WriteRegEnableExted(M_WriteRegEnableExted)
                );
-    assign M_Data = M_MemFamily ? ExtMemData:M_RawData;
+    
 endmodule
