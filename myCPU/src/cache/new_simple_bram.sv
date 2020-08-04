@@ -1,3 +1,5 @@
+`include "def.svh"
+
 module new_simple_bram
   #(
     parameter ADDR_WIDTH = 10,

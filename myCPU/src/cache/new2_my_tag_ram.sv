@@ -1,4 +1,5 @@
 `timescale 1ns / 1ps
+`include "def.svh"
 
 module new2_my_tag_ram
   #(

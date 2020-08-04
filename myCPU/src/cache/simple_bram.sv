@@ -1,3 +1,5 @@
+`include "def.svh"
+
 module simple_bram
   #(
     parameter ADDR_WIDTH = 10,
@@ -6,26 +8,26 @@ module simple_bram
     parameter ENABLE_BYPASS = 1
     )
    (
-    input 		    clk,
-    input [ADDR_WIDTH-1:0]  raddr,
-    input 		    re,
-    input [ADDR_WIDTH-1:0]  waddr,
-    input 		    we,
-    input [31:0]  din,
-    output [DATA_WIDTH-1:0] dout,
-    output [DATA_WIDTH*8-1:0] dout_all,
+    input  logic		    clk,
+    input  logic [ADDR_WIDTH-1:0]  raddr,
+    input  logic 		    re,
+    input  logic [ADDR_WIDTH-1:0]  waddr,
+    input  logic we,
+    input  logic [31:0]  din,
+    output logic [DATA_WIDTH-1:0] dout,
+    output logic [DATA_WIDTH*8-1:0] dout_all,
 
-    input hit_write,    //回填的写使能
-    input [3:0] byte_ben,
-    input store ,
+    input  logic hit_write,    
+    input  logic [3:0] byte_ben,
+    input  logic store ,
 
     input [DATA_WIDTH*8-1:0] din_all
     );
   logic [DATA_WIDTH*2-1:0] ram_out[3:0];
   logic [DATA_WIDTH*2-1:0] ram_in[3:0];
   logic [31:0] cpu_we_out;
-  logic [31:0] final_wea ;//�?终的写使�?
-  //assign ram_in = din;
+  logic [31:0] final_wea ;
+  
 
   assign dout_all ={ram_out[3],ram_out[2],ram_out[1],ram_out[0]};
   assign {
@@ -39,12 +41,12 @@ module simple_bram
   generate 
   for(s0=0;s0<4'd4 ;s0=s0+1) begin : way_banks
     blk_mem_gen_2 my_way (
-    .clka(clk),    // input logic clka
-    .ena(1'b1),      // input logic ena
-    .wea(final_wea[(s0+1)*8-1:s0*8]),      // input logic [ ] wea
-    .addra(cur_addr[9:3]),  // input logic [6 : 0] addra
-    .dina(ram_in[s0]),    // input logic [255 : 0] dina
-    .douta(ram_out[s0])  // output logic [255 : 0] douta
+    .clka(clk),    
+    .ena(1'b1),      
+    .wea(final_wea[(s0+1)*8-1:s0*8]),      
+    .addra(cur_addr[9:3]),  
+    .dina(ram_in[s0]),    
+    .douta(ram_out[s0])  
     );
   end
   endgenerate
@@ -77,7 +79,7 @@ endmodule
 
 module load_data_sel(datain, offset, dataout);
 input  [255:0] datain;
-input  [  2:0] offset; //word offset
+input  [  2:0] offset; 
 output [ 31:0] dataout;
 
 logic [7:0] hot_wire ;
@@ -111,7 +113,7 @@ endmodule
 
 module expand(enable,offset,out,v);
 input   enable;
-input  [  2:0] offset; //word offset
+input  [  2:0] offset; 
 output [ 31:0] out;
 input [3:0]v;
 

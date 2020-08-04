@@ -223,17 +223,23 @@ module mycpu_top(
                           .resetn(aresetn ),
 
                           .inst_req( inst_uncached & inst_sram_en),
-                          .inst_wr(|inst_sram_wen),                           .inst_size(2'b10),                           .inst_wdata(inst_sram_wdata),
+                          .inst_wr(|inst_sram_wen),                           
+                          .inst_size(2'b10),                           
+                          .inst_wdata(inst_sram_wdata),
                           .inst_addr(inst_sram_addr),
                           .inst_rdata(inst_sram_rdata),
                           .inst_addr_ok(inst_sram_addr_ok),
                           .inst_data_ok(inst_sram_data_ok), 
-                          .data_req( data_uncached &(read|write) & !E_now_exp ),                           .data_wr(|data_sram_wen) ,                           .data_size(data_size),                           .data_wdata(data_sram_wdata),
+                          .data_req( data_uncached &(read|write) & !E_now_exp ),                           
+                          .data_wr(|data_sram_wen) ,                           
+                          .data_size(data_size),                           
+                          .data_wdata(data_sram_wdata),
                           .data_addr(data_sram_addr),
                           .data_rdata(data_sram_rdata),
                           .data_addr_ok(data_sram_addr_ok),
                           .data_data_ok(data_sram_data_ok), 
-                                                                              .arid(arid_uncache),
+                                                                              
+                          .arid(arid_uncache),
                           .araddr(araddr_uncache),
                           .arlen(arlen_uncache),
                           .arsize(arsize_uncache),
@@ -243,13 +249,15 @@ module mycpu_top(
                           .arprot(arprot_uncache),
                           .arvalid(arvalid_uncache),
                           .arready(axi_arready),
-                                                    .rid(axi_rid),
+                                                    
+                          .rid(axi_rid),
                           .rdata(axi_rdata),
                           .rresp(axi_rresp),
                           .rlast(axi_rlast),
                           .rvalid(axi_rvalid),
                           .rready(rready_uncache),
-                                                    .awid(awid_uncache),
+                                                    
+                          .awid(awid_uncache),
                           .awaddr(awaddr_uncache),
                           .awlen(awlen_uncache),
                           .awsize(awsize_uncache),
@@ -259,13 +267,15 @@ module mycpu_top(
                           .awprot(awprot_uncache),
                           .awvalid(awvalid_uncache),
                           .awready(axi_awready),
-                                                    .wid(wid_uncache),
+                                                    
+                          .wid(wid_uncache),
                           .wdata(wdata_uncache),
                           .wstrb(wstrb_uncache),
                           .wlast(wlast_uncache),
                           .wvalid(wvalid_uncache),
                           .wready(axi_wready),
-                                                    .bid(axi_bid),
+                                                    
+                          .bid(axi_bid),
                           .bresp(axi_bresp),
                           .bvalid(axi_bvalid),
                           .bready(bready_uncache)
@@ -344,7 +354,8 @@ module mycpu_top(
                     .W_RegWriteData(M_Data),
                     .I_PC_Pass(I_PC_Pass),
                     .I_PC(I_PC),
-                    .I_MipsInstr(I_Instr),                    .W_PC(M_PC),
+                    .I_MipsInstr(I_Instr),                    
+                    .W_PC(M_PC),
                     .D_NewPC_Pass(D_NewPC_Pass),
                     .D_PC(D_PC),
                     .D_EPC(D_EPC),
@@ -373,9 +384,9 @@ module mycpu_top(
                     .D_inst_miss(D_inst_miss),
                     .D_inst_illegal(D_inst_illegal),
                     .D_inst_invalid(D_inst_invalid),
-                                        .I_nextNotReady(I_nextNotReady),
-                                        .exception_new_pc(exception_new_pc)
-                                                                                                );
+                    .I_nextNotReady(I_nextNotReady),
+                    .exception_new_pc(exception_new_pc)
+                                    );
 
     wire [31:0] E_PC, E_EPC;
     wire [31:0] E_WriteMemData;
@@ -425,7 +436,8 @@ module mycpu_top(
                      .E_MemWriteEnable(E_MemWriteEnable),
                      .E_MemFamily(E_MemFamily),
                      .E_InstrBus(E_InstrBus),
-                     .E_OverFlow(E_OverFlow),                      .E_data_alignment_err(data_alignment_err),
+                     .E_OverFlow(E_OverFlow),                      
+                     .E_data_alignment_err(data_alignment_err),
                      .dm_stall(dm_stall),
                      .E_XALU_Busy_real(E_XALU_Busy),
                      .D_in_delayslot(D_in_delayslot),
@@ -531,7 +543,9 @@ module mycpu_top(
                   .E_EPC(E_EPC),
                   .pc(E_PC),
                   .mm_pc(M_PC_post),
-                  .data_vaddr(E_Data),                   .data_we(sb | sh | sw),                   .data_miss(data_exp_miss),
+                  .data_vaddr(E_Data),                   
+                  .data_we(sb | sh | sw),                   
+                  .data_miss(data_exp_miss),
                   .inst_miss(E_inst_miss),
                   .data_illegal(data_exp_illegal | data_alignment_err),
                   .inst_illegal(E_inst_illegal | fetch_alignment_err),
@@ -548,7 +562,8 @@ module mycpu_top(
                   .epc_in(cp0_epc),
                   .allow_int(cp0_allow_int),
                   .interrupt_flag(interrupt_flag),
-                  .inst_sram_data_ok(inst_sram_data_ok) ,                  .icache_stall(icache_stall),
+                  .inst_sram_data_ok(inst_sram_data_ok) ,                  
+                  .icache_stall(icache_stall),
                   .E_now_exp(E_now_exp),
                   .inst_uncached(inst_uncached)
               );
@@ -564,13 +579,17 @@ module mycpu_top(
     end
 
     cp0 cp0(
-                        .epc(cp0_epc),
+            .epc(cp0_epc),
             .allow_int(cp0_allow_int),
-            .in_exl(),             .data_o(cp0_reg_value),
+            .in_exl(),             
+            .data_o(cp0_reg_value),
             .interrupt_flag(interrupt_flag),
-                        .clk(Clk),
+            .clk(Clk),
             .rst(Clr),
-            .rd_addr(E_RdID),             .we(mtc0),             .wr_addr(E_RegId),             .data_i(data2cp0),
+            .rd_addr(E_RdID),             
+            .we(mtc0),             
+            .wr_addr(E_RegId),             
+            .data_i(data2cp0),
             .hardware_int(hardware_int_sample),
             .clear_exl(clear_exl),
             .en_exp_i(cp0_wr_exp),
@@ -583,11 +602,12 @@ module mycpu_top(
             .tlbr(tlbr),
             .tlbp(tlbp),
 
-                                    .icache_close(icache_close),
+            .icache_close(icache_close),
             .dcache_close(dcache_close),
             .daddr_o(data_sram_addr),
             .iaddr_o(inst_sram_addr),
-            .data_uncached(data_uncached),             .inst_uncached(inst_uncached), 
+            .data_uncached(data_uncached),             
+            .inst_uncached(inst_uncached), 
             .data_exp_miss(data_exp_miss),
             .inst_exp_miss(inst_exp_miss),
             .data_exp_illegal(data_exp_illegal),
@@ -596,9 +616,10 @@ module mycpu_top(
             .data_exp_invalid(data_exp_invalid),
             .inst_exp_invalid(inst_exp_invalid),
 
-                        .daddr_i(E_Data),
+            .daddr_i(E_Data),
             .iaddr_i(im_pc),
-            .data_en(E_MemFamily),             .inst_en(1'b1)
+            .data_en(E_MemFamily),             
+            .inst_en(1'b1)
         );
     assign data_sram_wen = E_MemWriteEnable;
     assign data_sram_en = aresetn;
@@ -619,7 +640,8 @@ module mycpu_top(
                   .cache_reset(myaresetn),
                   .reset(Clr) ,
                   .clk(Clk) ,
-                                                      .i_p_addr(E_DataLSaddr) ,
+                                                      
+                  .i_p_addr(E_DataLSaddr) ,
                   .i_p_tag_bit_raddr(E_Data[11:5]),
                   .i_p_addrAfterTrans(data_sram_addr) ,
                   .i_p_byte_en(E_MemWriteEnable) ,
@@ -635,7 +657,8 @@ module mycpu_top(
                   .i_p_wrdata(data_sram_wdata),
                   .o_p_rddata(rdata_dcache),
                   .o_p_stall(not_hit),
-                                    .o_p_EstallClear(E_EstallClear),
+                                    
+                  .o_p_EstallClear(E_EstallClear),
                   
                   .arid(arid_d),
                   .araddr(araddr_d) ,
@@ -647,13 +670,15 @@ module mycpu_top(
                   .arprot(arprot_d) ,
                   .arvalid(arvalid_d) ,
                   .arready(arready_d) ,
-                                    .rid(rid_d) ,
+                                    
+                  .rid(rid_d) ,
                   .rdata(rdata_d) ,
                   .rresp(rresp_d) ,
                   .rlast(rlast_d) ,
                   .rvalid (rvalid_d) ,
                   .rready(rready_d) ,
-                                    .awid(awid_d) ,
+                                    
+                  .awid(awid_d) ,
                   .awaddr(awaddr_d) ,
                   .awlen(awlen_d) ,
                   .awsize(awsize_d) ,
@@ -663,13 +688,15 @@ module mycpu_top(
                   .awprot(awprot_d) ,
                   .awvalid(awvalid_d) ,
                   .awready(awready_d) ,
-                                    .wid(wid_d) ,
+                                    
+                  .wid(wid_d) ,
                   .wdata(wdata_d) ,
                   .wstrb(wstrb_d) ,
                   .wlast(wlast_d) ,
                   .wvalid(wvalid_d) ,
                   .wready(wready_d) ,
-                                    .bid(bid_d) ,
+                                    
+                  .bid(bid_d) ,
                   .bresp(bresp_d) ,
                   .bvalid(bvalid_d) ,
                   .bready(bready_d)
@@ -713,8 +740,8 @@ module mycpu_top(
                   .cache_reset(myaresetn),
                   .reset(Clr) ,
                   .clk(Clk),
-                                    .dm_stall(dm_stall | D_stall_Pass ),
-                                                      .i_p_addr(D_NewPC_Pass),
+                  .dm_stall(dm_stall | D_stall_Pass ),
+                  .i_p_addr(D_NewPC_Pass),
                   .i_p_tag_bit_raddr(I_PC_Pass[11:5]),
                   .i_p_byte_en(4'b0),
                   .i_p_read((!inst_uncached)& 1'b1 ),

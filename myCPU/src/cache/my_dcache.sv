@@ -1,5 +1,5 @@
 `timescale 1ns / 1ps
-
+`include "def.svh"
 `define TAG_WIDTH 5'd20
 `define OFFSET_WIDTH 3'd3
 `define INDEX_WIDTH 5'd7
@@ -451,7 +451,6 @@ module my_dcache
                awaddr<= {tag_way_out[tag_lru_out][19:0],missFillBuffer_addr[11:5],5'b0}  ;
                state<=`WRITEBACK;
                awvalid <=1'b1;
-             
                counter <= 3'b0;
                wlast<=1'b0;
             end
@@ -525,6 +524,13 @@ module my_dcache
 
 
 endmodule
+
+module num_2_hot_1s2 (in , out);
+input  [1:0] in;
+output [1:0] out;
+assign out=(in[0])? 2'b10:2'b01;
+           
+endmodule 
 
 module onehot_3s8(in,out);
 input [2:0] in ;
