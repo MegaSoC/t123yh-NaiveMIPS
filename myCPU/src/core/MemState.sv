@@ -19,9 +19,9 @@ module MemState(
         input [31:0] cp0_reg_value,
         input [`INSTRBUS_WIDTH-1:0] E_InstrBus,
         output reg M_WriteRegEnable,
-        output wire [3:0] M_WriteRegEnableExted,
+        output reg [3:0] M_WriteRegEnableExted,
         output reg [4:0] M_RegId,
-        output [31:0] M_Data,
+        output reg [31:0] M_Data,
         output reg [31:0] M_PC,
         output reg [3:0] M_T,
         input wire [31:0] data_sram_rdata,
@@ -68,16 +68,9 @@ module MemState(
     reg [8:0] M_ExtType;
     reg [31:0] M_RawData;
     reg M_MemFamily;
+    wire [31:0] E_Datarrr;
+    wire [3:0] E_WriteRegEnableExtedrrr;
 
-    initial begin
-        M_WriteRegEnable <= 0;
-        M_RegId <= 0;
-        M_Offset <= 0;
-        M_ExtType <= 0;
-        M_RawData <= 0;
-        M_MemFamily <= 0;
-        M_PC <= 0;
-    end
     always @ (posedge Clk) begin
         if(Clr | (exp_flush)  ) begin
             M_WriteRegEnable <= 0;
@@ -88,6 +81,8 @@ module MemState(
             M_MemFamily <= 0;
             M_PC <= 0;
             M_T<=0;
+            M_Data <= 0;
+            M_WriteRegEnableExted <= 0;
         end
         else if(!dm_stall ) begin //Estallclear 发生的唯�??情况�?? w级为SW, E级为LW�?? M级命�??
             M_WriteRegEnable <= E_WriteRegEnable;
@@ -98,17 +93,19 @@ module MemState(
             M_MemFamily <= E_MemFamily;
             M_PC <= E_PC;
             M_T<= E_T==0?0:E_T-1;
+            M_Data <= E_Datarrr;
+            M_WriteRegEnableExted <= E_WriteRegEnableExtedrrr;
         end
     end
-
+   
     MemExtUnit MemExtUnit(
-                   .RawMemData(M_RawData),
-                   .Offset(M_Offset),
-                   .ExtType(M_ExtType),
-                   .M_MemFamily(M_MemFamily),
-                   .M_Data(M_Data),
-                   .M_WriteRegEnable(M_WriteRegEnable),
-                   .M_WriteRegEnableExted(M_WriteRegEnableExted)
+                   .RawMemData(Ans),
+                   .Offset(Offset_Inter),
+                   .ExtType(E_ExtType),
+                   .M_MemFamily(E_MemFamily),
+                   .M_Data(E_Datarrr),
+                   .M_WriteRegEnable(E_WriteRegEnable),
+                   .M_WriteRegEnableExted(E_WriteRegEnableExtedrrr)
                );
     
 endmodule
