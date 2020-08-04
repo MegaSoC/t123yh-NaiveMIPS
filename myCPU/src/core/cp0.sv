@@ -152,6 +152,7 @@ module cp0(
     reg[89:0] tlb0[0:1];
     reg[89:0] tlb1[0:1];
     wire[0:0] tlbEntryIndex;
+    reg count_add;
         always_ff @(posedge clk) begin
         if (rst) begin
             cp0_reg_Index <= 32'b0;
@@ -165,9 +166,11 @@ module cp0(
             cp0_reg_Cause <= 32'b0;
             cp0_reg_EPC <= 32'b0;
             dcache_close <= 0;
+            count_add <= 1'b0;
         end
         else begin
-            cp0_reg_Count <= cp0_reg_Count + 32'h1;
+            count_add <= ~count_add;
+            cp0_reg_Count <= cp0_reg_Count + {31'd0,count_add);
             if (cp0_reg_Compare == cp0_reg_Count) begin
                 timer_int <= 1'b1;
                 cp0_reg_Cause[30] <= 1'b1;
