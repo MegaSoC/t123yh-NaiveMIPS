@@ -2,7 +2,7 @@
 
 module D(
         input Clk,
-        input Clr,
+        input reset,
         input is_mul,
         input dm_stall,
         input ExceptionFlush,
@@ -77,7 +77,7 @@ module D(
     wire [31:0] RsData_Inter,RtData_Inter;
     GRF my_grf(
             .Clk(Clk),
-            .Clr(Clr),
+            .reset(reset),
             .PC(W_PC),
             .Addr1(Rs_Inter),
             .Addr2(Rt_Inter),
@@ -132,7 +132,7 @@ module D(
            .ExceptionFlush(ExceptionFlush)
        );
     always @(posedge Clk ) begin
-        if (Clr) begin
+        if (reset) begin
             D_EPC <= 0;
             D_is_branch <= 0;
             D_InDelaySlot <= 0;
@@ -142,7 +142,7 @@ module D(
         end
     end
     always @ (posedge Clk) begin
-        if( Clr | ExceptionFlush | (D_stall_Pass & !dm_stall) | (!dm_stall & I_nextNotReady) )
+        if( reset | ExceptionFlush | (D_stall_Pass & !dm_stall) | (!dm_stall & I_nextNotReady) )
         begin
             D_PC <= 0;
             RsNumber_D <= 0;

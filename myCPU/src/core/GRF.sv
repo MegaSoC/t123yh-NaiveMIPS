@@ -2,7 +2,7 @@
 
 module GRF(
         input Clk,
-        input Clr,
+        input reset,
         input [31:0] PC,
         input [4:0] Addr1,
         input [4:0] Addr2,
@@ -42,7 +42,7 @@ module GRF(
            Reg[Addr2][31:24];
     integer i;
     always @ (posedge Clk) begin
-        if(Clr)begin
+        if(reset)begin
             for(i=0;i<32;i=i+1)
                 Reg[i] <= 0;
         end

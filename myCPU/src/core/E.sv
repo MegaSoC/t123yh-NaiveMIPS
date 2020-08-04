@@ -2,7 +2,7 @@
 
 module E(
         input Clk,
-        input Clr,
+        input reset,
         input ExceptionFlush,
         input data_sram_data_ok,
         input [31:0] D_PC,
@@ -77,7 +77,7 @@ module E(
 
     XALU XALU(
              .clk(Clk),
-             .reset(Clr),
+             .reset(reset),
              .instrBus(D_InstrBus),
              .xaluA(regRS),
              .xaluB(regRT),
@@ -146,10 +146,10 @@ module E(
     assign E_XALU_Busy_real = E_XALU_Busy | mul_in_xalu;
 
     always @ (posedge Clk) begin
-        if(Clr | ExceptionFlush | E_CurrentException | E_EstallClear ) begin
+        if(reset | ExceptionFlush | E_CurrentException | E_EstallClear ) begin
             E_PC <= 0;
             mul_in_xalu <= 0;
-            E_EPC <= Clr? 0 : D_EPC;
+            E_EPC <= reset? 0 : D_EPC;
             E_WriteMemData <= 0;
             E_RtID <= 0;
             E_T <= 0;

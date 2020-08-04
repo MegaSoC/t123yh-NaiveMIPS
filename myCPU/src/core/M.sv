@@ -2,7 +2,7 @@
 
 module M(
         input Clk,
-        input Clr,
+        input reset,
         output dm_stall,
         input ExceptionFlush,
         input [31:0] E_PC,
@@ -84,7 +84,7 @@ module M(
     assign RegWriteEnable_EExtedrrr = ({32{lwr}}&(WritePreExted>>Offset_Inter)) | ({32{lwl}}&( WritePreExted<<(~Offset_Inter))) | ({32{pnormal}}&(WritePreExted));
 
     always @ (posedge Clk) begin
-        if(Clr | (ExceptionFlush) ) begin
+        if(reset | (ExceptionFlush) ) begin
             M_WriteRegEnable <= 0;
             M_RegId <= 0;
             M_Offset <= 0;

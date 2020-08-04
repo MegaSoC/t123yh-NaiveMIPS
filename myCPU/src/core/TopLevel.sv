@@ -57,7 +57,7 @@ module mycpu_top(
     wire `INSTR_SET;
     wire dm_stall;
     wire Clk = aclk;
-    wire Clr = ! aresetn;
+    wire reset = ! aresetn;
 
     reg myaresetn ;
     reg [6:0] resetCounter ;
@@ -73,7 +73,7 @@ module mycpu_top(
             myaresetn <=1'b1;
         end
     end
-    wire MyClr = !aresetn | !myaresetn ;
+    wire Myreset = !aresetn | !myaresetn ;
     wire inst_sram_en;
     wire[3:0] inst_sram_wen;
     wire[31:0] inst_sram_wdata;
@@ -189,7 +189,7 @@ module mycpu_top(
     wire inst_sram_data_ok;
     reg[3:0] cache_timer;
     always @(posedge aclk) begin
-        if (MyClr) begin
+        if (Myreset) begin
             icache_close <= 1;
             cache_timer <= 4'b11;
         end
@@ -307,7 +307,7 @@ module mycpu_top(
     assign im_pc = I_PC_Pass;
     I my_i(
           .clk(Clk),
-          .reset(MyClr),
+          .reset(Myreset),
           .dmStall(dm_stall),
           .expFlush(exp_flush_vice3),
           .instSramValid(inst_sram_data_ok),
@@ -350,7 +350,7 @@ module mycpu_top(
     wire [3:0] M_WriteRegEnableExted;
     D my_d(
           .Clk(Clk),
-          .Clr(MyClr),
+          .reset(Myreset),
           .is_mul(my_e.mul_in_xalu),
           .dm_stall(dm_stall),
           .ExceptionFlush(exp_flush_vice2),
@@ -410,7 +410,7 @@ module mycpu_top(
     wire E_MemLStype_Inter = E_MemReadEnable_Inter | E_MemSaveType_Inter ;
     E my_e(
           .Clk(Clk),
-          .Clr(MyClr),
+          .reset(Myreset),
           .ExceptionFlush(exp_flush_vice1),
           .data_sram_data_ok(data_sram_data_ok),
           .D_PC(D_PC),
@@ -480,7 +480,7 @@ module mycpu_top(
 
     M my_m(
           .Clk(Clk),
-          .Clr(MyClr),
+          .reset(Myreset),
           .dm_stall(dm_stall),
           .ExceptionFlush(ExceptionFlush),
           .E_PC(E_PC),
@@ -551,6 +551,7 @@ module mycpu_top(
                   .NewExceptionPC(NewExceptionPC),
 
                   .clk(Clk),
+                  .reset(reset),
                   .E_EPC(E_EPC),
                   .pc(E_PC),
                   .mm_pc(M_PC_post),
@@ -582,7 +583,7 @@ module mycpu_top(
     reg[5:0] hardware_int_sample;
 
     always @(posedge Clk) begin
-        if (Clr) begin
+        if (reset) begin
             hardware_int_sample <= 6'b0;
         end else begin
             hardware_int_sample <= ext_int;
@@ -597,7 +598,7 @@ module mycpu_top(
             .interrupt_flag(interrupt_flag),
 
             .clk(Clk),
-            .rst(Clr),
+            .rst(reset),
             .rd_addr(E_RdID),
             .we(mtc0),
             .wr_addr(E_RegNumber),
@@ -651,7 +652,7 @@ module mycpu_top(
 
     my_dcache dcache(
                   .cache_reset(myaresetn),
-                  .reset(Clr) ,
+                  .reset(reset) ,
                   .clk(Clk) ,
 
                   .i_p_addr(E_DataLSaddr) ,
@@ -714,7 +715,7 @@ module mycpu_top(
 
     my_icache icache(
                   .cache_reset(myaresetn),
-                  .reset(Clr) ,
+                  .reset(reset) ,
                   .clk(Clk),
                   .dm_stall(dm_stall | D_stall_Pass ),
                   .i_p_addr(D_NewPC_Pass),

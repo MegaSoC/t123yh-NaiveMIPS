@@ -2,6 +2,7 @@
 
 module exception(
         input wire clk,
+        input wire reset,
         input wire [31:0] E_EPC,
         input wire [31:0] pc,
         input wire [31:0] mm_pc,
@@ -51,7 +52,7 @@ module exception(
            IllegalInst | IllegalData |
            syscall | my_break | unknown_inst| overflow | eret;
     always @(posedge clk) begin
-        if (Clr) begin
+        if (reset) begin
             ExcCode <= 5'b0;
             flush <= 1'b0;
             vice_flush1 <= 1'b0
