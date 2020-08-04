@@ -96,7 +96,7 @@ always @(posedge clk) begin
 end
 
 mult_signed my_mult_signed (
-  .clk(clk),                    // input wire clk
+  .CLK(clk),                    // input wire clk
   .A(a_reg),                        // input wire [31 : 0] A
   .B(b_reg),                        // input wire [31 : 0] B
   .SCLR(ready),           // input wire SCLR
@@ -104,7 +104,7 @@ mult_signed my_mult_signed (
 );
 
 mult_unsigned my_mult_unsigned (
-  .clk(clk),                    // input wire clk
+  .CLK(clk),                    // input wire clk
   .A(a_reg),                        // input wire [31 : 0] A
   .B(b_reg),                        // input wire [31 : 0] B
   .SCLR(ready),           // input wire SCLR
