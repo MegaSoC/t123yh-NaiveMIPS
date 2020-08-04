@@ -99,7 +99,7 @@ module XALU(
                     .CLK(clk), // input wire clk
                     .A(a_reg), // input wire [31 : 0] A
                     .B(b_reg), // input wire [31 : 0] B
-                    .SClr(ready), // input wire SClr
+                    .SCLR(ready), // input wire SClr
                     .P(mult_o) // output wire [63 : 0] P
                 );
 
@@ -107,7 +107,7 @@ module XALU(
                       .CLK(clk), // input wire clk
                       .A(a_reg), // input wire [31 : 0] A
                       .B(b_reg), // input wire [31 : 0] B
-                      .SClr(ready), // input wire SCLr
+                      .SCLR(ready), // input wire SCLr
                       .P(multu_o) // output wire [63 : 0] P
                   );
 
