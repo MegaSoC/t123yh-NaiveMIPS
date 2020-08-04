@@ -334,7 +334,7 @@ module mycpu_top(
     DecodeState decodestate(
                     .Clk(Clk),
                     .Clr(MyClr),
-                    .is_mul(ExecuteSdate.mul_in_xalu),
+                    .is_mul(my_e.mul_in_xalu),
                     .dm_stall(dm_stall),
                     .exp_flush(exp_flush),
                     .inst_sram_data_ok(inst_sram_data_ok),
@@ -388,9 +388,9 @@ module mycpu_top(
     wire [31:0] E_DataLSaddr;
     wire E_MemReadEnable_Inter;
     wire E_EstallClear ; 
-        wire E_MemSaveType_Inter ;
+    wire E_MemSaveType_Inter ;
     wire E_MemLStype_Inter = E_MemReadEnable_Inter | E_MemSaveType_Inter ;
-        ExecuteSdate ExecuteSdate(
+        E my_e(
                      .Clk(Clk),
                      .Clr(MyClr),
                      .exp_flush(exp_flush),

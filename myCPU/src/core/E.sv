@@ -1,6 +1,6 @@
 `include "my_global.vh"
 
-module ExecuteSdate(
+module E(
         input Clk,
         input Clr,
         input exp_flush,
@@ -77,15 +77,15 @@ module ExecuteSdate(
     wire XALU_Busy_Inter;
 
     XALU XALU(
-             .Clk(Clk),
-             .Clr(Clr),
-             .InstrBus(D_InstrBus),
-             .XALU_A(MF_Rs),
-             .XALU_B(MF_Rt),
-             .XALU_HI(XALU_HI),
-             .XALU_LO(XALU_LO),
-             .XALU_Busy(XALU_Busy_Inter),
-             .Intreq(exp_flush | E_now_exp )
+             .clk(Clk),
+             .reset(Clr),
+             .instrBus(D_InstrBus),
+             .xaluA(MF_Rs),
+             .xaluB(MF_Rt),
+             .xaluHi(XALU_HI),
+             .xaluLo(XALU_LO),
+             .xaluBusy(XALU_Busy_Inter),
+             .xaluFlush(exp_flush | E_now_exp )
          );
 
     assign E_XALU_Busy = XALU_Busy_Inter;

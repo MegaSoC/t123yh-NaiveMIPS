@@ -2,7 +2,7 @@
 
 module MemCtrlUnit(
         input [`INSTRBUS_WIDTH-1:0] InstrBus,
-        input [1:0] Offset,//地址末尾的两�???
+        input [1:0] Offset,
         output [8:0] ExtType,
         output [3:0] MemWriteEnable,
         output MemFamily,
@@ -18,7 +18,7 @@ module MemCtrlUnit(
     assign load_alignment_err = (lw & Offset[1:0]!=0) |           (lh & Offset[0] !=0) |           (lhu & Offset[0] !=0) ;
     assign store_alignment_err = (sw & Offset[1:0]!=0) |           (sh & Offset[0] !=0) ;
     
-    assign MemWriteEnable = store_alignment_err ? 4'b0000: //必须提前禁止写内�???
+    assign MemWriteEnable = store_alignment_err ? 4'b0000: 
            (({4{sw}} & 4'b1111) |({4{sh}} & (4'b0011<<Offset)) |({4{sb}} & (4'b0001<<Offset)) |({4{swl}} & (4'b1111>>(~Offset))) |({4{swr}} & (4'b1111<<(Offset))));
 
     assign LoadFamily = lb|lbu|lh|lhu|lw|lwl|lwr ;
