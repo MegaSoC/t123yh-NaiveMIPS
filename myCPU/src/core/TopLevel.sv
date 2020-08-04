@@ -295,7 +295,6 @@ module mycpu_top(
                         .inst_sram_data_ok(inst_sram_data_ok),
                         .D_stall_Pass(D_stall_Pass),
                         .D_NewPC_Pass(D_NewPC_Pass),
-                        .exception_new_pc(exception_new_pc),
                         .Instr_axi_Inter(inst_sram_rdata),
                         .inst_exp_miss(inst_exp_miss),
                         .inst_exp_illegal(inst_exp_illegal),
@@ -310,8 +309,7 @@ module mycpu_top(
                                                 .icache_stall(icache_stall),
                         .uncache_inst(inst_uncached),
                         .I_icache_rdata(rdata_icache),
-                        .I_nextNotReady(I_nextNotReady),
-                        .inst_sram_addr(inst_sram_addr)
+                        .I_nextNotReady(I_nextNotReady)
                                             );
 
     wire M_WriteRegEnable;
