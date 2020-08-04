@@ -170,7 +170,7 @@ module cp0(
         end
         else begin
             count_add <= ~count_add;
-            cp0_reg_Count <= cp0_reg_Count + {31'd0,count_add);
+            cp0_reg_Count <= cp0_reg_Count + {31'd0,count_add};
             if (cp0_reg_Compare == cp0_reg_Count) begin
                 timer_int <= 1'b1;
                 cp0_reg_Cause[30] <= 1'b1;
