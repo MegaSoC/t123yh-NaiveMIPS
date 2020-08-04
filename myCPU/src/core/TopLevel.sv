@@ -331,7 +331,7 @@ module mycpu_top(
     wire D_in_delayslot;
 
     wire [3:0] M_WriteRegEnableExted;
-    DecodeState decodestate(
+    D my_d(
                     .Clk(Clk),
                     .Clr(MyClr),
                     .is_mul(my_e.mul_in_xalu),
@@ -458,7 +458,7 @@ module mycpu_top(
     wire [31:0] rdata_dcache,data2cp0;
     wire not_hit ;
 
-    MemState MemState(
+    M my_m(
                  .Clk(Clk),
                  .Clr(MyClr),
                  .dm_stall(dm_stall),
