@@ -99,7 +99,7 @@ module D(
         .ipc(I_PC_Pass),
         .npc(D_NewPC_Pass),
 
-        .exp_flush(exp_flus),
+        .exp_flush(exp_flush),
         .epc(exception_new_pc)
     );
 
@@ -135,7 +135,10 @@ module D(
       .D_MultCalFamily(D_MultCalFamily),
       .exp_flush(exp_flush)
     );
-
+    initial begin        
+        D_is_branch      <= 0;
+        D_in_delayslot   <= 0;   
+    end
     always @(posedge Clk ) begin
         if (Clr) begin
             D_EPC            <= 0;            
@@ -146,9 +149,7 @@ module D(
     end
     always @ (posedge Clk) begin
         if( Clr | exp_flush | (D_stall_Pass & !dm_stall) | (!dm_stall & I_nextNotReady) )
-        begin  
-            D_is_branch      <= 0;
-            D_in_delayslot   <= 0;                       
+        begin                      
             D_PC             <= 0;             
             D_RsID           <= 0;
             D_RtID           <= 0;

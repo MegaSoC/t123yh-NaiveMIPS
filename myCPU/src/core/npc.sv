@@ -31,18 +31,13 @@ module NPC(
     wire bltzal       = (op==6'b000001 && instr[20:16]==5'b10000),
          bgezal       = (op==6'b000001 && instr[20:16]==5'b10001);
     wire b_type       = (beq|bne|blez)|(bgtz|bltz|bgez)|(bltzal|bgezal);
-    wire b_valid      = beq ? rs==rt:
-         bne ? rs!=rt:
-         blez ? rs    <=rt:
-         bgtz ? rs>0:
-         bltz|bltzal ? rs<0:
-         bgez|bgezal ? rs>=0:
-         0;
 
+    logic b_valid;
+    assign b_valid = (beq&(rs==rt)) | (bne&(rs!=rt)) | (blez&(rs<=0)) | (bgtz&(rs>0)) | ((bltz|bltzal)&(rs<0)) | ((bgez|bgezal)&(rs>=0));
     wire [31:0] bpc   = ipc + {{14{Imm16[15]}},Imm16,2'b00};
-        assign npc    = exp_flush ? epc :
-           j_type ? jpc:
-           jr_type ? jrpc:
-           (b_type & b_valid) ? bpc:
-           pc4;
+    logic normal;
+    assign normal = !(j_type | jr_type | (b_type & b_valid));
+    assign npc = exp_flush ? epc :
+               ({32{j_type}}&jpc) | ({32{jr_type}}&jrpc) | ({32{(b_type & b_valid)}}&bpc) | ({32{normal}}&pc4);
+
 endmodule
