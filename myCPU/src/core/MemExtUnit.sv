@@ -10,23 +10,23 @@ module MemExtUnit(
         output [3:0] M_WriteRegEnableExted
     );
     wire lb,lbu,lh,lhu,lw,lwl,lwr,swl,swr;
-    assign {lb,lbu,lh,lhu,lw,lwl,lwr,swl,swr}=ExtType;
+    assign {lb,lbu,lh,lhu,lw,lwl,lwr,swl,swr} =ExtType;
     logic [31:0] lwld,alwld;
-    assign lwld = ( RawMemData<<({Offset,3'b0}));
-    assign alwld = ( RawMemData>>({Offset,3'b0}));
+    assign lwld                               = ( RawMemData<<({Offset,3'b0}));
+    assign alwld                              = ( RawMemData>>({Offset,3'b0}));
 
     logic normal;
-    assign normal = !(lb|lbu|lh|lhu|lwl|(!M_MemFamily));
-    assign M_Data = ({32{!M_MemFamily}} & RawMemData) | 
+    assign normal                             = !(lb|lbu|lh|lhu|lwl|(!M_MemFamily));
+    assign M_Data                             = ({32{!M_MemFamily}} & RawMemData) | 
            ({32{lhu}} & {16'b0,alwld[15:0]})|
            ({32{lh}} & {{16{alwld[15]}},alwld[15:0]})|
            ({32{lbu}} & {24'b0,alwld[7:0]})|
            ({32{lb}} & {{24{alwld[7]}},alwld[7:0]})|
            ({32{lwl}} & lwld)|
            ({32{normal}} & alwld);
-    wire [3:0] WritePreExted = {4{M_WriteRegEnable}};
+    wire [3:0] WritePreExted                  = {4{M_WriteRegEnable}};
     logic pnormal;
-    assign pnormal = !(lwl|lwr);
-    assign M_WriteRegEnableExted = ({32{lwr}}&(WritePreExted>>Offset)) | ({32{lwl}}&( WritePreExted<<(~Offset))) | ({32{pnormal}}&(WritePreExted));
+    assign pnormal                            = !(lwl|lwr);
+    assign M_WriteRegEnableExted              = ({32{lwr}}&(WritePreExted>>Offset)) | ({32{lwl}}&( WritePreExted<<(~Offset))) | ({32{pnormal}}&(WritePreExted));
 
 endmodule

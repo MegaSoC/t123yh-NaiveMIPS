@@ -1,5 +1,5 @@
 module mmu(
-        input wire clk,
+    input wire clk,
     input wire rst,
 
     input wire[31:0] daddr_i,
@@ -24,26 +24,26 @@ module mmu(
 
     
     mmu_map data_mmu(
-                                .addr_o(daddr_o),
-                .invalid(data_illegal),
-                .using_tlb(data_tlb_map),
-                .uncached(data_uncached),
-                                .addr_i(daddr_i),
-                .cp0_kseg0_uncached(cp0_kseg0_uncached),
-                .en(data_en),
-                .um(user_mode)
-            );
+        .addr_o(daddr_o),
+        .invalid(data_illegal),
+        .using_tlb(data_tlb_map),
+        .uncached(data_uncached),
+        .addr_i(daddr_i),
+        .cp0_kseg0_uncached(cp0_kseg0_uncached),
+        .en(data_en),
+        .um(user_mode)
+    );
 
     mmu_map inst_mmu(
-                                .addr_o(iaddr_o),
-                .invalid(inst_illegal),
-                .using_tlb(inst_tlb_map),
-                .uncached(inst_uncached),
-                                .addr_i(iaddr_i),
-                .cp0_kseg0_uncached(cp0_kseg0_uncached),
-                .en(inst_en),
-                .um(user_mode)
-            );
+        .addr_o(iaddr_o),
+        .invalid(inst_illegal),
+        .using_tlb(inst_tlb_map),
+        .uncached(inst_uncached),
+        .addr_i(iaddr_i),
+        .cp0_kseg0_uncached(cp0_kseg0_uncached),
+        .en(inst_en),
+        .um(user_mode)
+    );
 
 
 endmodule 
@@ -59,12 +59,12 @@ input wire[31:0] addr_i,
     output wire uncached
     );
 
-    assign invalid = (en & um & addr_i[31]); // 用户态访问非法地�?
+    assign invalid   = (en & um & addr_i[31]); // 用户态访问非法地�?
 
-    assign uncached = addr_i[31:29] == 3'b101 ? 1'b1 :
+    assign uncached  = addr_i[31:29] == 3'b101 ? 1'b1 :
            addr_i[31:29] == 3'b100 ? cp0_kseg0_uncached :
            1'b0 ;
-        assign addr_o = addr_i[31:29] == 3'b100 ? {3'b000 , addr_i[28:0]} :            addr_i[31:29] == 3'b101 ? {3'b000 , addr_i[28:0]} :            32'b0 ;
+    assign addr_o    = addr_i[31:29] == 3'b100 ? {3'b000 , addr_i[28:0]} : addr_i[31:29] == 3'b101 ? {3'b000 , addr_i[28:0]} : 32'b0 ;
     assign using_tlb = addr_i[31:29] == 3'b100 ? 1'b0 :
            addr_i[31:29] == 3'b101 ? 1'b0 :
            en ;
