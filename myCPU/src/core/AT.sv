@@ -1,6 +1,6 @@
 `include "my_global.vh"
 
-module StallCtrlUnit(
+module AT(
         input [`INSTRBUS_WIDTH-1:0] InstrBus,
         input [4:0] Rs,
         input [4:0] Rt,

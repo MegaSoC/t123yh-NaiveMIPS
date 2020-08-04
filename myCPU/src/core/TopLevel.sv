@@ -456,7 +456,7 @@ module mycpu_top(
      .E_inst_illegal(E_inst_illegal),
      .E_inst_invalid(E_inst_invalid),
                           
-      .E_now_exp(E_now_exp),
+     .E_now_exp(E_now_exp),
      .E_calLSaddr(E_DataLSaddr),
      .E_MemReadEnable_Inter(E_MemReadEnable_Inter),
      .E_EstallClear(E_EstallClear),

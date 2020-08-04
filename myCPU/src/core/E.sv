@@ -68,7 +68,7 @@ module E(
          D_RsData;
     wire [31:0] MF_Rt                = (D_RtID!=0 && D_RtID==E_RegId && E_T==0 && E_WriteRegEnable) ? E_Data:
          (D_RtID!=0 && M_WriteRegEnable && M_T==0 && M_RegId==D_RtID) ? M_Data:         D_RtData;
-    wire [31:0] C_Inter;
+    wire [31:0] Data_Inter;
     wire D_OverFlow;
   
 
@@ -88,34 +88,32 @@ module E(
      );
 
     assign E_XALU_Busy               = XALU_Busy_Inter;
+    wire `INSTR_SET;
+    assign {`INSTR_SET}              = D_InstrBus;
 
     wire [8:0] ExtType_Inter;
     wire [3:0] MemWriteEnable_Inter;
     wire MemFamily_Inter;
 
-    wire[1:0] Offset;
-    assign Offset                    = C_Inter[1:0];
     wire D_load_alignment_err, D_store_alignment_err;
-    MemCtrlUnit MemCtrlUnit(
-        .InstrBus(D_InstrBus),
-        .Offset(C_Inter[1:0]),
-        .ExtType(ExtType_Inter),
-        .MemWriteEnable(MemWriteEnable_Inter),
-        .MemFamily(MemFamily_Inter),
-        .load_alignment_err(D_load_alignment_err),
-        .store_alignment_err(D_store_alignment_err),
-        .LoadFamily(E_MemReadEnable_Inter),
-        .E_MemSaveType_Inter(E_MemSaveType_Inter)
-    );
+    wire [1:0] Offset;
+    assign Offset = Data_Inter[1:0];
 
-    wire [3:0] E_T_Inter             = (D_T > 0)?D_T-1:0;
+    assign ExtType_Inter             = {lb,lbu,lh,lhu,lw,lwl,lwr,swl,swr};
+    assign MemFamily_Inter           = lb|lbu|lh|lhu|lw|sb|sh|sw;
+    assign D_load_alignment_err  = (lw & Offset[1:0]!=0) |           (lh & Offset[0] !=0) |           (lhu & Offset[0] !=0) ;
+    assign D_store_alignment_err = (sw & Offset[1:0]!=0) |           (sh & Offset[0] !=0) ;
+    
+    assign MemWriteEnable_Inter      = D_store_alignment_err ? 4'b0000: 
+           (({4{sw}} & 4'b1111) |({4{sh}} & (4'b0011<<Offset)) |({4{sb}} & (4'b0001<<Offset)) |({4{swl}} & (4'b1111>>(~Offset))) |({4{swr}} & (4'b1111<<(Offset))));
 
-    wire `INSTR_SET;
-    assign {`INSTR_SET}              = D_InstrBus;
+    assign E_MemReadEnable_Inter          = lb|lbu|lh|lhu|lw|lwl|lwr ;
 
+    assign E_MemSaveType_Inter = sw|sb|sh ;
 
-    wire [31:0] Data_Inter;
-    assign E_calLSaddr               = C_Inter;
+    wire [3:0] E_T_Inter             = (D_T > 0)?D_T-1:0;    
+
+    assign E_calLSaddr               = Data_Inter;
     reg mul_in_xalu;
         
     ALU ALU(
@@ -124,7 +122,6 @@ module E(
         .shamt(D_Shamt),
         .Imm16(D_Imm16),
         .InstrBus(D_InstrBus),
-        .aluresult(C_Inter),
         .datainter(Data_Inter),
         .mfhi1(mfhi),
         .mflo1(mflo),

@@ -61,7 +61,7 @@ module D(
     wire WriteRegEnable_Inter;
     wire [4:0] WriteRegId_Inter;
 
-    DecodeUnit DecodeUnit(
+    instr2bus my_trans(
        .MipsInstr(I_MipsInstr),
        .Rs(Rs_Inter),
        .Rt(Rt_Inter),
@@ -75,7 +75,7 @@ module D(
    );
 
     wire [31:0] RsData_Inter,RtData_Inter;
-    GRF GRF(
+    GRF my_grf(
         .Clk(Clk),
         .Clr(Clr),
         .PC(W_PC),
@@ -92,7 +92,7 @@ module D(
     /////////////////////杞�鍙戝�????
     wire[31:0] MF_Rs         = (Rs_Inter!=0 && Rs_Inter==E_RegId && E_T==0 && E_WriteRegEnable) ? E_Data: RsData_Inter;
     wire[31:0] MF_Rt         = (Rt_Inter!=0 && Rt_Inter==E_RegId && E_T==0 && E_WriteRegEnable) ? E_Data: RtData_Inter;
-    NPC NPC(
+    NPC my_npc(
         .instr(I_MipsInstr),
         .rs(MF_Rs),
         .rt(MF_Rt),
@@ -119,7 +119,7 @@ module D(
     assign D_stall_Pass      = D_stall_Pass1 | is_mul;
 
     wire [3:0] T_Inter;
-    StallCtrlUnit StallCtrlUnit(
+    AT my_at(
       .InstrBus(InstrBus_Inter),
       .Rs(Rs_Inter),
       .Rt(Rt_Inter),

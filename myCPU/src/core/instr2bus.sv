@@ -1,6 +1,6 @@
 `include "my_global.vh"
 
-module DecodeUnit(
+module instr2bus(
         input [31:0] MipsInstr,
         output [4:0] Shamt,
         output [4:0] Rs,

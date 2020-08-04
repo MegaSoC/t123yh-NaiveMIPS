@@ -525,13 +525,6 @@ module my_dcache
 
 endmodule
 
-module num_2_hot_1s2 (in , out);
-input  [1:0] in;
-output [1:0] out;
-assign out=(in[0])? 2'b10:2'b01;
-           
-endmodule 
-
 module onehot_3s8(in,out);
 input [2:0] in ;
 output logic [7:0] out ;
