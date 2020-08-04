@@ -136,7 +136,7 @@ module GRF(
 
 	integer	i;
 	always_ff @ (posedge Clk) begin
-		if(Clr)begin
+		if(reset)begin
 			for(i=0;i<32;i=i+1)
 				Reg[i]<=0;
 		end
