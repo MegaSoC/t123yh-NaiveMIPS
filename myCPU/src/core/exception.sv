@@ -1,76 +1,43 @@
 `include "my_global.vh"
 
 module exception(
-                flush,
-        wr_exp,
-        clear_exl,
-        exp_code,
-        epc,
-        badvaddr,
-        badvaddr_we,
-        exception_new_pc,
-                clk,
-        E_EPC,
-        pc,
-        mm_pc,
-        data_vaddr,
-        data_we,
-        data_miss,
-        inst_miss,
-        data_illegal,
-        inst_illegal,
-        data_dirty,
-        data_invalid,
-        inst_invalid,
-        eret,
-        my_break,
-        syscall,
-        unknown_inst,
-        in_delayslot,
-        overflow,
-        epc_in,
-        allow_int,
-        interrupt_flag,
-        inst_sram_data_ok,
-                icache_stall,
-        E_now_exp,
-        inst_uncached
-            );
-    input wire clk;
-    input wire [31:0] E_EPC;
-    input wire [31:0] pc;
-    input wire [31:0] mm_pc;
-    input wire [31:0] data_vaddr;
-    input wire data_we;
-    input wire data_miss;
-    input wire inst_miss;
-    input wire data_illegal;
-    input wire inst_illegal;
-    input wire data_dirty;
-    input wire data_invalid;
-    input wire inst_invalid;
-    input wire eret;
-    input wire my_break;
-    input wire syscall;
-    input wire unknown_inst;
-    input wire in_delayslot;
-    input wire overflow;
-    input wire[31:0] epc_in;
-    input wire allow_int;
-    input wire[7:0] interrupt_flag;
-    input wire inst_sram_data_ok;
-    input wire icache_stall;
+               input wire clk,
+    input wire [31:0] E_EPC,
+    input wire [31:0] pc,
+    input wire [31:0] mm_pc,
+    input wire [31:0] data_vaddr,
+    input wire data_we,
+    input wire data_miss,
+    input wire inst_miss,
+    input wire data_illegal,
+    input wire inst_illegal,
+    input wire data_dirty,
+    input wire data_invalid,
+    input wire inst_invalid,
+    input wire eret,
+    input wire my_break,
+    input wire syscall,
+    input wire unknown_inst,
+    input wire in_delayslot,
+    input wire overflow,
+    input wire[31:0] epc_in,
+    input wire allow_int,
+    input wire[7:0] interrupt_flag,
+    input wire inst_sram_data_ok,
+    input wire icache_stall,
             
-    output reg flush;
-    output reg wr_exp;
-    output reg clear_exl;
-    output reg[4:0] exp_code;
-    output reg[31:0] epc;
-    output reg[31:0] badvaddr;
-    output reg badvaddr_we;
-    output reg[31:0] exception_new_pc;
-        output wire E_now_exp;
-    input wire inst_uncached;
+    output reg flush,
+    output reg wr_exp,
+    output reg clear_exl,
+    output reg[4:0] exp_code,
+    output reg[31:0] epc,
+    output reg[31:0] badvaddr,
+    output reg badvaddr_we,
+    output reg[31:0] exception_new_pc,
+        output wire E_now_exp,
+    input wire inst_uncached
+            );
+    
     
     wire[31:0] exception_base;
     wire boot_exp_vec;

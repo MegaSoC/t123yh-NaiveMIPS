@@ -1,96 +1,53 @@
 `include "my_global.vh"
 
 module cp0(
-                epc,
-        allow_int,
-        in_exl,
-        data_o,
-        interrupt_flag,
-                clk,
-        rst,
-        rd_addr,
-        we,
-        wr_addr,
-        data_i,
-        hardware_int,
-        clear_exl,
-        en_exp_i,
-        exp_bd,
-        exp_epc,
-        exp_code,
-        exp_badvaddr,
-        exp_badvaddr_we,
-        tlbwi,
-        tlbr,
-        tlbp,
+    input wire clk,
+    input wire rst,
 
-                        daddr_o,
-        iaddr_o,
-        data_uncached,
-        inst_uncached,
+    input wire[4:0] rd_addr,
+    input wire we,
+    input wire[4:0] wr_addr,
+    input wire[31:0] data_i,
 
-        data_exp_miss,
-        inst_exp_miss,
-        data_exp_illegal,
-        inst_exp_illegal,
-        data_exp_dirty,
-        data_exp_invalid,
-        inst_exp_invalid,
-        icache_close,
-        dcache_close,
+    input wire[5:0]hardware_int,
+    input wire clear_exl,
+    input wire en_exp_i,
+    input wire exp_bd,
+    input wire[31:0] exp_epc,
+    input wire[4:0] exp_code,
+    input wire[31:0] exp_badvaddr,
+    input wire exp_badvaddr_we,
+    input wire tlbwi,
+    input wire tlbr,
+    input wire tlbp,
 
-                daddr_i,
-        iaddr_i,
-        data_en,
-        inst_en
+    output wire allow_int,
+    output wire in_exl,
+
+    output wire[31:0] epc,
+    output reg[31:0] data_o,
+    output wire[7:0] interrupt_flag,
+
+    input wire[31:0] daddr_i,
+    input wire[31:0] iaddr_i,
+    input wire data_en,
+    input wire inst_en,
+
+    output wire[31:0] daddr_o,
+    output wire[31:0] iaddr_o,
+
+    output wire data_uncached,
+    output wire inst_uncached,
+    output wire data_exp_miss,
+    output wire inst_exp_miss,
+    output wire data_exp_illegal,
+    output wire inst_exp_illegal,
+    output wire data_exp_dirty,
+    output wire data_exp_invalid,
+    output wire inst_exp_invalid,
+    input wire icache_close,
+    output reg dcache_close
     );
-
-
-    input wire clk;
-    input wire rst;
-
-    input wire[4:0] rd_addr;
-    input wire we;
-    input wire[4:0] wr_addr;
-    input wire[31:0] data_i;
-
-    input wire[5:0]hardware_int;
-    input wire clear_exl;
-    input wire en_exp_i;
-    input wire exp_bd;
-    input wire[31:0] exp_epc;
-    input wire[4:0] exp_code;
-    input wire[31:0] exp_badvaddr;
-    input wire exp_badvaddr_we;
-    input wire tlbwi;
-    input wire tlbr;
-    input wire tlbp;
-
-    output wire allow_int;
-    output wire in_exl;
-
-    output wire[31:0] epc;
-    output reg[31:0] data_o;
-    output wire[7:0] interrupt_flag;
-
-    input wire[31:0] daddr_i;
-    input wire[31:0] iaddr_i;
-    input wire data_en;
-    input wire inst_en;
-
-    output wire[31:0] daddr_o;
-    output wire[31:0] iaddr_o;
-
-    output wire data_uncached;
-    output wire inst_uncached;
-    output wire data_exp_miss;
-    output wire inst_exp_miss;
-    output wire data_exp_illegal;
-    output wire inst_exp_illegal;
-    output wire data_exp_dirty;
-    output wire data_exp_invalid;
-    output wire inst_exp_invalid;
-    input wire icache_close;
 
     reg[31:0] cp0_reg_Index;
     reg[31:0] cp0_reg_EntryLo0;
@@ -148,7 +105,7 @@ module cp0(
             endcase
         end
     end
-    output reg dcache_close;
+    
     reg[89:0] tlb0[0:1];
     reg[89:0] tlb1[0:1];
     wire[0:0] tlbEntryIndex;
