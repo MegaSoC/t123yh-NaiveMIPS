@@ -55,7 +55,7 @@ module exception(
         if (reset) begin
             ExcCode <= 5'b0;
             flush <= 1'b0;
-            vice_flush1 <= 1'b0
+            vice_flush1 <= 1'b0;
             vice_flush2 <= 1'b0;
             vice_flush3 <= 1'b0;
             NewExceptionPC <= 32'b0;
