@@ -55,18 +55,18 @@ module my_tag_ram
 
 
    genvar s0;
-   // generate
-   //    for(s0=0;s0<=1;s0=s0+1) begin :way_tags
-   //       tag_ram_bram way_tag(
-   //          .clka(clk),    
-   //          .ena(1'b1),      
-   //          .wea( (refill& we[s0])  | !cache_reset),      
-   //          .addra(tag_addr),  
-   //          .dina(tag_way_in[s0]),    
-   //          .douta(tag_way_out[s0])  
-   //       );
-   //    end
-   // endgenerate
+   generate
+      for(s0=0;s0<=1;s0=s0+1) begin :way_tags
+         tag_ram_bram way_tag(
+            .clka(clk),    
+            .ena(1'b1),      
+            .wea( (refill& we[s0])  | !cache_reset),      
+            .addra(tag_addr),  
+            .dina(tag_way_in[s0]),    
+            .douta(tag_way_out[s0])  
+         );
+      end
+   endgenerate
 
    // generate
    //    for(s0=0;s0<=1;s0=s0+1) begin :way_tags
