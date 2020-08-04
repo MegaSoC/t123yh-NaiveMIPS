@@ -25,10 +25,7 @@ module my_tag_ram
     input load_over 
     );
    logic [2:0]     tag_bit[(1<<ADDR_WIDTH)-1:0];
-    
-   
    logic [20:0] tag_way_in [1:0];
-   //logic [20:0] tag_way_out [1:0];
    logic [1:0] [20:0] tag_reg_out, tag_way_out;
    assign tag_way_in[0] = (!cache_reset| !we[0]) ? 21'b0 : din[20:0] ;
    assign tag_way_in[1] = (!cache_reset| !we[1]) ? 21'b0 : din[42:22] ;
@@ -67,45 +64,6 @@ module my_tag_ram
          );
       end
    endgenerate
-
-   // generate
-   //    for(s0=0;s0<=1;s0=s0+1) begin :way_tags
-   //    xpm_memory_dpdistram #(
-	//    	// Common module parameters
-	//    	.MEMORY_SIZE(21*128),
-	//    	.CLOCKING_MODE("common_clock"),
-	//    	.USE_MEM_INIT(0),
-	//    	.MESSAGE_CONTROL(0),
-
-	//    	// Port A module parameters
-	//    	.WRITE_DATA_WIDTH_A(21),
-	//    	.READ_DATA_WIDTH_A(21),
-	//    	.READ_RESET_VALUE_A("0"),
-	//    	.READ_LATENCY_A(0),
-
-	//    	// Port B module parameters
-	//    	.READ_DATA_WIDTH_B(21),
-	//    	.READ_RESET_VALUE_B("0"),
-	//    	.READ_LATENCY_B(0)
-	//    ) xpm_mem (
-	//    	.clka           ( clk ),
-	//    	.rsta           ( rst ),
-	//    	.ena            ( 1'b1  ),
-	//    	.regcea         ( 1'b0  ),
-	//    	.wea            ( (refill& we[s0])  | !cache_reset),  
-	//    	.addra          ( tag_addr ),
-	//    	.dina           ( tag_way_in[s0]  ),  
-	//    	.douta          ( ),
-
-	//    	.clkb           ( clk ),
-	//    	.rstb           ( rst ),
-	//    	.enb            ( 1'b1  ), 
-	//    	.regceb         ( 1'b0  ),
-	//    	.addrb          ( tag_addr ),
-	//    	.doutb          ( tag_way_out[s0] )
-	//    );     
-   //    end
-   // endgenerate
 
 
    integer i;

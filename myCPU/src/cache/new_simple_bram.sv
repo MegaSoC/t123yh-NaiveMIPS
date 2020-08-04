@@ -17,7 +17,7 @@ module new_simple_bram
     output [DATA_WIDTH-1:0] dout,
     output [DATA_WIDTH*8-1:0] dout_all,
 
-    input hit_write,    //回填的写使能
+    input hit_write,    
     input [3:0] byte_ben,
     input store ,
 
@@ -27,8 +27,7 @@ module new_simple_bram
   logic [DATA_WIDTH*2-1:0] ram_in[3:0];
   logic [31:0] wea_out;
   logic [31:0] cpu_we_out;
-  logic [31:0] final_wea ;//最终的写使能
-  //assign ram_in = din;
+  logic [31:0] final_wea ;
 
   assign dout_all ={ram_out[3],ram_out[2],ram_out[1],ram_out[0]};
   assign {
@@ -42,12 +41,12 @@ module new_simple_bram
   generate 
   for(s0=0;s0<4'd4 ;s0=s0+1) begin : way_banks
     blk_mem_gen_2 my_way (
-    .clka(clk),    // input logic clka
-    .ena(1'b1),      // input logic ena
-    .wea(final_wea[(s0+1)*8-1:s0*8]),      // input logic [ ] wea
-    .addra(cur_addr[9:3]),  // input logic [6 : 0] addra
-    .dina(ram_in[s0]),    // input logic [255 : 0] dina
-    .douta(ram_out[s0])  // output logic [255 : 0] douta
+    .clka(clk),   
+    .ena(1'b1),      
+    .wea(final_wea[(s0+1)*8-1:s0*8]),      
+    .addra(cur_addr[9:3]),  
+    .dina(ram_in[s0]),    
+    .douta(ram_out[s0])  
     );
   end
   endgenerate
@@ -73,14 +72,7 @@ module new_simple_bram
       .v(byte_ben) 
   );
 
-  assign final_wea = hit_write ?  {32{we}} : cpu_we_out ;
-  
-  // genvar i;
-  // generate
-  //     for(i=0;i< 8;i=i+1)begin
-  //         assign ram_in[(i+1)*32-1:i*32] = (if_idle)? din[31:0] : din_all[(i+1)*32-1:i*32];
-  //     end
-  // endgenerate   
+  assign final_wea = hit_write ?  {32{we}} : cpu_we_out ; 
     
     
 endmodule

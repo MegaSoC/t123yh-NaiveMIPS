@@ -50,9 +50,6 @@ module simple_bram
     );
   end
   endgenerate
-
-
-
   
   logic [2:0] addr_pre ;
   always_ff @(posedge clk) begin
@@ -91,16 +88,7 @@ assign hot_wire[4] = offset==3'b100;
 assign hot_wire[5] = offset==3'b101;
 assign hot_wire[6] = offset==3'b110;
 assign hot_wire[7] = offset==3'b111;
-/*
-assign dataout = ({32{offset==3'b000}} & datain[ 31:  0]) |
-                 ({32{offset==3'b001}} & datain[ 63: 32]) |
-                 ({32{offset==3'b010}} & datain[ 95: 64]) |
-                 ({32{offset==3'b011}} & datain[127: 96]) |
-                 ({32{offset==3'b100}} & datain[159: 128]) |
-                 ({32{offset==3'b101}} & datain[191: 160]) |
-                 ({32{offset==3'b110}} & datain[223: 192]) |
-                 ({32{offset==3'b111}} & datain[255: 224]) ;
-*/
+
 assign dataout = ({32{hot_wire[0]}} & datain[ 31:  0]) |
                  ({32{hot_wire[1]}} & datain[ 63: 32]) |
                  ({32{hot_wire[2]}} & datain[ 95: 64]) |

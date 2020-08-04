@@ -26,21 +26,16 @@ module new2_my_tag_ram
     
    
    logic [20:0] tag_way_in [1:0];
-   //logic [20:0] tag_way_out [1:0];
    logic [1:0] [20:0] tag_way_out, tag_reg_out;
    assign tag_way_in[0] = !cache_reset ? 21'b0 : din[20:0] ;
    assign tag_way_in[1] = !cache_reset ? 21'b0 : din[42:22] ;
   
-    
    logic  tag_bit_in;
    logic  tag_bit_out;
- //  logic [4:0] tag_bit_out;   
    
-    
-    
    assign tag_bit_in =  {din[44]};
     
-   logic  [ADDR_WIDTH-1:0] reg_initial_addr; 
+   logic [ADDR_WIDTH-1:0] reg_initial_addr; 
    logic [ADDR_WIDTH-1:0] cur_addr;
    logic [ADDR_WIDTH-1:0] cur_addr_pre;
    
@@ -57,28 +52,16 @@ module new2_my_tag_ram
    end
    
    genvar s0;
-   // generate
-   //    for(s0=0;s0<=1;s0=s0+1) begin :way_tags
-   //       tag_ram_bram way_tag(
-   //          .clka(clk),    // input logic clka
-   //          .ena(1'b1),      // input logic ena
-   //          .wea(refill | !cache_reset),      // input logic [0 : 0] wea
-   //          .addra(cur_addr),  // input logic [6 : 0] addra
-   //          .dina(tag_way_in[s0]),    // input logic [19 : 0] dina
-   //          .douta(tag_way_out[s0])  // output logic [19 : 0] douta
-   //       );
-   //    end
-   // endgenerate
 
    generate
       for(s0=0;s0<=1;s0=s0+1) begin :way_tags
          tag_ram_bram way_tag(
             .clka(clk),    
             .ena(1'b1),      
-            .wea(refill | !cache_reset),      // input logic [0 : 0] wea
-            .addra(cur_addr),  // input logic [6 : 0] addra
-            .dina(tag_way_in[s0]),    // input logic [19 : 0] dina
-            .douta(tag_way_out[s0])  // output logic [19 : 0] douta
+            .wea(refill | !cache_reset),      
+            .addra(cur_addr),  
+            .dina(tag_way_in[s0]),    
+            .douta(tag_way_out[s0])  
          );
       end
    endgenerate
@@ -122,8 +105,6 @@ module new2_my_tag_ram
    //    end
    // endgenerate
    
-    
-    
    integer i;
    always_ff @(posedge clk) begin
       if(rst)begin
@@ -143,7 +124,6 @@ module new2_my_tag_ram
    end
    
     assign tag_bit_out = tag_bit[cur_addr_pre];
-  //  assign tag_bit_out = tag_bit[tag_bit_raddr] ;
     
     assign dout =
      {

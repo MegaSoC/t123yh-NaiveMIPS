@@ -1,5 +1,5 @@
 `include "my_global.vh"
-//注意，这�??个模块里面实际上把WriteBack级给包括进来�??//在后续扩展中，很可能会在这个模块中加入内部流水级,也就是说，很可能这个模块是二级流�??
+
 module M(
         input Clk,
         input Clr,
