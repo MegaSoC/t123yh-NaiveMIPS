@@ -38,26 +38,20 @@ module M(
         input wire EstallClear
     );
 
+    wire `INSTR_SET;
+    assign {`INSTR_SET} = E_InstrBus;
     wire [31:0] MF_Rt                         = (E_RtID!=0 && M_WriteRegEnable && M_RegId==E_RtID) ? M_Data : E_MemWriteData;
     wire [1:0] AddrOffset                     = E_Data[1:0];
-    wire lb,lbu,lh,lhu,lw,lwl,lwr,swl,swr;
-    assign {lb,lbu,lh,lhu,lw,lwl,lwr,swl,swr} =E_ExtType;
+    
+    assign read = (lb|lbu|lh|lhu|lw);
+    assign write = (sb|sh|sw);
+    assign dm_stall = ((read|write)& uncached & !data_sram_data_ok ) | ( (!uncached) & (!hit));
     assign data2cp0                           = MF_Rt;
     assign data_sram_wdata                    = swl?(MF_Rt>>({(~AddrOffset),3'b0})):
            (MF_Rt<<({AddrOffset,3'b0}));
     wire [31:0] MemReadData_Inter;
     assign MemReadData_Inter                  = (uncached)? data_sram_rdata: cache_rdata ;
 
-    DmStall dmstall(
-        .clk(Clk),
-        .data_sram_data_ok(data_sram_data_ok),
-        .InstrBus(E_InstrBus),
-        .dm_stall(dm_stall),
-        .read(read),
-        .write(write),
-        .uncached(uncached),
-        .o_p_stall(!hit)
-    );
     wire [31:0] Ans                           = E_MemFamily ? MemReadData_Inter:
          rd_cp0_value? cp0_reg_value:
          E_Data;
