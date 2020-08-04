@@ -5,7 +5,7 @@ module NPC(
         input signed [31:0] rs,
         input signed [31:0] rt,
         input [31:0] ipc,
-        input exp_flush,
+        input ExceptionFlush,
         input [31:0] epc,
         output [31:0] npc
     );
@@ -37,7 +37,7 @@ module NPC(
     wire [31:0] bpc = ipc + {{14{Imm16[15]}},Imm16,2'b00};
     logic normal;
     assign normal = !(j_type | jr_type | (b_type & b_valid));
-    assign npc = exp_flush ? epc :
+    assign npc = ExceptionFlush ? epc :
            ({32{j_type}}&jpc) | ({32{jr_type}}&jrpc) | ({32{(b_type & b_valid)}}&bpc) | ({32{normal}}&pc4);
 
 endmodule

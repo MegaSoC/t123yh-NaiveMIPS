@@ -5,7 +5,7 @@ module D(
         input Clr,
         input is_mul,
         input dm_stall,
-        input exp_flush,
+        input ExceptionFlush,
         input inst_sram_data_ok,
         input [3:0] W_WriteRegEnable,
         input [4:0] W_RegWriteId,
@@ -19,8 +19,8 @@ module D(
         output [31:0] D_NewPC_Pass,
         output reg [31:0] D_PC,
         output reg [31:0] D_EPC,
-        output reg [4:0] D_RsID,
-        output reg [4:0] D_RtID,
+        output reg [4:0] RsNumber_D,
+        output reg [4:0] RtNumber_D,
         output reg [4:0] D_RdID,
         output reg [31:0] D_RsData,
         output reg [31:0] D_RtData,
@@ -29,8 +29,8 @@ module D(
         output reg [`INSTRBUS_WIDTH-1:0] D_InstrBus,
 
         input [3:0] E_T,
-        input E_WriteRegEnable,
-        input [4:0] E_RegId,
+        input E_RegWriteEnable,
+        input [4:0] E_RegNumber,
         input [31:0] E_Data,
 
         output reg [3:0] D_T,
@@ -40,18 +40,18 @@ module D(
         output D_stall_Pass,
 
         input E_XALU_Busy,
-        output reg D_in_delayslot,
+        output reg D_InDelaySlot,
 
         input I_inst_miss,
         input I_inst_illegal,
         input I_inst_invalid,
 
-        output reg D_inst_miss,
-        output reg D_inst_illegal,
-        output reg D_inst_invalid,
+        output reg D_InstMiss,
+        output reg D_IllegalInstruction,
+        output reg D_InvalidInstruction,
 
         input I_nextNotReady,
-        input wire [31:0] exception_new_pc
+        input wire [31:0] NewExceptionPC
     );
 
     wire [25:0] Imm26_Inter;
@@ -89,18 +89,18 @@ module D(
             .dm_stall(dm_stall)
         );
 
-    /////////////////////杞�鍙戝�????
-    wire[31:0] MF_Rs = (Rs_Inter!=0 && Rs_Inter==E_RegId && E_T==0 && E_WriteRegEnable) ? E_Data: RsData_Inter;
-    wire[31:0] MF_Rt = (Rt_Inter!=0 && Rt_Inter==E_RegId && E_T==0 && E_WriteRegEnable) ? E_Data: RtData_Inter;
+    /////////////////////杞�鍙戝�????
+    wire[31:0] regRS = (Rs_Inter!=0 && Rs_Inter==E_RegNumber && E_T==0 && E_RegWriteEnable) ? E_Data: RsData_Inter;
+    wire[31:0] regRT = (Rt_Inter!=0 && Rt_Inter==E_RegNumber && E_T==0 && E_RegWriteEnable) ? E_Data: RtData_Inter;
     NPC my_npc(
             .instr(I_MipsInstr),
-            .rs(MF_Rs),
-            .rt(MF_Rt),
+            .rs(regRS),
+            .rt(regRT),
             .ipc(I_PC_Pass),
             .npc(D_NewPC_Pass),
 
-            .exp_flush(exp_flush),
-            .epc(exception_new_pc)
+            .ExceptionFlush(ExceptionFlush),
+            .epc(NewExceptionPC)
         );
 
     wire `INSTR_SET;
@@ -109,7 +109,7 @@ module D(
     reg D_is_branch;
     initial begin
         D_is_branch <= 0;
-        D_in_delayslot <= 0;
+        D_InDelaySlot <= 0;
     end
     assign is_branch = |{beq,bne,blez,bgtz,bltz,bgez,bltzal,bgezal,j,jal,jr,jalr};
 
@@ -126,17 +126,17 @@ module D(
            .D_T(D_T),
            .D_RegId(D_WriteRegEnable?D_RegId:5'd0),
            .E_T(E_T),
-           .E_WriteRegEnable(E_WriteRegEnable),
-           .E_RegId(E_RegId),
+           .E_RegWriteEnable(E_RegWriteEnable),
+           .E_RegNumber(E_RegNumber),
            .stall(D_stall_Pass1),
            .T(T_Inter),
            .XALU_Busy(E_XALU_Busy),
            .D_MultCalFamily(D_MultCalFamily),
-           .exp_flush(exp_flush)
+           .ExceptionFlush(ExceptionFlush)
        );
     initial begin
         D_is_branch <= 0;
-        D_in_delayslot <= 0;
+        D_InDelaySlot <= 0;
     end
     always @(posedge Clk ) begin
         if (Clr) begin
@@ -147,11 +147,11 @@ module D(
         end
     end
     always @ (posedge Clk) begin
-        if( Clr | exp_flush | (D_stall_Pass & !dm_stall) | (!dm_stall & I_nextNotReady) )
+        if( Clr | ExceptionFlush | (D_stall_Pass & !dm_stall) | (!dm_stall & I_nextNotReady) )
         begin
             D_PC <= 0;
-            D_RsID <= 0;
-            D_RtID <= 0;
+            RsNumber_D <= 0;
+            RtNumber_D <= 0;
             D_RsData <= 0;
             D_RtData <= 0;
             D_Shamt <= 0;
@@ -162,17 +162,17 @@ module D(
             D_RegId <= 0;
             D_MultCalFamily <= 0;
 
-            D_inst_miss <= 0;
-            D_inst_illegal <= 0;
-            D_inst_invalid <= 0;
+            D_InstMiss <= 0;
+            D_IllegalInstruction <= 0;
+            D_InvalidInstruction <= 0;
         end
         else if (!dm_stall & !I_nextNotReady ) begin
             D_PC <= I_PC;
-            D_RsID <= Rs_Inter;
-            D_RtID <= Rt_Inter;
+            RsNumber_D <= Rs_Inter;
+            RtNumber_D <= Rt_Inter;
             D_RdID <= Rd_Inter;
-            D_RsData <= MF_Rs; //这里之前不是转发�????
-            D_RtData <= MF_Rt;
+            D_RsData <= regRS; //这里之前不是转发�????
+            D_RtData <= regRT;
             D_Shamt <= Shamt_Inter;
             D_Imm16 <= Imm16_Inter;
             D_InstrBus <= InstrBus_Inter;
@@ -182,11 +182,11 @@ module D(
 
             D_MultCalFamily <= MultCalFamily_Inter;
             D_is_branch <= is_branch;
-            D_in_delayslot <= D_is_branch;
+            D_InDelaySlot <= D_is_branch;
 
-            D_inst_miss <= I_inst_miss;
-            D_inst_illegal <= I_inst_illegal;
-            D_inst_invalid <= I_inst_invalid;
+            D_InstMiss <= I_inst_miss;
+            D_IllegalInstruction <= I_inst_illegal;
+            D_InvalidInstruction <= I_inst_invalid;
         end
     end
 

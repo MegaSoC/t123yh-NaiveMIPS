@@ -17,15 +17,15 @@ module mmu(
         output wire inst_uncached,
         output wire data_tlb_map,
         output wire inst_tlb_map,
-        output wire data_illegal,
-        output wire inst_illegal
+        output wire IllegalData,
+        output wire IllegalInst
 
     );
 
 
     mmu_map data_mmu(
                 .addr_o(daddr_o),
-                .invalid(data_illegal),
+                .invalid(IllegalData),
                 .using_tlb(data_tlb_map),
                 .uncached(data_uncached),
                 .addr_i(daddr_i),
@@ -36,7 +36,7 @@ module mmu(
 
     mmu_map inst_mmu(
                 .addr_o(iaddr_o),
-                .invalid(inst_illegal),
+                .invalid(IllegalInst),
                 .using_tlb(inst_tlb_map),
                 .uncached(inst_uncached),
                 .addr_i(iaddr_i),

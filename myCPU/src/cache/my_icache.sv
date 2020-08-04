@@ -321,7 +321,7 @@ module my_icache
     logic store ;
     logic [31:0] reg_o_p_rdata;
     always_ff @(posedge clk) begin
-        if(reset /* | exp_flush */) begin
+        if(reset /* | ExceptionFlush */) begin
             store <=1'b0;
         end
         else if(/* (way_hit!=2'b0 )*/ hit & (dm_stall|o_p_stall) & !store ) begin

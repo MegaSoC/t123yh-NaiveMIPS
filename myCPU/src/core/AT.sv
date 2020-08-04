@@ -7,14 +7,14 @@ module AT(
         input [3:0] D_T,
         input [4:0] D_RegId,
         input [3:0] E_T,
-        input E_WriteRegEnable,
-        input [4:0] E_RegId,
+        input E_RegWriteEnable,
+        input [4:0] E_RegNumber,
         output stall,
         output [3:0] T,
 
         input XALU_Busy,
         input D_MultCalFamily,
-        input exp_flush
+        input ExceptionFlush
     );
     wire `INSTR_SET;
     assign {`INSTR_SET} = InstrBus;
@@ -40,11 +40,11 @@ module AT(
            3;
     wire MultFamily;
     assign MultFamily = (mult|multu|div|divu|mfhi|mflo|mthi|mtlo|mul);
-    wire stall_Rs = NeedRs && Rs!=5'b0 &&( (D_T>T_Rs && D_RegId==Rs)|| (E_T>T_Rs && E_RegId==Rs)),
-         stall_Rt = NeedRt && Rt!=5'b0 &&( (D_T>T_Rt && D_RegId==Rt)|| (E_T>T_Rt && E_RegId==Rt));
+    wire stall_Rs = NeedRs && Rs!=5'b0 &&( (D_T>T_Rs && D_RegId==Rs)|| (E_T>T_Rs && E_RegNumber==Rs)),
+         stall_Rt = NeedRt && Rt!=5'b0 &&( (D_T>T_Rt && D_RegId==Rt)|| (E_T>T_Rt && E_RegNumber==Rt));
 
     wire stall_XALU;
     assign stall_XALU = ((XALU_Busy&MultFamily)|(MultFamily&D_MultCalFamily));
-    assign stall = (stall_Rs|stall_Rt|stall_XALU) & !exp_flush ;
+    assign stall = (stall_Rs|stall_Rt|stall_XALU) & !ExceptionFlush ;
 
 endmodule

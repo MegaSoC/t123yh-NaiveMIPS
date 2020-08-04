@@ -178,7 +178,7 @@ module mycpu_top(
     wire inst_uncached ;
     wire icache_stall;
 
-    wire E_now_exp ;
+    wire E_CurrentException ;
     wire [31:0] rdata_icache;
 
     wire data_uncached ;
@@ -236,7 +236,7 @@ module mycpu_top(
                           .inst_rdata(inst_sram_rdata),
                           .inst_addr_ok(inst_sram_addr_ok),
                           .inst_data_ok(inst_sram_data_ok),
-                          .data_req( data_uncached &(read|write) & !E_now_exp ),
+                          .data_req( data_uncached &(read|write) & !E_CurrentException ),
                           .data_wr(|data_sram_wen) ,
                           .data_size(data_size),
                           .data_wdata(data_sram_wdata),
@@ -294,11 +294,11 @@ module mycpu_top(
     wire [31:0] im_pc;
 
 
-    wire exp_flush;
+    wire ExceptionFlush;
     wire exp_flush_vice1,exp_flush_vice2,exp_flush_vice3;
 
 
-    wire[31:0] exception_new_pc;
+    wire[31:0] NewExceptionPC;
     wire I_nextNotReady;
 
     wire inst_exp_miss;
@@ -330,22 +330,22 @@ module mycpu_top(
       );
 
     wire M_WriteRegEnable;
-    wire [4:0] D_RsID,D_RtID,D_RdID;
+    wire [4:0] RsNumber_D,RtNumber_D,D_RdID;
     wire [31:0] D_RsData,D_RtData;
     wire [4:0] D_Shamt;
     wire [15:0] D_Imm16;
     wire [`INSTRBUS_WIDTH-1:0] D_InstrBus;
     wire [31:0] D_PC,M_PC,D_EPC;
     wire [3:0] E_T,D_T;
-    wire E_WriteRegEnable,D_WriteRegEnable;
-    wire [4:0] E_RegId,D_RegId;
+    wire E_RegWriteEnable,D_WriteRegEnable;
+    wire [4:0] E_RegNumber,D_RegId;
 
     wire [3:0] M_T;
     wire [4:0] M_RegId;
     wire [31:0] M_Data;
 
     wire E_XALU_Busy;
-    wire D_in_delayslot;
+    wire D_InDelaySlot;
 
     wire [3:0] M_WriteRegEnableExted;
     D my_d(
@@ -353,7 +353,7 @@ module mycpu_top(
           .Clr(MyClr),
           .is_mul(my_e.mul_in_xalu),
           .dm_stall(dm_stall),
-          .exp_flush(exp_flush_vice2),
+          .ExceptionFlush(exp_flush_vice2),
           .inst_sram_data_ok(inst_sram_data_ok),
           .W_T(M_T),
           .W_WriteRegEnable(M_WriteRegEnableExted),
@@ -366,8 +366,8 @@ module mycpu_top(
           .D_NewPC_Pass(D_NewPC_Pass),
           .D_PC(D_PC),
           .D_EPC(D_EPC),
-          .D_RsID(D_RsID),
-          .D_RtID(D_RtID),
+          .RsNumber_D(RsNumber_D),
+          .RtNumber_D(RtNumber_D),
           .D_RdID(D_RdID),
           .D_RsData(D_RsData),
           .D_RtData(D_RtData),
@@ -375,24 +375,24 @@ module mycpu_top(
           .D_Imm16(D_Imm16),
           .D_InstrBus(D_InstrBus),
           .E_T(E_T),
-          .E_WriteRegEnable(E_WriteRegEnable),
-          .E_RegId(E_RegId),
+          .E_RegWriteEnable(E_RegWriteEnable),
+          .E_RegNumber(E_RegNumber),
           .E_Data(E_Data),
           .D_T(D_T),
           .D_WriteRegEnable(D_WriteRegEnable),
           .D_RegId(D_RegId),
           .D_stall_Pass(D_stall_Pass),
           .E_XALU_Busy(E_XALU_Busy),
-          .D_in_delayslot(D_in_delayslot),
+          .D_InDelaySlot(D_InDelaySlot),
 
           .I_inst_miss(I_inst_miss),
           .I_inst_illegal(I_inst_illegal),
           .I_inst_invalid(I_inst_invalid),
-          .D_inst_miss(D_inst_miss),
-          .D_inst_illegal(D_inst_illegal),
-          .D_inst_invalid(D_inst_invalid),
+          .D_InstMiss(D_InstMiss),
+          .D_IllegalInstruction(D_IllegalInstruction),
+          .D_InvalidInstruction(D_InvalidInstruction),
           .I_nextNotReady(I_nextNotReady),
-          .exception_new_pc(exception_new_pc)
+          .NewExceptionPC(NewExceptionPC)
       );
 
     wire [31:0] E_PC, E_EPC;
@@ -411,12 +411,12 @@ module mycpu_top(
     E my_e(
           .Clk(Clk),
           .Clr(MyClr),
-          .exp_flush(exp_flush_vice1),
+          .ExceptionFlush(exp_flush_vice1),
           .data_sram_data_ok(data_sram_data_ok),
           .D_PC(D_PC),
           .D_EPC(D_EPC),
-          .D_RsID(D_RsID),
-          .D_RtID(D_RtID),
+          .RsNumber_D(RsNumber_D),
+          .RtNumber_D(RtNumber_D),
           .D_RdID(D_RdID),
           .D_RsData(D_RsData),
           .D_RtData(D_RtData),
@@ -436,28 +436,28 @@ module mycpu_top(
           .E_RtID(E_RtID),
           .E_RdID(E_RdID),
           .E_T(E_T),
-          .E_WriteRegEnable(E_WriteRegEnable),
-          .E_RegId(E_RegId),
+          .E_RegWriteEnable(E_RegWriteEnable),
+          .E_RegNumber(E_RegNumber),
           .E_Data(E_Data),
           .E_ExtType(E_ExtType),
           .E_MemWriteEnable(E_MemWriteEnable),
           .E_MemFamily(E_MemFamily),
           .E_InstrBus(E_InstrBus),
           .E_OverFlow(E_OverFlow),
-          .E_data_alignment_err(data_alignment_err),
+          .E_DataUnaligned(data_alignment_err),
           .dm_stall(dm_stall),
           .E_XALU_Busy_real(E_XALU_Busy),
-          .D_in_delayslot(D_in_delayslot),
+          .D_InDelaySlot(D_InDelaySlot),
           .E_in_delayslot(E_in_delayslot),
 
-          .D_inst_miss(D_inst_miss),
-          .D_inst_illegal(D_inst_illegal),
-          .D_inst_invalid(D_inst_invalid),
-          .E_inst_miss(E_inst_miss),
-          .E_inst_illegal(E_inst_illegal),
-          .E_inst_invalid(E_inst_invalid),
+          .D_InstMiss(D_InstMiss),
+          .D_IllegalInstruction(D_IllegalInstruction),
+          .D_InvalidInstruction(D_InvalidInstruction),
+          .E_InstMiss(E_InstMiss),
+          .E_IllegalInstruction(E_IllegalInstruction),
+          .E_InvalidInstruction(E_InvalidInstruction),
 
-          .E_now_exp(E_now_exp),
+          .E_CurrentException(E_CurrentException),
           .E_calLSaddr(E_DataLSaddr),
           .E_MemReadEnable_Inter(E_MemReadEnable_Inter),
           .E_EstallClear(E_EstallClear),
@@ -482,15 +482,15 @@ module mycpu_top(
           .Clk(Clk),
           .Clr(MyClr),
           .dm_stall(dm_stall),
-          .exp_flush(exp_flush),
+          .ExceptionFlush(ExceptionFlush),
           .E_PC(E_PC),
           .E_MemWriteData(E_WriteMemData),
           .E_RtID(E_RtID),
           .E_Data(E_Data),
           .E_ExtType(E_ExtType),
           .E_MemWriteEnable(E_MemWriteEnable),
-          .E_WriteRegEnable(E_WriteRegEnable),
-          .E_RegId(E_RegId),
+          .E_RegWriteEnable(E_RegWriteEnable),
+          .E_RegNumber(E_RegNumber),
           .E_MemFamily(E_MemFamily),
           .E_InstrBus(E_InstrBus),
           .E_T(E_T),
@@ -514,10 +514,10 @@ module mycpu_top(
           .M_T(M_T),
           .M_WriteRegEnableExted(M_WriteRegEnableExted)
       );
-    assign M_PC = exp_flush ? 32'h0 : M_PC_post;
-    assign M_Data = exp_flush ? 32'h0 : M_Data_post;
-    assign M_RegId = exp_flush ? 5'h0 : M_RegId_post;
-    assign M_WriteRegEnable = exp_flush ? 1'b0 : M_WriteRegEnable_post;
+    assign M_PC = ExceptionFlush ? 32'h0 : M_PC_post;
+    assign M_Data = ExceptionFlush ? 32'h0 : M_Data_post;
+    assign M_RegId = ExceptionFlush ? 5'h0 : M_RegId_post;
+    assign M_WriteRegEnable = ExceptionFlush ? 1'b0 : M_WriteRegEnable_post;
 
 
     wire unknown_inst;
@@ -527,7 +527,7 @@ module mycpu_top(
     wire cp0_allow_int;
     wire[31:0] exp_badvaddr, exp_epc;
     wire exp_badvaddr_we;
-    wire[4:0] exp_code;
+    wire[4:0] ExcCode;
     wire clear_exl;
     wire[7:0] interrupt_flag;
     wire cp0_wr_exp;
@@ -538,17 +538,17 @@ module mycpu_top(
     wire data_exp_invalid;
 
     exception exception(
-                  .flush(exp_flush),
+                  .flush(ExceptionFlush),
                   .vice_flush1(exp_flush_vice1),
                   .vice_flush2(exp_flush_vice2),
                   .vice_flush3(exp_flush_vice3),
                   .wr_exp(cp0_wr_exp),
                   .clear_exl(clear_exl),
-                  .exp_code(exp_code),
+                  .ExcCode(ExcCode),
                   .epc(exp_epc),
                   .badvaddr(exp_badvaddr),
                   .badvaddr_we(exp_badvaddr_we),
-                  .exception_new_pc(exception_new_pc),
+                  .NewExceptionPC(NewExceptionPC),
 
                   .clk(Clk),
                   .E_EPC(E_EPC),
@@ -556,13 +556,13 @@ module mycpu_top(
                   .mm_pc(M_PC_post),
                   .data_vaddr(E_Data),
                   .data_we(sb | sh | sw),
-                  .data_miss(data_exp_miss),
-                  .inst_miss(E_inst_miss),
-                  .data_illegal(data_exp_illegal | data_alignment_err),
-                  .inst_illegal(E_inst_illegal | fetch_alignment_err),
+                  .DataMiss(data_exp_miss),
+                  .InstMiss(E_InstMiss),
+                  .IllegalData(data_exp_illegal | data_alignment_err),
+                  .IllegalInst(E_IllegalInstruction | fetch_alignment_err),
                   .data_invalid(data_exp_invalid),
-                  .inst_invalid(E_inst_invalid),
-                  .data_dirty(data_exp_dirty),
+                  .inst_invalid(E_InvalidInstruction),
+                  .DirtyData(data_exp_dirty),
 
                   .eret(eret),
                   .my_break(my_break),
@@ -575,7 +575,7 @@ module mycpu_top(
                   .interrupt_flag(interrupt_flag),
                   .inst_sram_data_ok(inst_sram_data_ok) ,
                   .icache_stall(icache_stall),
-                  .E_now_exp(E_now_exp),
+                  .E_CurrentException(E_CurrentException),
                   .inst_uncached(inst_uncached)
               );
 
@@ -600,14 +600,14 @@ module mycpu_top(
             .rst(Clr),
             .rd_addr(E_RdID),
             .we(mtc0),
-            .wr_addr(E_RegId),
+            .wr_addr(E_RegNumber),
             .data_i(data2cp0),
             .hardware_int(hardware_int_sample),
             .clear_exl(clear_exl),
             .en_exp_i(cp0_wr_exp),
             .exp_bd(E_in_delayslot),
             .exp_epc(exp_epc),
-            .exp_code(exp_code),
+            .ExcCode(ExcCode),
             .exp_badvaddr(exp_badvaddr),
             .exp_badvaddr_we(exp_badvaddr_we),
             .tlbwi(tlbwi),
@@ -639,7 +639,7 @@ module mycpu_top(
 
     assign debug_wb_pc = M_PC;
     assign debug_wb_rf_wdata = M_Data;
-    assign debug_wb_rf_wen = (M_WriteRegEnable & (!dm_stall | E_now_exp ))?4'b1111:4'b0000;
+    assign debug_wb_rf_wen = (M_WriteRegEnable & (!dm_stall | E_CurrentException ))?4'b1111:4'b0000;
     assign debug_wb_rf_wnum = M_RegId;
 
 
@@ -661,8 +661,8 @@ module mycpu_top(
                   .i_p_nextIsRead(E_MemReadEnable_Inter) ,
                   .i_p_nextIsLS(E_MemLStype_Inter),
                   .i_p_nextIsSave(E_MmeSaveTypeInter) ,
-                  .i_p_read((!data_uncached) &read & !E_now_exp) ,
-                  .i_p_write((!data_uncached) &write & !E_now_exp),
+                  .i_p_read((!data_uncached) &read & !E_CurrentException) ,
+                  .i_p_write((!data_uncached) &write & !E_CurrentException),
 
                   .i_p_wrdata(data_sram_wdata),
                   .o_p_rddata(rdata_dcache),

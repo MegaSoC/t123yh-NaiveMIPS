@@ -14,7 +14,7 @@ module cp0(
         input wire en_exp_i,
         input wire exp_bd,
         input wire[31:0] exp_epc,
-        input wire[4:0] exp_code,
+        input wire[4:0] ExcCode,
         input wire[31:0] exp_badvaddr,
         input wire exp_badvaddr_we,
         input wire tlbwi,
@@ -163,7 +163,7 @@ module cp0(
                     if (exp_badvaddr_we)
                         cp0_reg_BadVAddr <= exp_badvaddr;
                     cp0_reg_EntryHi[31:12] <= exp_badvaddr[31:12];
-                    cp0_reg_Cause[31] <= exp_bd; cp0_reg_Cause[6:2] <= exp_code;
+                    cp0_reg_Cause[31] <= exp_bd; cp0_reg_Cause[6:2] <= ExcCode;
                     cp0_reg_EPC <= exp_epc;
                     cp0_reg_Status[1] <= 1'b1; end
                 if (clear_exl) begin
@@ -191,13 +191,13 @@ module cp0(
     wire[31:0] daddr_tlb;
     wire[31:0] iaddr_tlb;
     wire data_tlb_map, inst_tlb_map, data_mmu_uncached, inst_mmu_uncached,
-         data_miss, inst_miss, data_dirt, data_valid, inst_valid;
+         DataMiss, InstMiss, data_dirt, data_valid, inst_valid;
     assign daddr_o = data_tlb_map ? daddr_tlb : daddr_direct;
     assign iaddr_o = inst_tlb_map ? iaddr_tlb : iaddr_direct;
     assign data_uncached = data_mmu_uncached | icache_close | dcache_close;
     assign inst_uncached = inst_mmu_uncached | icache_close | dcache_close;
-    assign data_exp_miss = data_tlb_map & data_miss;
-    assign inst_exp_miss = inst_tlb_map & inst_miss;
+    assign data_exp_miss = data_tlb_map & DataMiss;
+    assign inst_exp_miss = inst_tlb_map & InstMiss;
     assign data_exp_dirty = (data_dirt & data_tlb_map);
     assign data_exp_invalid = (~data_valid & data_tlb_map);
     assign inst_exp_invalid = (~inst_valid & inst_tlb_map);
@@ -209,8 +209,8 @@ module cp0(
             .inst_uncached(inst_mmu_uncached),
             .data_tlb_map(data_tlb_map),
             .inst_tlb_map(inst_tlb_map),
-            .data_illegal(data_exp_illegal),
-            .inst_illegal(inst_exp_illegal),
+            .IllegalData(data_exp_illegal),
+            .IllegalInst(inst_exp_illegal),
 
             .clk(clk),
             .rst(rst),
@@ -230,7 +230,7 @@ module cp0(
                 .va(iaddr_i),
                 .asid(tlbEntryAsid),
                 .pa(iaddr_tlb),
-                .miss(inst_miss),
+                .miss(InstMiss),
                 .valid(inst_valid),
                 .dirt(inst_dirt),
                 .cached(inst_cached),
@@ -245,7 +245,7 @@ module cp0(
                 .va(daddr_i),
                 .asid(tlbEntryAsid),
                 .pa(daddr_tlb),
-                .miss(data_miss),
+                .miss(DataMiss),
                 .valid(data_valid),
                 .dirt(data_dirt),
                 .cached(data_cached),
