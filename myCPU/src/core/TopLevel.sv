@@ -530,7 +530,7 @@ module mycpu_top(
     wire[4:0] ExcCode;
     wire clear_exl;
     wire[7:0] interrupt_flag;
-    wire cp0_wr_exp;
+    wire cp0_CP0_WrExp;
 
     wire data_exp_miss;
     wire data_exp_illegal;
@@ -542,7 +542,7 @@ module mycpu_top(
                   .vice_flush1(exp_flush_vice1),
                   .vice_flush2(exp_flush_vice2),
                   .vice_flush3(exp_flush_vice3),
-                  .wr_exp(cp0_wr_exp),
+                  .CP0_WrExp(cp0_CP0_WrExp),
                   .clear_exl(clear_exl),
                   .ExcCode(ExcCode),
                   .epc(exp_epc),
@@ -604,7 +604,7 @@ module mycpu_top(
             .data_i(data2cp0),
             .hardware_int(hardware_int_sample),
             .clear_exl(clear_exl),
-            .en_exp_i(cp0_wr_exp),
+            .en_exp_i(cp0_CP0_WrExp),
             .exp_bd(E_in_delayslot),
             .exp_epc(exp_epc),
             .ExcCode(ExcCode),

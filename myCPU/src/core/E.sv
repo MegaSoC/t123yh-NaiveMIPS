@@ -143,24 +143,8 @@ module E(
     reg mul_MemFamily,mul_OverFlow,mul_data_alignment_err,mul_in_delayslot,mul_inst_miss,mul_inst_illegal,mul_inst_invalid;
     reg [`INSTRBUS_WIDTH-1:0] mul_InstrBus;
 
-
-
     assign E_XALU_Busy_real = E_XALU_Busy | mul_in_xalu;
 
-    initial begin
-        E_PC <= 0;
-        E_EPC <= 0;
-        E_WriteMemData <= 0;
-        E_RtID <= 0;
-        E_T <= 0;
-        E_RegWriteEnable <= 0;
-        E_RegNumber <= 0;
-        E_Data <= 0;
-        E_ExtType <= 0;
-        E_MemWriteEnable <= 0;
-        E_MemFamily <= 0;
-        E_InstrBus <= 1;
-    end
     always @ (posedge Clk) begin
         if(Clr | ExceptionFlush | E_CurrentException | E_EstallClear ) begin
             E_PC <= 0;

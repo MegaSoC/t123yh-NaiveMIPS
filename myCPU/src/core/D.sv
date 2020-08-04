@@ -107,10 +107,7 @@ module D(
     assign {`INSTR_SET} = InstrBus_Inter;
     wire is_branch;
     reg D_is_branch;
-    initial begin
-        D_is_branch <= 0;
-        D_InDelaySlot <= 0;
-    end
+
     assign is_branch = |{beq,bne,blez,bgtz,bltz,bgez,bltzal,bgezal,j,jal,jr,jalr};
 
     wire MultCalFamily_Inter = (mult|multu|div|divu|mul);
@@ -134,13 +131,11 @@ module D(
            .D_MultCalFamily(D_MultCalFamily),
            .ExceptionFlush(ExceptionFlush)
        );
-    initial begin
-        D_is_branch <= 0;
-        D_InDelaySlot <= 0;
-    end
     always @(posedge Clk ) begin
         if (Clr) begin
             D_EPC <= 0;
+            D_is_branch <= 0;
+            D_InDelaySlot <= 0;
         end
         else begin
             D_EPC <= D_is_branch? I_PC - 4 : I_PC;
