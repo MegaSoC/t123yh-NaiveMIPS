@@ -2,7 +2,7 @@
 
 module GRF(
 	input	wire Clk,
-	input	wire Clr,
+	input	wire reset,
     
 	input	wire [4:0]	Addr1,
 	input	wire [4:0]	Addr2,
@@ -133,9 +133,8 @@ module GRF(
 	assign	eOutData4[31:24]	=	(eAddr4 == 0)						     ?	 0:
 							     (WriteAddr == eAddr4 && WriteEnable[3])	 ?   WriteData[31:24]:
 																	           Reg[eAddr4][31:24]; 
-	////////////////////////////////////////////////////////
+
 	integer	i;
-	///////////////////////////////////////////////////////
 	always_ff @ (posedge Clk) begin
 		if(Clr)begin
 			for(i=0;i<32;i=i+1)

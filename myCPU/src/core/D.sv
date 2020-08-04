@@ -78,15 +78,13 @@ module D(
     GRF my_grf(
             .Clk(Clk),
             .reset(reset),
-            .PC(W_PC),
             .Addr1(Rs_Inter),
             .Addr2(Rt_Inter),
             .WriteAddr(W_RegWriteId),
             .WriteEnable(W_WriteRegEnable),
             .WriteData(W_RegWriteData),
             .OutData1(RsData_Inter),
-            .OutData2(RtData_Inter),
-            .dm_stall(dm_stall)
+            .OutData2(RtData_Inter)
         );
 
     /////////////////////杞�鍙戝�????
