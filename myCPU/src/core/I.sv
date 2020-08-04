@@ -36,34 +36,30 @@ module I(
   
 
     always @ (posedge clk) begin
-        if (reset) begin
-            iPcReg <= 0;
-            iInstr <= 0;
-            pcReg <= `TextAddr;
+        if (reset | exp_flush ) begin
+			iPcReg <= 0;
+			iInstr <= 0;
             iInstMiss <= 0;
             iInstIllegal <= 0;
             iInstInvalid <= 0;
-        end
-        else begin
-            if(expFlush)begin
-                iPcReg <= 0;
-                iInstr <= 0;
-                iInstMiss <= 0;
-                iInstIllegal <= 0;
-                iInstInvalid <= 0;
-            end
-            else if (nextState==`FETCH) begin
-                iPcReg <= pcReg;
-                iInstr <=(instUncached)? instSramData: iIcacheRdata;
-                iInstMiss <= instMiss;
-                iInstIllegal <= instIllegal;
-                iInstInvalid <= instInvalid;
-            end
-            
-            if((nextState==`FETCH) && !(dStall |dmStall))begin
-                pcReg <= dNpc;
-            end
-        end
+		end
+        else if (next_state==`FETCH) begin
+			iPcReg <= pcReg;
+			iInstr <=(instUncached)? instSramData: iIcacheRdata;
+            iInstMiss <= instMiss;
+            iInstIllegal <= instIllegal;
+            iInstInvalid <= instInvalid;
+		end
+        if(reset) begin
+			pcReg<=`TextAddr;
+		end
+
+		else if (dStall |dmStall ) begin
+			pcReg<=pcReg;
+		end
+		else if (next_state==`FETCH) begin
+			pcReg<=dNpc;
+		end
     end
 
 
