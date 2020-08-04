@@ -38,8 +38,7 @@ module MemState(
                 input wire EstallClear
             );
 
-        wire [31:0] MF_Rt = (E_RtID!=0 && M_WriteRegEnable && M_RegId==E_RtID) ? M_Data:
-         E_MemWriteData;
+    wire [31:0] MF_Rt = (E_RtID!=0 && M_WriteRegEnable && M_RegId==E_RtID) ? M_Data : E_MemWriteData;
     wire [1:0] AddrOffset = E_Data[1:0];
     wire lb,lbu,lh,lhu,lw,lwl,lwr,swl,swr;
     assign {lb,lbu,lh,lhu,lw,lwl,lwr,swl,swr}=E_ExtType;
@@ -102,13 +101,11 @@ module MemState(
         end
     end
 
-    wire [31:0] ExtMemData;
     MemExtUnit MemExtUnit(
                    .RawMemData(M_RawData),
                    .Offset(M_Offset),
                    .ExtType(M_ExtType),
                    .M_MemFamily(M_MemFamily),
-                   .ExtMemData(ExtMemData),
                    .M_Data(M_Data),
                    .M_WriteRegEnable(M_WriteRegEnable),
                    .M_WriteRegEnableExted(M_WriteRegEnableExted)
