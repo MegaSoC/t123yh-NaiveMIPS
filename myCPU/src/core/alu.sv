@@ -8,6 +8,12 @@ module ALU(
         input [31:0] PC,
         input [`INSTRBUS_WIDTH-1:0] InstrBus,
         output [31:0] aluresult,
+        output [31:0] datainter,
+        input mfhi1,
+        input mflo1,
+        input mul1,
+        input [31:0] hi,
+        input [31:0] lo,
         output OverFlow
     );
     logic `INSTR_SET;
@@ -84,4 +90,6 @@ module ALU(
     assign type_pc = (jal|jalr|bltzal|bgezal);
 
     assign aluresult = ({32{normal}}&normal_r) | ({32{i}}&i_r) | ({32{s}}&s_r) | ({32{cmp}}&cmp_r) | ({32{type_pc}}&(PC+8));
+    
+    assign datainter = ({32{mfhi1}} & hi) | ({32{mflo1|mul}} & lo) | ({32{normal}}&normal_r) | ({32{i}}&i_r) | ({32{s}}&s_r) | ({32{cmp}}&cmp_r) | ({32{type_pc}}&(PC+8));
 endmodule

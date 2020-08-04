@@ -70,16 +70,7 @@ module ExecuteSdate(
          (D_RtID!=0 && M_WriteRegEnable && M_T==0 && M_RegId==D_RtID) ? M_Data:         D_RtData;
         wire [31:0] C_Inter;
     wire D_OverFlow;
-    ALU ALU(
-            .srca(MF_Rs),
-            .srcb(MF_Rt),
-            .shamt(D_Shamt),
-            .Imm16(D_Imm16),
-            .InstrBus(D_InstrBus),
-            .aluresult(C_Inter),
-            .PC(D_PC),
-            .OverFlow(D_OverFlow)
-        );
+  
 
     wire [31:0] XALU_HI,
          XALU_LO;
@@ -124,11 +115,26 @@ module ExecuteSdate(
     assign {`INSTR_SET} = D_InstrBus;
 
 
-    wire [31:0] Data_Inter = mfhi ? XALU_HI:
-         (mflo|mul) ? XALU_LO:
-         C_Inter;
+    wire [31:0] Data_Inter;
         assign E_calLSaddr = C_Inter;
         reg mul_in_xalu;
+        
+          ALU ALU(
+            .srca(MF_Rs),
+            .srcb(MF_Rt),
+            .shamt(D_Shamt),
+            .Imm16(D_Imm16),
+            .InstrBus(D_InstrBus),
+            .aluresult(C_Inter),
+            .datainter(Data_Inter),
+            .mfhi1(mfhi),
+            .mflo1(mflo),
+            .mul1(mul),
+            .hi(XALU_HI),
+            .lo(XALU_LO),
+            .PC(D_PC),
+            .OverFlow(D_OverFlow)
+        );
 
     reg [31:0] mul_PC,mul_EPC,mul_WriteMemData;
     reg [4:0] mul_RtID,mul_RdID;
