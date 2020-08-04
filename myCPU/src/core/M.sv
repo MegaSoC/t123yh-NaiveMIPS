@@ -39,23 +39,23 @@ module M(
     );
 
     wire `INSTR_SET;
-    assign {`INSTR_SET}             = E_InstrBus;
-    wire [31:0] MF_Rt               = (E_RtID!=0 && M_WriteRegEnable && M_RegId==E_RtID) ? M_Data : E_MemWriteData;
-    wire [1:0] AddrOffset           = E_Data[1:0];
-    
-    assign read                     = (lb|lbu|lh|lhu|lw);
-    assign write                    = (sb|sh|sw);
-    assign dm_stall                 = ((read|write)& uncached & !data_sram_data_ok ) | ( (!uncached) & (!hit));
-    assign data2cp0                 = MF_Rt;
-    assign data_sram_wdata          = swl?(MF_Rt>>({(~AddrOffset),3'b0})):
+    assign {`INSTR_SET} = E_InstrBus;
+    wire [31:0] MF_Rt = (E_RtID!=0 && M_WriteRegEnable && M_RegId==E_RtID) ? M_Data : E_MemWriteData;
+    wire [1:0] AddrOffset = E_Data[1:0];
+
+    assign read = (lb|lbu|lh|lhu|lw);
+    assign write = (sb|sh|sw);
+    assign dm_stall = ((read|write)& uncached & !data_sram_data_ok ) | ( (!uncached) & (!hit));
+    assign data2cp0 = MF_Rt;
+    assign data_sram_wdata = swl?(MF_Rt>>({(~AddrOffset),3'b0})):
            (MF_Rt<<({AddrOffset,3'b0}));
     wire [31:0] MemReadData_Inter;
-    assign MemReadData_Inter        = (uncached)? data_sram_rdata: cache_rdata ;
+    assign MemReadData_Inter = (uncached)? data_sram_rdata: cache_rdata ;
 
-    wire [31:0] Ans                 = E_MemFamily ? MemReadData_Inter:
+    wire [31:0] Ans = E_MemFamily ? MemReadData_Inter:
          rd_cp0_value? cp0_reg_value:
          E_Data;
-    wire [1:0] Offset_Inter         = E_Data[1:0];
+    wire [1:0] Offset_Inter = E_Data[1:0];
 
 
     reg [1:0] M_Offset;
@@ -66,48 +66,48 @@ module M(
     wire [3:0] E_WriteRegEnableExtedrrr;
 
     logic [31:0] lwld,alwld;
-    assign lwld                     = ( Ans<<({Offset_Inter,3'b0}));
-    assign alwld                    = ( Ans>>({Offset_Inter,3'b0}));
+    assign lwld = ( Ans<<({Offset_Inter,3'b0}));
+    assign alwld = ( Ans>>({Offset_Inter,3'b0}));
     logic normal;
-    assign normal                   = !(lb|lbu|lh|lhu|lwl|(!E_MemFamily));
-    assign E_Datarrr                = ({32{!E_MemFamily}} & Ans) | 
+    assign normal = !(lb|lbu|lh|lhu|lwl|(!E_MemFamily));
+    assign E_Datarrr = ({32{!E_MemFamily}} & Ans) |
            ({32{lhu}} & {16'b0,alwld[15:0]})|
            ({32{lh}} & {{16{alwld[15]}},alwld[15:0]})|
            ({32{lbu}} & {24'b0,alwld[7:0]})|
            ({32{lb}} & {{24{alwld[7]}},alwld[7:0]})|
            ({32{lwl}} & lwld)|
            ({32{normal}} & alwld);
-           
-    wire [3:0] WritePreExted        = {4{E_WriteRegEnable}};
+
+    wire [3:0] WritePreExted = {4{E_WriteRegEnable}};
     logic pnormal;
-    assign pnormal                  = !(lwl|lwr);
+    assign pnormal = !(lwl|lwr);
     assign E_WriteRegEnableExtedrrr = ({32{lwr}}&(WritePreExted>>Offset_Inter)) | ({32{lwl}}&( WritePreExted<<(~Offset_Inter))) | ({32{pnormal}}&(WritePreExted));
 
     always @ (posedge Clk) begin
-        if(Clr | (exp_flush)  ) begin
-            M_WriteRegEnable        <= 0;
-            M_RegId                 <= 0;
-            M_Offset                <= 0;
-            M_ExtType               <= 0;
-            M_RawData               <= 0;
-            M_MemFamily             <= 0;
-            M_PC                    <= 0;
-            M_T                     <=0;
-            M_Data                  <= 0;
-            M_WriteRegEnableExted   <= 0;
+        if(Clr | (exp_flush) ) begin
+            M_WriteRegEnable <= 0;
+            M_RegId <= 0;
+            M_Offset <= 0;
+            M_ExtType <= 0;
+            M_RawData <= 0;
+            M_MemFamily <= 0;
+            M_PC <= 0;
+            M_T <=0;
+            M_Data <= 0;
+            M_WriteRegEnableExted <= 0;
         end
-        else if(!dm_stall ) begin 
-            M_WriteRegEnable        <= E_WriteRegEnable;
-            M_RegId                 <= E_RegId;
-            M_Offset                <= Offset_Inter;
-            M_ExtType               <= E_ExtType;
-            M_RawData               <= Ans;
-            M_MemFamily             <= E_MemFamily;
-            M_PC                    <= E_PC;
-            M_T                     <= E_T==0?0:E_T-1;
-            M_Data                  <= E_Datarrr;
-            M_WriteRegEnableExted   <= E_WriteRegEnableExtedrrr;
+        else if(!dm_stall ) begin
+            M_WriteRegEnable <= E_WriteRegEnable;
+            M_RegId <= E_RegId;
+            M_Offset <= Offset_Inter;
+            M_ExtType <= E_ExtType;
+            M_RawData <= Ans;
+            M_MemFamily <= E_MemFamily;
+            M_PC <= E_PC;
+            M_T <= E_T==0?0:E_T-1;
+            M_Data <= E_Datarrr;
+            M_WriteRegEnableExted <= E_WriteRegEnableExtedrrr;
         end
     end
-    
+
 endmodule

@@ -56,7 +56,7 @@ module cpu_axi_interface
 
         output [3 :0] arid ,
         output [31:0] araddr ,
-        output [7 :0] arlen ,        
+        output [7 :0] arlen ,
         output [2 :0] arsize ,
         output [1 :0] arburst ,
         output [1 :0] arlock ,
@@ -73,7 +73,7 @@ module cpu_axi_interface
 
         output [3 :0] awid ,
         output [31:0] awaddr ,
-        output [7 :0] awlen ,         
+        output [7 :0] awlen ,
         output [2 :0] awsize ,
         output [1 :0] awburst ,
         output [1 :0] awlock ,
@@ -81,21 +81,21 @@ module cpu_axi_interface
         output [2 :0] awprot ,
         output awvalid ,
         input awready ,
-                
+
         output [3 :0] wid ,
         output [31:0] wdata ,
         output [3 :0] wstrb ,
         output wlast ,
         output wvalid ,
         input wready ,
-        
+
         input [3 :0] bid ,
         input [1 :0] bresp ,
         input bvalid ,
         output bready
     );
     reg do_req;
-    reg do_req_or;     
+    reg do_req_or;
     reg do_wr_r;
     reg [3 :0] do_size_r;
     reg [31:0] do_addr_r;
@@ -105,70 +105,70 @@ module cpu_axi_interface
     assign data_addr_ok = !do_req;
     always @(posedge clk)
     begin
-        do_req          <= !resetn ? 1'b0 :
+        do_req <= !resetn ? 1'b0 :
                (inst_req||data_req)&&!do_req ? 1'b1 :
                data_back ? 1'b0 : do_req;
-        do_req_or       <= !resetn ? 1'b0 :
+        do_req_or <= !resetn ? 1'b0 :
                   !do_req ? data_req : do_req_or;
 
-        do_wr_r         <= data_req&&data_addr_ok ? data_wr :
+        do_wr_r <= data_req&&data_addr_ok ? data_wr :
                 inst_req&&inst_addr_ok ? inst_wr : do_wr_r;
-        do_size_r       <= data_req&&data_addr_ok ? data_size :
+        do_size_r <= data_req&&data_addr_ok ? data_size :
                   inst_req&&inst_addr_ok ? inst_size : do_size_r;
-        do_addr_r       <= data_req&&data_addr_ok ? data_addr :
+        do_addr_r <= data_req&&data_addr_ok ? data_addr :
                   inst_req&&inst_addr_ok ? inst_addr : do_addr_r;
-        do_wdata_r      <= data_req&&data_addr_ok ? data_wdata :
+        do_wdata_r <= data_req&&data_addr_ok ? data_wdata :
                    inst_req&&inst_addr_ok ? inst_wdata :do_wdata_r;
 
     end
 
     assign inst_data_ok = do_req&&!do_req_or&&data_back;
     assign data_data_ok = do_req&& do_req_or&&data_back;
-    assign inst_rdata   = rdata;
-    assign data_rdata   = rdata;
+    assign inst_rdata = rdata;
+    assign data_rdata = rdata;
 
     reg addr_rcv;
     reg wdata_rcv;
 
-    assign data_back    = addr_rcv && (rvalid&&rready||bvalid&&bready);
+    assign data_back = addr_rcv && (rvalid&&rready||bvalid&&bready);
     always @(posedge clk)
     begin
-        addr_rcv        <= !resetn ? 1'b0 :
+        addr_rcv <= !resetn ? 1'b0 :
                  arvalid&&arready ? 1'b1 :
                  awvalid&&awready ? 1'b1 :
                  data_back ? 1'b0 : addr_rcv;
-        wdata_rcv       <= !resetn ? 1'b0 :
+        wdata_rcv <= !resetn ? 1'b0 :
                   wvalid&&wready ? 1'b1 :
                   data_back ? 1'b0 : wdata_rcv;
     end
-    assign arid         = 4'd0;
-    assign araddr       = do_addr_r;
-    assign arlen        = 4'd0;
-    assign arsize       = do_size_r;
-    assign arburst      = 2'd0;
-    assign arlock       = 2'd0;
-    assign arcache      = 4'd0;
-    assign arprot       = 3'd0;
-    assign arvalid      = do_req&&!do_wr_r&&!addr_rcv;
-    assign rready       = 1'b1;
+    assign arid = 4'd0;
+    assign araddr = do_addr_r;
+    assign arlen = 4'd0;
+    assign arsize = do_size_r;
+    assign arburst = 2'd0;
+    assign arlock = 2'd0;
+    assign arcache = 4'd0;
+    assign arprot = 3'd0;
+    assign arvalid = do_req&&!do_wr_r&&!addr_rcv;
+    assign rready = 1'b1;
 
-    assign awid         = 4'd0;
-    assign awaddr       = do_addr_r;
-    assign awlen        = 4'd0;
-    assign awsize       = do_size_r;
-    assign awburst      = 2'd0;
-    assign awlock       = 2'd0;
-    assign awcache      = 4'd0;
-    assign awprot       = 3'd0;
-    assign awvalid      = do_req&&do_wr_r&&!addr_rcv;
-    assign wid          = 4'd0;
-    assign wdata        = do_wdata_r;
-    
-    assign wstrb        = do_size_r==2'd0 ? 4'b0001<<do_addr_r[1:0] :
+    assign awid = 4'd0;
+    assign awaddr = do_addr_r;
+    assign awlen = 4'd0;
+    assign awsize = do_size_r;
+    assign awburst = 2'd0;
+    assign awlock = 2'd0;
+    assign awcache = 4'd0;
+    assign awprot = 3'd0;
+    assign awvalid = do_req&&do_wr_r&&!addr_rcv;
+    assign wid = 4'd0;
+    assign wdata = do_wdata_r;
+
+    assign wstrb = do_size_r==2'd0 ? 4'b0001<<do_addr_r[1:0] :
            do_size_r==2'd1 ? 4'b0011<<do_addr_r[1:0] : 4'b1111;
 
-    assign wlast        = 1'd1;
-    assign wvalid       = do_req&&do_wr_r&&!wdata_rcv;
-    assign bready       = 1'b1;
+    assign wlast = 1'd1;
+    assign wvalid = do_req&&do_wr_r&&!wdata_rcv;
+    assign bready = 1'b1;
 
 endmodule
