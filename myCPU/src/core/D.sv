@@ -132,15 +132,17 @@ module D(
     always @(posedge Clk ) begin
         if (reset) begin
             D_EPC <= 0;
-            D_is_branch <= 0;
-            D_InDelaySlot <= 0;
         end
         else begin
             D_EPC <= D_is_branch? I_PC - 4 : I_PC;
         end
     end
     always @ (posedge Clk) begin
-        if( reset | ExceptionFlush | (D_stall_Pass & !dm_stall) | (!dm_stall & I_nextNotReady) )
+        if (reset) begin
+            D_is_branch <= 0;
+            D_InDelaySlot <= 0;
+        end
+        if(reset || ExceptionFlush || (D_stall_Pass && !dm_stall) || (!dm_stall & I_nextNotReady) )
         begin
             D_PC <= 0;
             RsNumber_D <= 0;
