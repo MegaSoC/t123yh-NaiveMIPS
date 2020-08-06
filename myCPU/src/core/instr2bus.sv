@@ -99,6 +99,28 @@ module instr2bus(
 
     wire mul = (OpCode == 6'b011100 && MipsInstr[10:0] == 11'b10);
 
+    wire teq = (OpCode == 6'h0 && Funct == 6'b110100);
+    wire teqi = (OpCode == 6'h1 && Rt == 5'b01100);
+    wire tge = (OpCode == 6'h0 && Funct == 6'b110000);
+    wire tgei = (OpCode == 6'h1 && Rt == 5'b01000);
+    wire tgeiu = (OpCode == 6'h1 && Rt == 5'b01001);
+    wire tgeu = (OpCode == 6'h0 && Funct == 6'b110001);
+    wire tlt = (OpCode == 6'h0 && Funct == 6'b110010);
+    wire tlti = (OpCode == 6'h1 && Rt == 5'b01010);
+    wire tltiu = (OpCode == 6'h1 && Rt == 5'b01011);
+    wire tltu = (OpCode == 6'h0 && Funct == 6'b110011);
+    wire tne = (OpCode == 6'h0 && Funct == 6'b110110);
+    wire tnei = (OpCode == 6'h1 && Rt == 5'b01110);
+
+    wire beql = (OpCode == 6'b010100);
+    wire bgezall = (OpCode == 6'h1 && Rt == 5'b10011);
+    wire bgezl = (OpCode == 6'h1 && Rt == 5'b00011);
+    wire bgtzl = (OpCode == 6'b010111);
+    wire blezl = (OpCode == 6'b010110);
+    wire bltzall = (OpCode == 6'h1 && Rt == 5'b10010);
+    wire bltzl = (OpCode == 6'h1 && Rt == 5'b00010);
+    wire bnel = (OpCode == 6'b010101);
+
     assign RegWriteEnable = ~nop & (addi | addiu | add | addu | sub | subu |
                                     ori | lui | my_Or | my_And | my_Xor | my_Nor | Andi |Xori |
                                     lw | lh | lhu | lb | lbu |
@@ -107,14 +129,14 @@ module instr2bus(
                                     sll | srl | sra | sllv | srlv | srav |
                                     slt | slti | sltu | sltiu |
                                     mfc0 |
-                                    bltzal |bgezal|
+                                    bltzal |bgezal|bgezall|bltzall|
                                     lwl|lwr);
     assign WriteRegId = (addi | addiu | ori | Xori | Andi | lui |
                          lw | lhu | lh | lbu | lb | slti | sltiu | mfc0|lwl|lwr) ? Rt:
            (add | addu | sub | subu | mfhi | mflo | mul |
             sll | srl | sra | sllv | srlv | srav | slt |
             sltu | my_And | my_Or | my_Xor | my_Nor | jalr) ? Rd:
-           (jal | bltzal | bgezal) ? 5'd31:
+           (jal | bltzal | bgezal|bgezall|bltzall) ? 5'd31:
            Rd;
 
     assign InstrBus = {`INSTR_SET};

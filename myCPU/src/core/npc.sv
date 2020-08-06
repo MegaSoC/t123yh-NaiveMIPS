@@ -30,10 +30,20 @@ module NPC(
          bgez = (instr[31:26]==6'h1 && instr[20:16]==6'h1);
     wire bltzal = (op==6'b000001 && instr[20:16]==5'b10000),
          bgezal = (op==6'b000001 && instr[20:16]==5'b10001);
-    wire b_type = (beq|bne|blez)|(bgtz|bltz|bgez)|(bltzal|bgezal);
+
+    wire beql = (op == 6'b010100);
+    wire bgezall = (op == 6'h1 && instr[20:16] == 5'b10011);
+    wire bgezl = (op == 6'h1 && instr[20:16] == 5'b00011);
+    wire bgtzl = (op == 6'b010111);
+    wire blezl = (op == 6'b010110);
+    wire bltzall = (op == 6'h1 && instr[20:16] == 5'b10010);
+    wire bltzl = (op == 6'h1 && instr[20:16] == 5'b00010);
+    wire bnel = (op == 6'b010101);
+
+    wire b_type = ((beq||beql)|(bne||bnel)|(blez||blezl))|((bgtz||bgtzl)|(bltz||bltzl)|(bgez||bgezl))|((bltzal||bltzall)|(bgezal||bgezall));
 
     logic b_valid;
-    assign b_valid = (beq&(rs==rt)) | (bne&(rs!=rt)) | (blez&(rs<=0)) | (bgtz&(rs>0)) | ((bltz|bltzal)&(rs<0)) | ((bgez|bgezal)&(rs>=0));
+    assign b_valid = ((beq||beql)&(rs==rt)) | ((bne||bnel)&(rs!=rt)) | ((blez||blezl)&(rs<=0)) | ((bgtz||bgtzl)&(rs>0)) | (((bltz||bltzl)|(bltzal||bltzall))&(rs<0)) | (((bgez||bgezl)|(bgezal||bgezall))&(rs>=0));
     wire [31:0] bpc = ipc + {{14{Imm16[15]}},Imm16,2'b00};
     logic normal;
     assign normal = !(j_type | jr_type | (b_type & b_valid));

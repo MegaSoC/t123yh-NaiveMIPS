@@ -49,6 +49,7 @@ module D(
         output reg D_InstMiss,
         output reg D_IllegalInstruction,
         output reg D_InvalidInstruction,
+        output reg D_trap,
 
         input I_nextNotReady,
         input wire [31:0] NewExceptionPC
@@ -88,6 +89,7 @@ module D(
         );
 
     /////////////////////杞�鍙戝�????
+    wire is_trap_inter;
     wire[31:0] regRS = (Rs_Inter!=0 && Rs_Inter==E_RegNumber && E_T==0 && E_RegWriteEnable) ? E_Data: RsData_Inter;
     wire[31:0] regRT = (Rt_Inter!=0 && Rt_Inter==E_RegNumber && E_T==0 && E_RegWriteEnable) ? E_Data: RtData_Inter;
     NPC my_npc(
@@ -101,12 +103,19 @@ module D(
             .epc(NewExceptionPC)
         );
 
+    NTrap my_ntrap(
+            .instr(I_MipsInstr),
+            .rs(regRS),
+            .rt(regRT),
+            .is_trap(is_trap_inter)
+        );
+
     wire `INSTR_SET;
     assign {`INSTR_SET} = InstrBus_Inter;
     wire is_branch;
     reg D_is_branch;
 
-    assign is_branch = |{beq,bne,blez,bgtz,bltz,bgez,bltzal,bgezal,j,jal,jr,jalr};
+    assign is_branch = |{(beq||beql),(bne||bnel),(blez||blezl),(bgtz||bgtzl),(bltz||bltzl),(bgez||bgezl),(bltzal||bltzall),(bgezal||bgezall),j,jal,jr,jalr};
 
     wire MultCalFamily_Inter = (mult|multu|div|divu|mul);
     reg D_MultCalFamily;
@@ -159,6 +168,7 @@ module D(
 
             D_InstMiss <= 0;
             D_IllegalInstruction <= 0;
+            D_trap <= 0;
             D_InvalidInstruction <= 0;
         end
         else if (!dm_stall & !I_nextNotReady ) begin
@@ -181,6 +191,7 @@ module D(
 
             D_InstMiss <= I_inst_miss;
             D_IllegalInstruction <= I_inst_illegal;
+            D_trap <= is_trap_inter;
             D_InvalidInstruction <= I_inst_invalid;
         end
     end

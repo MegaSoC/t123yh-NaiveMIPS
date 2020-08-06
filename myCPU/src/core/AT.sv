@@ -20,9 +20,11 @@ module AT(
     assign {`INSTR_SET} = InstrBus;
     wire NeedRs =(addi||addiu||add||addu||sub||subu||lw||lwl||lwr||sw||swl||swr||lb||lbu||lh||lhu||sb||sh||jr||jalr||mult||multu||div||divu||mthi||mtlo||
                   sllv||srlv||srav||my_And||my_Or||my_Xor||my_Nor||ori||Andi||Xori||slt||sltu||slti||sltiu||
-                  beq||bne||blez||bgtz||bltz||bgez||bltzal||bgezal||mul);
+                  (beq||beql)||(bne||bnel)||(blez||blezl)||(bgtz||bgtzl)||(bltz||bltzl)||(bgez||bgezl)||(bltzal||bltzall)||(bgezal||bgezall)||mul||
+                  teq||teqi||tge||tgei||tgeiu||tgeu||tlt||tlti||tltiu||tltu||tne||tnei);
     wire NeedRt =(add||addu||sub||subu||sw||swl||swr||sb||sh||mult||multu||div||divu||sll||srl||sra||sllv||srlv||srav||
-                  my_And||my_Or||my_Xor||my_Nor||slt||sltu||beq||bne||mtc0||mul);
+                  my_And||my_Or||my_Xor||my_Nor||slt||sltu||(beq||beql)||(bne||bnel)||mtc0||mul||
+                  teq||tge||tgeu||tlt||tltu||tne);
 
     wire [3:0] T_Rs =
          (addi||addiu||add||addu||sub||subu||lw||lwl||lwr||sw||swl||swr||lb||lbu||lh||lhu||sb||sh||mult||multu||div||mthi||mtlo||

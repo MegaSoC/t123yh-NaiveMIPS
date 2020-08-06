@@ -39,7 +39,9 @@ module exception(
         output reg badvaddr_we,
         output reg[31:0] NewExceptionPC,
         output wire E_CurrentException,
-        input wire inst_uncached
+        input wire inst_uncached,
+
+        input wire trap
     );
 
 
@@ -123,6 +125,16 @@ module exception(
             end
             else if (my_break) begin
                 ExcCode <= `EX_BP;
+                flush <= 1'b1;
+                vice_flush1 <= 1'b1;
+                vice_flush2 <= 1'b1;
+                vice_flush3 <= 1'b1;
+                NewExceptionPC <= EBase + 32'h180;
+                epc <= E_EPC;
+                CP0_WrExp <= 1'b1;
+            end
+            else if (trap) begin
+                ExcCode <= `EX_TRAP;
                 flush <= 1'b1;
                 vice_flush1 <= 1'b1;
                 vice_flush2 <= 1'b1;

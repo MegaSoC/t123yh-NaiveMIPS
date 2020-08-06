@@ -87,7 +87,7 @@ module ALU(
     assign cmp_r = (slt|slti) ? ($signed(cmp_a)<$signed(cmp_b)):($unsigned(cmp_a)<$unsigned(cmp_b));
 
     logic type_pc;
-    assign type_pc = (jal|jalr|bltzal|bgezal);
+    assign type_pc = (jal|jalr|(bltzal||bltzall)|(bgezal||bgezall));
     assign aluresult = ({32{normal}}&normal_r) | ({32{i}}&i_r) | ({32{s}}&s_r) | ({32{cmp}}&cmp_r) | ({32{type_pc}}&(PC+8));
 
     assign datainter = ({32{mfhi1}} & hi) | ({32{mflo1|mul}} & lo) | ({32{normal}}&normal_r) | ({32{i}}&i_r) | ({32{s}}&s_r) | ({32{cmp}}&cmp_r) | ({32{type_pc}}&(PC+8));

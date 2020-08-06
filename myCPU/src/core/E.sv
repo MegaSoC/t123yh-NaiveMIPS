@@ -52,10 +52,12 @@ module E(
         input D_InstMiss,
         input D_IllegalInstruction,
         input D_InvalidInstruction,
+        input D_trap,
 
         output reg E_InstMiss,
         output reg E_IllegalInstruction,
         output reg E_InvalidInstruction,
+        output reg E_trap,
 
         input wire E_CurrentException,
         output wire [31:0] E_calLSaddr,
@@ -140,6 +142,7 @@ module E(
     reg [31:0] mul_Data;
     reg [8:0] mul_ExtType;
     reg [3:0] mul_MemWriteEnable;
+    reg mul_trap;
     reg mul_MemFamily,mul_OverFlow,mul_data_alignment_err,mul_in_delayslot,mul_inst_miss,mul_inst_illegal,mul_inst_invalid;
     reg [`INSTRBUS_WIDTH-1:0] mul_InstrBus;
 
@@ -158,6 +161,7 @@ module E(
             E_InstMiss <= 0;
             E_IllegalInstruction <= 0;
             E_InvalidInstruction <= 0;
+            E_trap <= 0;
             E_Data <= 0;
             E_ExtType <= 0;
             E_MemWriteEnable <= 0;
@@ -189,6 +193,7 @@ module E(
             mul_inst_miss <= D_InstMiss;
             mul_inst_illegal <= D_IllegalInstruction;
             mul_inst_invalid <= D_InvalidInstruction;
+            mul_trap <= D_trap;
         end
         else if (!dm_stall) begin
             if(mul_in_xalu && !E_XALU_Busy)begin
@@ -203,6 +208,7 @@ module E(
                 E_RegNumber <= mul_RegId;
                 E_IllegalInstruction <= mul_inst_illegal;
                 E_InvalidInstruction <= mul_inst_invalid;
+                E_trap <= mul_trap;
                 E_Data <= XALU_LO;
                 E_ExtType <= mul_ExtType;
                 E_MemWriteEnable <= mul_MemWriteEnable;
@@ -224,6 +230,7 @@ module E(
                 E_InstMiss <= D_InstMiss;
                 E_IllegalInstruction <= D_IllegalInstruction;
                 E_InvalidInstruction <= D_InvalidInstruction;
+                E_trap <= D_trap;
                 E_Data <= Data_Inter;
                 E_ExtType <= ExtType_Inter;
                 E_MemWriteEnable <= MemWriteEnable_Inter;

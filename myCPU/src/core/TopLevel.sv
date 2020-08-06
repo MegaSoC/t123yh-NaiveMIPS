@@ -54,6 +54,8 @@ module mycpu_top(
         output [31:0] debug_wb_rf_wdata
     );
 
+    wire D_trap,E_trap;
+
     wire `INSTR_SET;
     wire dm_stall;
     wire Clk = aclk;
@@ -391,6 +393,7 @@ module mycpu_top(
           .D_InstMiss(D_InstMiss),
           .D_IllegalInstruction(D_IllegalInstruction),
           .D_InvalidInstruction(D_InvalidInstruction),
+          .D_trap(D_trap),
           .I_nextNotReady(I_nextNotReady),
           .NewExceptionPC(NewExceptionPC)
       );
@@ -456,6 +459,8 @@ module mycpu_top(
           .E_InstMiss(E_InstMiss),
           .E_IllegalInstruction(E_IllegalInstruction),
           .E_InvalidInstruction(E_InvalidInstruction),
+          .D_trap(D_trap),
+          .E_trap(E_trap),
 
           .E_CurrentException(E_CurrentException),
           .E_calLSaddr(E_DataLSaddr),
@@ -577,7 +582,9 @@ module mycpu_top(
                   .inst_sram_data_ok(inst_sram_data_ok) ,
                   .icache_stall(icache_stall),
                   .E_CurrentException(E_CurrentException),
-                  .inst_uncached(inst_uncached)
+                  .inst_uncached(inst_uncached),
+
+                  .trap(E_trap)
               );
 
     reg[5:0] hardware_int_sample;
