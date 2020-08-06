@@ -2,7 +2,7 @@
 #include <regdef.h>
 #include <cpu_cde.h>
 
-#define TEST_NUM 2
+#define TEST_NUM 6
 
 
 ##s0, number
@@ -319,6 +319,10 @@ inst_test:
     nop
     jal wait_1s
     nop
+    jal e2_clo_clz_test    #lui
+    nop
+    jal e3_madd_msub_test    #lui
+    nop
 
     la t9, kseg0_kseg1 #####
     jr t9              #kseg0 -> kseg1
@@ -328,6 +332,10 @@ kseg0_kseg1:
     jal e1_trap_test   #addu
     nop
     jal wait_1s
+    nop
+    jal e2_clo_clz_test    #lui
+    nop
+    jal e3_madd_msub_test    #lui
     nop
     
 ###check io access

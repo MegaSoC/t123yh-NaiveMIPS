@@ -559,488 +559,662 @@ bfc00750:	00000000 	nop
 
 bfc00754 <inst_test>:
 /home/lxb/project/loooongson/soft/func_extended/start.S:318
-bfc00754:	0ff00220 	jal	bfc00880 <e1_trap_test>
+bfc00754:	0ff00228 	jal	bfc008a0 <e1_trap_test>
 /home/lxb/project/loooongson/soft/func_extended/start.S:319
 bfc00758:	00000000 	nop
 /home/lxb/project/loooongson/soft/func_extended/start.S:320
-bfc0075c:	0ff0020b 	jal	bfc0082c <wait_1s>
+bfc0075c:	0ff00213 	jal	bfc0084c <wait_1s>
 /home/lxb/project/loooongson/soft/func_extended/start.S:321
 bfc00760:	00000000 	nop
+/home/lxb/project/loooongson/soft/func_extended/start.S:322
+bfc00764:	0ff00338 	jal	bfc00ce0 <e2_clo_clz_test>
 /home/lxb/project/loooongson/soft/func_extended/start.S:323
-bfc00764:	3c19bfc0 	lui	t9,0xbfc0
-bfc00768:	27390774 	addiu	t9,t9,1908
+bfc00768:	00000000 	nop
 /home/lxb/project/loooongson/soft/func_extended/start.S:324
-bfc0076c:	03200008 	jr	t9
+bfc0076c:	0ff00354 	jal	bfc00d50 <e3_madd_msub_test>
 /home/lxb/project/loooongson/soft/func_extended/start.S:325
 bfc00770:	00000000 	nop
-
-bfc00774 <kseg0_kseg1>:
+/home/lxb/project/loooongson/soft/func_extended/start.S:327
+bfc00774:	3c19bfc0 	lui	t9,0xbfc0
+bfc00778:	27390784 	addiu	t9,t9,1924
 /home/lxb/project/loooongson/soft/func_extended/start.S:328
-bfc00774:	0ff00220 	jal	bfc00880 <e1_trap_test>
+bfc0077c:	03200008 	jr	t9
 /home/lxb/project/loooongson/soft/func_extended/start.S:329
-bfc00778:	00000000 	nop
-/home/lxb/project/loooongson/soft/func_extended/start.S:330
-bfc0077c:	0ff0020b 	jal	bfc0082c <wait_1s>
-/home/lxb/project/loooongson/soft/func_extended/start.S:331
 bfc00780:	00000000 	nop
+
+bfc00784 <kseg0_kseg1>:
+/home/lxb/project/loooongson/soft/func_extended/start.S:332
+bfc00784:	0ff00228 	jal	bfc008a0 <e1_trap_test>
+/home/lxb/project/loooongson/soft/func_extended/start.S:333
+bfc00788:	00000000 	nop
 /home/lxb/project/loooongson/soft/func_extended/start.S:334
-bfc00784:	3c04bfaf 	lui	a0,0xbfaf
-bfc00788:	3484ffec 	ori	a0,a0,0xffec
+bfc0078c:	0ff00213 	jal	bfc0084c <wait_1s>
 /home/lxb/project/loooongson/soft/func_extended/start.S:335
-bfc0078c:	24081234 	li	t0,4660
+bfc00790:	00000000 	nop
 /home/lxb/project/loooongson/soft/func_extended/start.S:336
-bfc00790:	ac880000 	sw	t0,0(a0)
+bfc00794:	0ff00338 	jal	bfc00ce0 <e2_clo_clz_test>
 /home/lxb/project/loooongson/soft/func_extended/start.S:337
-bfc00794:	8c890000 	lw	t1,0(a0)
+bfc00798:	00000000 	nop
 /home/lxb/project/loooongson/soft/func_extended/start.S:338
-bfc00798:	00084400 	sll	t0,t0,0x10
+bfc0079c:	0ff00354 	jal	bfc00d50 <e3_madd_msub_test>
 /home/lxb/project/loooongson/soft/func_extended/start.S:339
-bfc0079c:	15090009 	bne	t0,t1,bfc007c4 <io_err>
-/home/lxb/project/loooongson/soft/func_extended/start.S:340
 bfc007a0:	00000000 	nop
 /home/lxb/project/loooongson/soft/func_extended/start.S:342
-bfc007a4:	3c085678 	lui	t0,0x5678
+bfc007a4:	3c04bfaf 	lui	a0,0xbfaf
+bfc007a8:	3484ffec 	ori	a0,a0,0xffec
 /home/lxb/project/loooongson/soft/func_extended/start.S:343
-bfc007a8:	ac880000 	sw	t0,0(a0)
+bfc007ac:	24081234 	li	t0,4660
 /home/lxb/project/loooongson/soft/func_extended/start.S:344
-bfc007ac:	00084402 	srl	t0,t0,0x10
+bfc007b0:	ac880000 	sw	t0,0(a0)
 /home/lxb/project/loooongson/soft/func_extended/start.S:345
-bfc007b0:	8c890000 	lw	t1,0(a0)
+bfc007b4:	8c890000 	lw	t1,0(a0)
 /home/lxb/project/loooongson/soft/func_extended/start.S:346
-bfc007b4:	15090003 	bne	t0,t1,bfc007c4 <io_err>
+bfc007b8:	00084400 	sll	t0,t0,0x10
 /home/lxb/project/loooongson/soft/func_extended/start.S:347
-bfc007b8:	00000000 	nop
+bfc007bc:	15090009 	bne	t0,t1,bfc007e4 <io_err>
 /home/lxb/project/loooongson/soft/func_extended/start.S:348
-bfc007bc:	10000003 	b	bfc007cc <test_end>
-/home/lxb/project/loooongson/soft/func_extended/start.S:349
 bfc007c0:	00000000 	nop
-
-bfc007c4 <io_err>:
+/home/lxb/project/loooongson/soft/func_extended/start.S:350
+bfc007c4:	3c085678 	lui	t0,0x5678
 /home/lxb/project/loooongson/soft/func_extended/start.S:351
-bfc007c4:	26100001 	addiu	s0,s0,1
+bfc007c8:	ac880000 	sw	t0,0(a0)
 /home/lxb/project/loooongson/soft/func_extended/start.S:352
-bfc007c8:	ae300000 	sw	s0,0(s1)
-
-bfc007cc <test_end>:
+bfc007cc:	00084402 	srl	t0,t0,0x10
+/home/lxb/project/loooongson/soft/func_extended/start.S:353
+bfc007d0:	8c890000 	lw	t1,0(a0)
+/home/lxb/project/loooongson/soft/func_extended/start.S:354
+bfc007d4:	15090003 	bne	t0,t1,bfc007e4 <io_err>
 /home/lxb/project/loooongson/soft/func_extended/start.S:355
-bfc007cc:	24100002 	li	s0,2
+bfc007d8:	00000000 	nop
 /home/lxb/project/loooongson/soft/func_extended/start.S:356
-bfc007d0:	1213000d 	beq	s0,s3,bfc00808 <test_end+0x3c>
+bfc007dc:	10000003 	b	bfc007ec <test_end>
 /home/lxb/project/loooongson/soft/func_extended/start.S:357
-bfc007d4:	00000000 	nop
+bfc007e0:	00000000 	nop
+
+bfc007e4 <io_err>:
 /home/lxb/project/loooongson/soft/func_extended/start.S:359
-bfc007d8:	3c04bfaf 	lui	a0,0xbfaf
-bfc007dc:	3484f000 	ori	a0,a0,0xf000
+bfc007e4:	26100001 	addiu	s0,s0,1
 /home/lxb/project/loooongson/soft/func_extended/start.S:360
-bfc007e0:	3c05bfaf 	lui	a1,0xbfaf
-bfc007e4:	34a5f008 	ori	a1,a1,0xf008
-/home/lxb/project/loooongson/soft/func_extended/start.S:361
-bfc007e8:	3c06bfaf 	lui	a2,0xbfaf
-bfc007ec:	34c6f004 	ori	a2,a2,0xf004
+bfc007e8:	ae300000 	sw	s0,0(s1)
+
+bfc007ec <test_end>:
 /home/lxb/project/loooongson/soft/func_extended/start.S:363
-bfc007f0:	24090002 	li	t1,2
+bfc007ec:	24100006 	li	s0,6
+/home/lxb/project/loooongson/soft/func_extended/start.S:364
+bfc007f0:	1213000d 	beq	s0,s3,bfc00828 <test_end+0x3c>
 /home/lxb/project/loooongson/soft/func_extended/start.S:365
-bfc007f4:	ac800000 	sw	zero,0(a0)
-/home/lxb/project/loooongson/soft/func_extended/start.S:366
-bfc007f8:	aca90000 	sw	t1,0(a1)
+bfc007f4:	00000000 	nop
 /home/lxb/project/loooongson/soft/func_extended/start.S:367
-bfc007fc:	acc90000 	sw	t1,0(a2)
+bfc007f8:	3c04bfaf 	lui	a0,0xbfaf
+bfc007fc:	3484f000 	ori	a0,a0,0xf000
 /home/lxb/project/loooongson/soft/func_extended/start.S:368
-bfc00800:	10000008 	b	bfc00824 <test_end+0x58>
+bfc00800:	3c05bfaf 	lui	a1,0xbfaf
+bfc00804:	34a5f008 	ori	a1,a1,0xf008
 /home/lxb/project/loooongson/soft/func_extended/start.S:369
-bfc00804:	00000000 	nop
+bfc00808:	3c06bfaf 	lui	a2,0xbfaf
+bfc0080c:	34c6f004 	ori	a2,a2,0xf004
 /home/lxb/project/loooongson/soft/func_extended/start.S:371
-bfc00808:	24090001 	li	t1,1
-/home/lxb/project/loooongson/soft/func_extended/start.S:372
-bfc0080c:	3c04bfaf 	lui	a0,0xbfaf
-bfc00810:	3484f008 	ori	a0,a0,0xf008
+bfc00810:	24090002 	li	t1,2
 /home/lxb/project/loooongson/soft/func_extended/start.S:373
-bfc00814:	3c05bfaf 	lui	a1,0xbfaf
-bfc00818:	34a5f004 	ori	a1,a1,0xf004
+bfc00814:	ac800000 	sw	zero,0(a0)
 /home/lxb/project/loooongson/soft/func_extended/start.S:374
-bfc0081c:	ac890000 	sw	t1,0(a0)
+bfc00818:	aca90000 	sw	t1,0(a1)
 /home/lxb/project/loooongson/soft/func_extended/start.S:375
-bfc00820:	aca90000 	sw	t1,0(a1)
-/home/lxb/project/loooongson/soft/func_extended/start.S:378
-bfc00824:	0ff00040 	jal	bfc00100 <test_finish>
+bfc0081c:	acc90000 	sw	t1,0(a2)
+/home/lxb/project/loooongson/soft/func_extended/start.S:376
+bfc00820:	10000008 	b	bfc00844 <test_end+0x58>
+/home/lxb/project/loooongson/soft/func_extended/start.S:377
+bfc00824:	00000000 	nop
 /home/lxb/project/loooongson/soft/func_extended/start.S:379
-bfc00828:	00000000 	nop
-
-bfc0082c <wait_1s>:
+bfc00828:	24090001 	li	t1,1
+/home/lxb/project/loooongson/soft/func_extended/start.S:380
+bfc0082c:	3c04bfaf 	lui	a0,0xbfaf
+bfc00830:	3484f008 	ori	a0,a0,0xf008
+/home/lxb/project/loooongson/soft/func_extended/start.S:381
+bfc00834:	3c05bfaf 	lui	a1,0xbfaf
+bfc00838:	34a5f004 	ori	a1,a1,0xf004
 /home/lxb/project/loooongson/soft/func_extended/start.S:382
-bfc0082c:	3c08bfaf 	lui	t0,0xbfaf
-bfc00830:	3508f02c 	ori	t0,t0,0xf02c
+bfc0083c:	ac890000 	sw	t1,0(a0)
 /home/lxb/project/loooongson/soft/func_extended/start.S:383
-bfc00834:	3409aaaa 	li	t1,0xaaaa
+bfc00840:	aca90000 	sw	t1,0(a1)
 /home/lxb/project/loooongson/soft/func_extended/start.S:386
-bfc00838:	8d0a0000 	lw	t2,0(t0)
+bfc00844:	0ff00040 	jal	bfc00100 <test_finish>
 /home/lxb/project/loooongson/soft/func_extended/start.S:387
-bfc0083c:	01495026 	xor	t2,t2,t1
-/home/lxb/project/loooongson/soft/func_extended/start.S:388
-bfc00840:	000a5a40 	sll	t3,t2,0x9
-/home/lxb/project/loooongson/soft/func_extended/start.S:389
-bfc00844:	256b0001 	addiu	t3,t3,1
+bfc00848:	00000000 	nop
 
-bfc00848 <sub1>:
-/home/lxb/project/loooongson/soft/func_extended/start.S:392
-bfc00848:	256bffff 	addiu	t3,t3,-1
+bfc0084c <wait_1s>:
+/home/lxb/project/loooongson/soft/func_extended/start.S:390
+bfc0084c:	3c08bfaf 	lui	t0,0xbfaf
+bfc00850:	3508f02c 	ori	t0,t0,0xf02c
+/home/lxb/project/loooongson/soft/func_extended/start.S:391
+bfc00854:	3409aaaa 	li	t1,0xaaaa
+/home/lxb/project/loooongson/soft/func_extended/start.S:394
+bfc00858:	8d0a0000 	lw	t2,0(t0)
 /home/lxb/project/loooongson/soft/func_extended/start.S:395
-bfc0084c:	8d0a0000 	lw	t2,0(t0)
+bfc0085c:	01495026 	xor	t2,t2,t1
 /home/lxb/project/loooongson/soft/func_extended/start.S:396
-bfc00850:	01495026 	xor	t2,t2,t1
+bfc00860:	000a5a40 	sll	t3,t2,0x9
 /home/lxb/project/loooongson/soft/func_extended/start.S:397
-bfc00854:	000a5240 	sll	t2,t2,0x9
-/home/lxb/project/loooongson/soft/func_extended/start.S:398
-bfc00858:	016a602b 	sltu	t4,t3,t2
-/home/lxb/project/loooongson/soft/func_extended/start.S:399
-bfc0085c:	15800002 	bnez	t4,bfc00868 <sub1+0x20>
+bfc00864:	256b0001 	addiu	t3,t3,1
+
+bfc00868 <sub1>:
 /home/lxb/project/loooongson/soft/func_extended/start.S:400
-bfc00860:	00000000 	nop
-/home/lxb/project/loooongson/soft/func_extended/start.S:401
-bfc00864:	254b0000 	addiu	t3,t2,0
+bfc00868:	256bffff 	addiu	t3,t3,-1
 /home/lxb/project/loooongson/soft/func_extended/start.S:403
-bfc00868:	1560fff7 	bnez	t3,bfc00848 <sub1>
+bfc0086c:	8d0a0000 	lw	t2,0(t0)
 /home/lxb/project/loooongson/soft/func_extended/start.S:404
-bfc0086c:	00000000 	nop
+bfc00870:	01495026 	xor	t2,t2,t1
 /home/lxb/project/loooongson/soft/func_extended/start.S:405
-bfc00870:	03e00008 	jr	ra
+bfc00874:	000a5240 	sll	t2,t2,0x9
 /home/lxb/project/loooongson/soft/func_extended/start.S:406
-bfc00874:	00000000 	nop
+bfc00878:	016a602b 	sltu	t4,t3,t2
+/home/lxb/project/loooongson/soft/func_extended/start.S:407
+bfc0087c:	15800002 	bnez	t4,bfc00888 <sub1+0x20>
+/home/lxb/project/loooongson/soft/func_extended/start.S:408
+bfc00880:	00000000 	nop
+/home/lxb/project/loooongson/soft/func_extended/start.S:409
+bfc00884:	254b0000 	addiu	t3,t2,0
+/home/lxb/project/loooongson/soft/func_extended/start.S:411
+bfc00888:	1560fff7 	bnez	t3,bfc00868 <sub1>
+/home/lxb/project/loooongson/soft/func_extended/start.S:412
+bfc0088c:	00000000 	nop
+/home/lxb/project/loooongson/soft/func_extended/start.S:413
+bfc00890:	03e00008 	jr	ra
+/home/lxb/project/loooongson/soft/func_extended/start.S:414
+bfc00894:	00000000 	nop
 	...
 
-bfc00880 <e1_trap_test>:
+bfc008a0 <e1_trap_test>:
 /home/lxb/project/loooongson/soft/func_extended/inst/e1_trap_test.S:8
-bfc00880:	26100001 	addiu	s0,s0,1
+bfc008a0:	26100001 	addiu	s0,s0,1
 /home/lxb/project/loooongson/soft/func_extended/inst/e1_trap_test.S:9
-bfc00884:	40805800 	mtc0	zero,$11
+bfc008a4:	40805800 	mtc0	zero,$11
 /home/lxb/project/loooongson/soft/func_extended/inst/e1_trap_test.S:10
-bfc00888:	24120009 	li	s2,9
+bfc008a8:	24120009 	li	s2,9
 /home/lxb/project/loooongson/soft/func_extended/inst/e1_trap_test.S:11
-bfc0088c:	3c08800d 	lui	t0,0x800d
+bfc008ac:	3c08800d 	lui	t0,0x800d
 /home/lxb/project/loooongson/soft/func_extended/inst/e1_trap_test.S:12
-bfc00890:	ad120000 	sw	s2,0(t0)
+bfc008b0:	ad120000 	sw	s2,0(t0)
 /home/lxb/project/loooongson/soft/func_extended/inst/e1_trap_test.S:15
-bfc00894:	240f1926 	li	t7,6438
-bfc00898:	24181926 	li	t8,6438
-bfc0089c:	3c14bfc0 	lui	s4,0xbfc0
-bfc008a0:	269408a4 	addiu	s4,s4,2212
-bfc008a4:	01f80034 	teq	t7,t8
+bfc008b4:	240f1926 	li	t7,6438
+bfc008b8:	24181926 	li	t8,6438
+bfc008bc:	3c14bfc0 	lui	s4,0xbfc0
+bfc008c0:	269408c4 	addiu	s4,s4,2244
+bfc008c4:	01f80034 	teq	t7,t8
 /home/lxb/project/loooongson/soft/func_extended/inst/e1_trap_test.S:16
-bfc008a8:	240f1926 	li	t7,6438
-bfc008ac:	24180817 	li	t8,2071
-bfc008b0:	3c14bfc0 	lui	s4,0xbfc0
-bfc008b4:	269408b8 	addiu	s4,s4,2232
-bfc008b8:	01f80034 	teq	t7,t8
-/home/lxb/project/loooongson/soft/func_extended/inst/e1_trap_test.S:17
-bfc008bc:	240f1926 	li	t7,6438
-bfc008c0:	3c14bfc0 	lui	s4,0xbfc0
-bfc008c4:	269408c8 	addiu	s4,s4,2248
-bfc008c8:	05ec1926 	teqi	t7,6438
-/home/lxb/project/loooongson/soft/func_extended/inst/e1_trap_test.S:18
-bfc008cc:	240f1926 	li	t7,6438
+bfc008c8:	240f1926 	li	t7,6438
+bfc008cc:	24180817 	li	t8,2071
 bfc008d0:	3c14bfc0 	lui	s4,0xbfc0
 bfc008d4:	269408d8 	addiu	s4,s4,2264
-bfc008d8:	05ec0817 	teqi	t7,2071
-/home/lxb/project/loooongson/soft/func_extended/inst/e1_trap_test.S:19
+bfc008d8:	01f80034 	teq	t7,t8
+/home/lxb/project/loooongson/soft/func_extended/inst/e1_trap_test.S:17
 bfc008dc:	240f1926 	li	t7,6438
-bfc008e0:	24181926 	li	t8,6438
-bfc008e4:	3c14bfc0 	lui	s4,0xbfc0
-bfc008e8:	269408ec 	addiu	s4,s4,2284
-bfc008ec:	01f80036 	tne	t7,t8
+bfc008e0:	3c14bfc0 	lui	s4,0xbfc0
+bfc008e4:	269408e8 	addiu	s4,s4,2280
+bfc008e8:	05ec1926 	teqi	t7,6438
+/home/lxb/project/loooongson/soft/func_extended/inst/e1_trap_test.S:18
+bfc008ec:	240f1926 	li	t7,6438
+bfc008f0:	3c14bfc0 	lui	s4,0xbfc0
+bfc008f4:	269408f8 	addiu	s4,s4,2296
+bfc008f8:	05ec0817 	teqi	t7,2071
+/home/lxb/project/loooongson/soft/func_extended/inst/e1_trap_test.S:19
+bfc008fc:	240f1926 	li	t7,6438
+bfc00900:	24181926 	li	t8,6438
+bfc00904:	3c14bfc0 	lui	s4,0xbfc0
+bfc00908:	2694090c 	addiu	s4,s4,2316
+bfc0090c:	01f80036 	tne	t7,t8
 /home/lxb/project/loooongson/soft/func_extended/inst/e1_trap_test.S:20
-bfc008f0:	240f1926 	li	t7,6438
-bfc008f4:	24180817 	li	t8,2071
-bfc008f8:	3c14bfc0 	lui	s4,0xbfc0
-bfc008fc:	26940900 	addiu	s4,s4,2304
-bfc00900:	01f80036 	tne	t7,t8
-/home/lxb/project/loooongson/soft/func_extended/inst/e1_trap_test.S:21
-bfc00904:	240f1926 	li	t7,6438
-bfc00908:	3c14bfc0 	lui	s4,0xbfc0
-bfc0090c:	26940910 	addiu	s4,s4,2320
-bfc00910:	05ee1926 	tnei	t7,6438
-/home/lxb/project/loooongson/soft/func_extended/inst/e1_trap_test.S:22
-bfc00914:	240f1926 	li	t7,6438
+bfc00910:	240f1926 	li	t7,6438
+bfc00914:	24180817 	li	t8,2071
 bfc00918:	3c14bfc0 	lui	s4,0xbfc0
 bfc0091c:	26940920 	addiu	s4,s4,2336
-bfc00920:	05ee0817 	tnei	t7,2071
+bfc00920:	01f80036 	tne	t7,t8
+/home/lxb/project/loooongson/soft/func_extended/inst/e1_trap_test.S:21
+bfc00924:	240f1926 	li	t7,6438
+bfc00928:	3c14bfc0 	lui	s4,0xbfc0
+bfc0092c:	26940930 	addiu	s4,s4,2352
+bfc00930:	05ee1926 	tnei	t7,6438
+/home/lxb/project/loooongson/soft/func_extended/inst/e1_trap_test.S:22
+bfc00934:	240f1926 	li	t7,6438
+bfc00938:	3c14bfc0 	lui	s4,0xbfc0
+bfc0093c:	26940940 	addiu	s4,s4,2368
+bfc00940:	05ee0817 	tnei	t7,2071
 /home/lxb/project/loooongson/soft/func_extended/inst/e1_trap_test.S:24
-bfc00924:	240f04d2 	li	t7,1234
-bfc00928:	2418fb2e 	li	t8,-1234
-bfc0092c:	3c14bfc0 	lui	s4,0xbfc0
-bfc00930:	26940934 	addiu	s4,s4,2356
-bfc00934:	01f80030 	tge	t7,t8
+bfc00944:	240f04d2 	li	t7,1234
+bfc00948:	2418fb2e 	li	t8,-1234
+bfc0094c:	3c14bfc0 	lui	s4,0xbfc0
+bfc00950:	26940954 	addiu	s4,s4,2388
+bfc00954:	01f80030 	tge	t7,t8
 /home/lxb/project/loooongson/soft/func_extended/inst/e1_trap_test.S:25
-bfc00938:	240ffb2e 	li	t7,-1234
-bfc0093c:	241804d2 	li	t8,1234
-bfc00940:	3c14bfc0 	lui	s4,0xbfc0
-bfc00944:	26940948 	addiu	s4,s4,2376
-bfc00948:	01f80030 	tge	t7,t8
-/home/lxb/project/loooongson/soft/func_extended/inst/e1_trap_test.S:26
-bfc0094c:	240f04d2 	li	t7,1234
-bfc00950:	3c14bfc0 	lui	s4,0xbfc0
-bfc00954:	26940958 	addiu	s4,s4,2392
-bfc00958:	05e8fb2e 	tgei	t7,-1234
-/home/lxb/project/loooongson/soft/func_extended/inst/e1_trap_test.S:27
-bfc0095c:	240ffb2e 	li	t7,-1234
+bfc00958:	240ffb2e 	li	t7,-1234
+bfc0095c:	241804d2 	li	t8,1234
 bfc00960:	3c14bfc0 	lui	s4,0xbfc0
 bfc00964:	26940968 	addiu	s4,s4,2408
-bfc00968:	05e804d2 	tgei	t7,1234
-/home/lxb/project/loooongson/soft/func_extended/inst/e1_trap_test.S:28
+bfc00968:	01f80030 	tge	t7,t8
+/home/lxb/project/loooongson/soft/func_extended/inst/e1_trap_test.S:26
 bfc0096c:	240f04d2 	li	t7,1234
-bfc00970:	2418fb2e 	li	t8,-1234
-bfc00974:	3c14bfc0 	lui	s4,0xbfc0
-bfc00978:	2694097c 	addiu	s4,s4,2428
-bfc0097c:	01f80031 	tgeu	t7,t8
+bfc00970:	3c14bfc0 	lui	s4,0xbfc0
+bfc00974:	26940978 	addiu	s4,s4,2424
+bfc00978:	05e8fb2e 	tgei	t7,-1234
+/home/lxb/project/loooongson/soft/func_extended/inst/e1_trap_test.S:27
+bfc0097c:	240ffb2e 	li	t7,-1234
+bfc00980:	3c14bfc0 	lui	s4,0xbfc0
+bfc00984:	26940988 	addiu	s4,s4,2440
+bfc00988:	05e804d2 	tgei	t7,1234
+/home/lxb/project/loooongson/soft/func_extended/inst/e1_trap_test.S:28
+bfc0098c:	240f04d2 	li	t7,1234
+bfc00990:	2418fb2e 	li	t8,-1234
+bfc00994:	3c14bfc0 	lui	s4,0xbfc0
+bfc00998:	2694099c 	addiu	s4,s4,2460
+bfc0099c:	01f80031 	tgeu	t7,t8
 /home/lxb/project/loooongson/soft/func_extended/inst/e1_trap_test.S:29
-bfc00980:	240ffb2e 	li	t7,-1234
-bfc00984:	241804d2 	li	t8,1234
-bfc00988:	3c14bfc0 	lui	s4,0xbfc0
-bfc0098c:	26940990 	addiu	s4,s4,2448
-bfc00990:	01f80031 	tgeu	t7,t8
-/home/lxb/project/loooongson/soft/func_extended/inst/e1_trap_test.S:30
-bfc00994:	240f04d2 	li	t7,1234
-bfc00998:	3c14bfc0 	lui	s4,0xbfc0
-bfc0099c:	269409a0 	addiu	s4,s4,2464
-bfc009a0:	05e9fb2e 	tgeiu	t7,-1234
-/home/lxb/project/loooongson/soft/func_extended/inst/e1_trap_test.S:31
-bfc009a4:	240ffb2e 	li	t7,-1234
+bfc009a0:	240ffb2e 	li	t7,-1234
+bfc009a4:	241804d2 	li	t8,1234
 bfc009a8:	3c14bfc0 	lui	s4,0xbfc0
 bfc009ac:	269409b0 	addiu	s4,s4,2480
-bfc009b0:	05e904d2 	tgeiu	t7,1234
-/home/lxb/project/loooongson/soft/func_extended/inst/e1_trap_test.S:32
+bfc009b0:	01f80031 	tgeu	t7,t8
+/home/lxb/project/loooongson/soft/func_extended/inst/e1_trap_test.S:30
 bfc009b4:	240f04d2 	li	t7,1234
-bfc009b8:	2418fb2e 	li	t8,-1234
-bfc009bc:	3c14bfc0 	lui	s4,0xbfc0
-bfc009c0:	269409c4 	addiu	s4,s4,2500
-bfc009c4:	01f80032 	tlt	t7,t8
+bfc009b8:	3c14bfc0 	lui	s4,0xbfc0
+bfc009bc:	269409c0 	addiu	s4,s4,2496
+bfc009c0:	05e9fb2e 	tgeiu	t7,-1234
+/home/lxb/project/loooongson/soft/func_extended/inst/e1_trap_test.S:31
+bfc009c4:	240ffb2e 	li	t7,-1234
+bfc009c8:	3c14bfc0 	lui	s4,0xbfc0
+bfc009cc:	269409d0 	addiu	s4,s4,2512
+bfc009d0:	05e904d2 	tgeiu	t7,1234
+/home/lxb/project/loooongson/soft/func_extended/inst/e1_trap_test.S:32
+bfc009d4:	240f04d2 	li	t7,1234
+bfc009d8:	2418fb2e 	li	t8,-1234
+bfc009dc:	3c14bfc0 	lui	s4,0xbfc0
+bfc009e0:	269409e4 	addiu	s4,s4,2532
+bfc009e4:	01f80032 	tlt	t7,t8
 /home/lxb/project/loooongson/soft/func_extended/inst/e1_trap_test.S:33
-bfc009c8:	240ffb2e 	li	t7,-1234
-bfc009cc:	241804d2 	li	t8,1234
-bfc009d0:	3c14bfc0 	lui	s4,0xbfc0
-bfc009d4:	269409d8 	addiu	s4,s4,2520
-bfc009d8:	01f80032 	tlt	t7,t8
-/home/lxb/project/loooongson/soft/func_extended/inst/e1_trap_test.S:34
-bfc009dc:	240f04d2 	li	t7,1234
-bfc009e0:	3c14bfc0 	lui	s4,0xbfc0
-bfc009e4:	269409e8 	addiu	s4,s4,2536
-bfc009e8:	05eafb2e 	tlti	t7,-1234
-/home/lxb/project/loooongson/soft/func_extended/inst/e1_trap_test.S:35
-bfc009ec:	240ffb2e 	li	t7,-1234
+bfc009e8:	240ffb2e 	li	t7,-1234
+bfc009ec:	241804d2 	li	t8,1234
 bfc009f0:	3c14bfc0 	lui	s4,0xbfc0
 bfc009f4:	269409f8 	addiu	s4,s4,2552
-bfc009f8:	05ea04d2 	tlti	t7,1234
-/home/lxb/project/loooongson/soft/func_extended/inst/e1_trap_test.S:36
+bfc009f8:	01f80032 	tlt	t7,t8
+/home/lxb/project/loooongson/soft/func_extended/inst/e1_trap_test.S:34
 bfc009fc:	240f04d2 	li	t7,1234
-bfc00a00:	2418fb2e 	li	t8,-1234
-bfc00a04:	3c14bfc0 	lui	s4,0xbfc0
-bfc00a08:	26940a0c 	addiu	s4,s4,2572
-bfc00a0c:	01f80033 	tltu	t7,t8
+bfc00a00:	3c14bfc0 	lui	s4,0xbfc0
+bfc00a04:	26940a08 	addiu	s4,s4,2568
+bfc00a08:	05eafb2e 	tlti	t7,-1234
+/home/lxb/project/loooongson/soft/func_extended/inst/e1_trap_test.S:35
+bfc00a0c:	240ffb2e 	li	t7,-1234
+bfc00a10:	3c14bfc0 	lui	s4,0xbfc0
+bfc00a14:	26940a18 	addiu	s4,s4,2584
+bfc00a18:	05ea04d2 	tlti	t7,1234
+/home/lxb/project/loooongson/soft/func_extended/inst/e1_trap_test.S:36
+bfc00a1c:	240f04d2 	li	t7,1234
+bfc00a20:	2418fb2e 	li	t8,-1234
+bfc00a24:	3c14bfc0 	lui	s4,0xbfc0
+bfc00a28:	26940a2c 	addiu	s4,s4,2604
+bfc00a2c:	01f80033 	tltu	t7,t8
 /home/lxb/project/loooongson/soft/func_extended/inst/e1_trap_test.S:37
-bfc00a10:	240ffb2e 	li	t7,-1234
-bfc00a14:	241804d2 	li	t8,1234
-bfc00a18:	3c14bfc0 	lui	s4,0xbfc0
-bfc00a1c:	26940a20 	addiu	s4,s4,2592
-bfc00a20:	01f80033 	tltu	t7,t8
-/home/lxb/project/loooongson/soft/func_extended/inst/e1_trap_test.S:38
-bfc00a24:	240f04d2 	li	t7,1234
-bfc00a28:	3c14bfc0 	lui	s4,0xbfc0
-bfc00a2c:	26940a30 	addiu	s4,s4,2608
-bfc00a30:	05ebfb2e 	tltiu	t7,-1234
-/home/lxb/project/loooongson/soft/func_extended/inst/e1_trap_test.S:39
-bfc00a34:	240ffb2e 	li	t7,-1234
+bfc00a30:	240ffb2e 	li	t7,-1234
+bfc00a34:	241804d2 	li	t8,1234
 bfc00a38:	3c14bfc0 	lui	s4,0xbfc0
 bfc00a3c:	26940a40 	addiu	s4,s4,2624
-bfc00a40:	05eb04d2 	tltiu	t7,1234
+bfc00a40:	01f80033 	tltu	t7,t8
+/home/lxb/project/loooongson/soft/func_extended/inst/e1_trap_test.S:38
+bfc00a44:	240f04d2 	li	t7,1234
+bfc00a48:	3c14bfc0 	lui	s4,0xbfc0
+bfc00a4c:	26940a50 	addiu	s4,s4,2640
+bfc00a50:	05ebfb2e 	tltiu	t7,-1234
+/home/lxb/project/loooongson/soft/func_extended/inst/e1_trap_test.S:39
+bfc00a54:	240ffb2e 	li	t7,-1234
+bfc00a58:	3c14bfc0 	lui	s4,0xbfc0
+bfc00a5c:	26940a60 	addiu	s4,s4,2656
+bfc00a60:	05eb04d2 	tltiu	t7,1234
 /home/lxb/project/loooongson/soft/func_extended/inst/e1_trap_test.S:41
-bfc00a44:	03e01021 	move	v0,ra
-bfc00a48:	240f04d2 	li	t7,1234
-bfc00a4c:	241804d2 	li	t8,1234
-bfc00a50:	51f80002 	beql	t7,t8,bfc00a5c <e1_trap_test+0x1dc>
-bfc00a54:	25ef0001 	addiu	t7,t7,1
-bfc00a58:	25ef000a 	addiu	t7,t7,10
-bfc00a5c:	27180064 	addiu	t8,t8,100
-bfc00a60:	0040f821 	move	ra,v0
-/home/lxb/project/loooongson/soft/func_extended/inst/e1_trap_test.S:42
 bfc00a64:	03e01021 	move	v0,ra
 bfc00a68:	240f04d2 	li	t7,1234
-bfc00a6c:	2418162e 	li	t8,5678
-bfc00a70:	51f80002 	beql	t7,t8,bfc00a7c <e1_trap_test+0x1fc>
+bfc00a6c:	241804d2 	li	t8,1234
+bfc00a70:	51f80002 	beql	t7,t8,bfc00a7c <e1_trap_test+0x1dc>
 bfc00a74:	25ef0001 	addiu	t7,t7,1
 bfc00a78:	25ef000a 	addiu	t7,t7,10
 bfc00a7c:	27180064 	addiu	t8,t8,100
 bfc00a80:	0040f821 	move	ra,v0
-/home/lxb/project/loooongson/soft/func_extended/inst/e1_trap_test.S:43
+/home/lxb/project/loooongson/soft/func_extended/inst/e1_trap_test.S:42
 bfc00a84:	03e01021 	move	v0,ra
-bfc00a88:	240f162e 	li	t7,5678
-bfc00a8c:	241804d2 	li	t8,1234
-bfc00a90:	51f80002 	beql	t7,t8,bfc00a9c <e1_trap_test+0x21c>
+bfc00a88:	240f04d2 	li	t7,1234
+bfc00a8c:	2418162e 	li	t8,5678
+bfc00a90:	51f80002 	beql	t7,t8,bfc00a9c <e1_trap_test+0x1fc>
 bfc00a94:	25ef0001 	addiu	t7,t7,1
 bfc00a98:	25ef000a 	addiu	t7,t7,10
 bfc00a9c:	27180064 	addiu	t8,t8,100
 bfc00aa0:	0040f821 	move	ra,v0
-/home/lxb/project/loooongson/soft/func_extended/inst/e1_trap_test.S:44
+/home/lxb/project/loooongson/soft/func_extended/inst/e1_trap_test.S:43
 bfc00aa4:	03e01021 	move	v0,ra
-bfc00aa8:	240f04d2 	li	t7,1234
+bfc00aa8:	240f162e 	li	t7,5678
 bfc00aac:	241804d2 	li	t8,1234
-bfc00ab0:	55f80002 	bnel	t7,t8,bfc00abc <e1_trap_test+0x23c>
+bfc00ab0:	51f80002 	beql	t7,t8,bfc00abc <e1_trap_test+0x21c>
 bfc00ab4:	25ef0001 	addiu	t7,t7,1
 bfc00ab8:	25ef000a 	addiu	t7,t7,10
 bfc00abc:	27180064 	addiu	t8,t8,100
 bfc00ac0:	0040f821 	move	ra,v0
-/home/lxb/project/loooongson/soft/func_extended/inst/e1_trap_test.S:45
+/home/lxb/project/loooongson/soft/func_extended/inst/e1_trap_test.S:44
 bfc00ac4:	03e01021 	move	v0,ra
 bfc00ac8:	240f04d2 	li	t7,1234
-bfc00acc:	2418162e 	li	t8,5678
-bfc00ad0:	55f80002 	bnel	t7,t8,bfc00adc <e1_trap_test+0x25c>
+bfc00acc:	241804d2 	li	t8,1234
+bfc00ad0:	55f80002 	bnel	t7,t8,bfc00adc <e1_trap_test+0x23c>
 bfc00ad4:	25ef0001 	addiu	t7,t7,1
 bfc00ad8:	25ef000a 	addiu	t7,t7,10
 bfc00adc:	27180064 	addiu	t8,t8,100
 bfc00ae0:	0040f821 	move	ra,v0
-/home/lxb/project/loooongson/soft/func_extended/inst/e1_trap_test.S:46
+/home/lxb/project/loooongson/soft/func_extended/inst/e1_trap_test.S:45
 bfc00ae4:	03e01021 	move	v0,ra
-bfc00ae8:	240f162e 	li	t7,5678
-bfc00aec:	241804d2 	li	t8,1234
-bfc00af0:	55f80002 	bnel	t7,t8,bfc00afc <e1_trap_test+0x27c>
+bfc00ae8:	240f04d2 	li	t7,1234
+bfc00aec:	2418162e 	li	t8,5678
+bfc00af0:	55f80002 	bnel	t7,t8,bfc00afc <e1_trap_test+0x25c>
 bfc00af4:	25ef0001 	addiu	t7,t7,1
 bfc00af8:	25ef000a 	addiu	t7,t7,10
 bfc00afc:	27180064 	addiu	t8,t8,100
 bfc00b00:	0040f821 	move	ra,v0
-/home/lxb/project/loooongson/soft/func_extended/inst/e1_trap_test.S:47
+/home/lxb/project/loooongson/soft/func_extended/inst/e1_trap_test.S:46
 bfc00b04:	03e01021 	move	v0,ra
-bfc00b08:	240f04d2 	li	t7,1234
-bfc00b0c:	05e30002 	bgezl	t7,bfc00b18 <e1_trap_test+0x298>
-bfc00b10:	25ef0001 	addiu	t7,t7,1
-bfc00b14:	25ef0014 	addiu	t7,t7,20
+bfc00b08:	240f162e 	li	t7,5678
+bfc00b0c:	241804d2 	li	t8,1234
+bfc00b10:	55f80002 	bnel	t7,t8,bfc00b1c <e1_trap_test+0x27c>
+bfc00b14:	25ef0001 	addiu	t7,t7,1
 bfc00b18:	25ef000a 	addiu	t7,t7,10
-bfc00b1c:	0040f821 	move	ra,v0
+bfc00b1c:	27180064 	addiu	t8,t8,100
+bfc00b20:	0040f821 	move	ra,v0
+/home/lxb/project/loooongson/soft/func_extended/inst/e1_trap_test.S:47
+bfc00b24:	03e01021 	move	v0,ra
+bfc00b28:	240f04d2 	li	t7,1234
+bfc00b2c:	05e30002 	bgezl	t7,bfc00b38 <e1_trap_test+0x298>
+bfc00b30:	25ef0001 	addiu	t7,t7,1
+bfc00b34:	25ef0014 	addiu	t7,t7,20
+bfc00b38:	25ef000a 	addiu	t7,t7,10
+bfc00b3c:	0040f821 	move	ra,v0
 /home/lxb/project/loooongson/soft/func_extended/inst/e1_trap_test.S:48
-bfc00b20:	03e01021 	move	v0,ra
-bfc00b24:	240f0000 	li	t7,0
-bfc00b28:	05e30002 	bgezl	t7,bfc00b34 <e1_trap_test+0x2b4>
-bfc00b2c:	25ef0001 	addiu	t7,t7,1
-bfc00b30:	25ef0014 	addiu	t7,t7,20
-bfc00b34:	25ef000a 	addiu	t7,t7,10
-bfc00b38:	0040f821 	move	ra,v0
+bfc00b40:	03e01021 	move	v0,ra
+bfc00b44:	240f0000 	li	t7,0
+bfc00b48:	05e30002 	bgezl	t7,bfc00b54 <e1_trap_test+0x2b4>
+bfc00b4c:	25ef0001 	addiu	t7,t7,1
+bfc00b50:	25ef0014 	addiu	t7,t7,20
+bfc00b54:	25ef000a 	addiu	t7,t7,10
+bfc00b58:	0040f821 	move	ra,v0
 /home/lxb/project/loooongson/soft/func_extended/inst/e1_trap_test.S:49
-bfc00b3c:	03e01021 	move	v0,ra
-bfc00b40:	240ffb2e 	li	t7,-1234
-bfc00b44:	05e30002 	bgezl	t7,bfc00b50 <e1_trap_test+0x2d0>
-bfc00b48:	25ef0001 	addiu	t7,t7,1
-bfc00b4c:	25ef0014 	addiu	t7,t7,20
-bfc00b50:	25ef000a 	addiu	t7,t7,10
-bfc00b54:	0040f821 	move	ra,v0
+bfc00b5c:	03e01021 	move	v0,ra
+bfc00b60:	240ffb2e 	li	t7,-1234
+bfc00b64:	05e30002 	bgezl	t7,bfc00b70 <e1_trap_test+0x2d0>
+bfc00b68:	25ef0001 	addiu	t7,t7,1
+bfc00b6c:	25ef0014 	addiu	t7,t7,20
+bfc00b70:	25ef000a 	addiu	t7,t7,10
+bfc00b74:	0040f821 	move	ra,v0
 /home/lxb/project/loooongson/soft/func_extended/inst/e1_trap_test.S:50
-bfc00b58:	03e01021 	move	v0,ra
-bfc00b5c:	240f04d2 	li	t7,1234
-bfc00b60:	5de00002 	bgtzl	t7,bfc00b6c <e1_trap_test+0x2ec>
-bfc00b64:	25ef0001 	addiu	t7,t7,1
-bfc00b68:	25ef0014 	addiu	t7,t7,20
-bfc00b6c:	25ef000a 	addiu	t7,t7,10
-bfc00b70:	0040f821 	move	ra,v0
+bfc00b78:	03e01021 	move	v0,ra
+bfc00b7c:	240f04d2 	li	t7,1234
+bfc00b80:	5de00002 	bgtzl	t7,bfc00b8c <e1_trap_test+0x2ec>
+bfc00b84:	25ef0001 	addiu	t7,t7,1
+bfc00b88:	25ef0014 	addiu	t7,t7,20
+bfc00b8c:	25ef000a 	addiu	t7,t7,10
+bfc00b90:	0040f821 	move	ra,v0
 /home/lxb/project/loooongson/soft/func_extended/inst/e1_trap_test.S:51
-bfc00b74:	03e01021 	move	v0,ra
-bfc00b78:	240f0000 	li	t7,0
-bfc00b7c:	5de00002 	bgtzl	t7,bfc00b88 <e1_trap_test+0x308>
-bfc00b80:	25ef0001 	addiu	t7,t7,1
-bfc00b84:	25ef0014 	addiu	t7,t7,20
-bfc00b88:	25ef000a 	addiu	t7,t7,10
-bfc00b8c:	0040f821 	move	ra,v0
+bfc00b94:	03e01021 	move	v0,ra
+bfc00b98:	240f0000 	li	t7,0
+bfc00b9c:	5de00002 	bgtzl	t7,bfc00ba8 <e1_trap_test+0x308>
+bfc00ba0:	25ef0001 	addiu	t7,t7,1
+bfc00ba4:	25ef0014 	addiu	t7,t7,20
+bfc00ba8:	25ef000a 	addiu	t7,t7,10
+bfc00bac:	0040f821 	move	ra,v0
 /home/lxb/project/loooongson/soft/func_extended/inst/e1_trap_test.S:52
-bfc00b90:	03e01021 	move	v0,ra
-bfc00b94:	240ffb2e 	li	t7,-1234
-bfc00b98:	5de00002 	bgtzl	t7,bfc00ba4 <e1_trap_test+0x324>
-bfc00b9c:	25ef0001 	addiu	t7,t7,1
-bfc00ba0:	25ef0014 	addiu	t7,t7,20
-bfc00ba4:	25ef000a 	addiu	t7,t7,10
-bfc00ba8:	0040f821 	move	ra,v0
+bfc00bb0:	03e01021 	move	v0,ra
+bfc00bb4:	240ffb2e 	li	t7,-1234
+bfc00bb8:	5de00002 	bgtzl	t7,bfc00bc4 <e1_trap_test+0x324>
+bfc00bbc:	25ef0001 	addiu	t7,t7,1
+bfc00bc0:	25ef0014 	addiu	t7,t7,20
+bfc00bc4:	25ef000a 	addiu	t7,t7,10
+bfc00bc8:	0040f821 	move	ra,v0
 /home/lxb/project/loooongson/soft/func_extended/inst/e1_trap_test.S:53
-bfc00bac:	03e01021 	move	v0,ra
-bfc00bb0:	240f04d2 	li	t7,1234
-bfc00bb4:	05e20002 	bltzl	t7,bfc00bc0 <e1_trap_test+0x340>
-bfc00bb8:	25ef0001 	addiu	t7,t7,1
-bfc00bbc:	25ef0014 	addiu	t7,t7,20
-bfc00bc0:	25ef000a 	addiu	t7,t7,10
-bfc00bc4:	0040f821 	move	ra,v0
+bfc00bcc:	03e01021 	move	v0,ra
+bfc00bd0:	240f04d2 	li	t7,1234
+bfc00bd4:	05e20002 	bltzl	t7,bfc00be0 <e1_trap_test+0x340>
+bfc00bd8:	25ef0001 	addiu	t7,t7,1
+bfc00bdc:	25ef0014 	addiu	t7,t7,20
+bfc00be0:	25ef000a 	addiu	t7,t7,10
+bfc00be4:	0040f821 	move	ra,v0
 /home/lxb/project/loooongson/soft/func_extended/inst/e1_trap_test.S:54
-bfc00bc8:	03e01021 	move	v0,ra
-bfc00bcc:	240f0000 	li	t7,0
-bfc00bd0:	05e20002 	bltzl	t7,bfc00bdc <e1_trap_test+0x35c>
-bfc00bd4:	25ef0001 	addiu	t7,t7,1
-bfc00bd8:	25ef0014 	addiu	t7,t7,20
-bfc00bdc:	25ef000a 	addiu	t7,t7,10
-bfc00be0:	0040f821 	move	ra,v0
+bfc00be8:	03e01021 	move	v0,ra
+bfc00bec:	240f0000 	li	t7,0
+bfc00bf0:	05e20002 	bltzl	t7,bfc00bfc <e1_trap_test+0x35c>
+bfc00bf4:	25ef0001 	addiu	t7,t7,1
+bfc00bf8:	25ef0014 	addiu	t7,t7,20
+bfc00bfc:	25ef000a 	addiu	t7,t7,10
+bfc00c00:	0040f821 	move	ra,v0
 /home/lxb/project/loooongson/soft/func_extended/inst/e1_trap_test.S:55
-bfc00be4:	03e01021 	move	v0,ra
-bfc00be8:	240ffb2e 	li	t7,-1234
-bfc00bec:	05e20002 	bltzl	t7,bfc00bf8 <e1_trap_test+0x378>
-bfc00bf0:	25ef0001 	addiu	t7,t7,1
-bfc00bf4:	25ef0014 	addiu	t7,t7,20
-bfc00bf8:	25ef000a 	addiu	t7,t7,10
-bfc00bfc:	0040f821 	move	ra,v0
+bfc00c04:	03e01021 	move	v0,ra
+bfc00c08:	240ffb2e 	li	t7,-1234
+bfc00c0c:	05e20002 	bltzl	t7,bfc00c18 <e1_trap_test+0x378>
+bfc00c10:	25ef0001 	addiu	t7,t7,1
+bfc00c14:	25ef0014 	addiu	t7,t7,20
+bfc00c18:	25ef000a 	addiu	t7,t7,10
+bfc00c1c:	0040f821 	move	ra,v0
 /home/lxb/project/loooongson/soft/func_extended/inst/e1_trap_test.S:56
-bfc00c00:	03e01021 	move	v0,ra
-bfc00c04:	240f04d2 	li	t7,1234
-bfc00c08:	59e00002 	blezl	t7,bfc00c14 <e1_trap_test+0x394>
-bfc00c0c:	25ef0001 	addiu	t7,t7,1
-bfc00c10:	25ef0014 	addiu	t7,t7,20
-bfc00c14:	25ef000a 	addiu	t7,t7,10
-bfc00c18:	0040f821 	move	ra,v0
+bfc00c20:	03e01021 	move	v0,ra
+bfc00c24:	240f04d2 	li	t7,1234
+bfc00c28:	59e00002 	blezl	t7,bfc00c34 <e1_trap_test+0x394>
+bfc00c2c:	25ef0001 	addiu	t7,t7,1
+bfc00c30:	25ef0014 	addiu	t7,t7,20
+bfc00c34:	25ef000a 	addiu	t7,t7,10
+bfc00c38:	0040f821 	move	ra,v0
 /home/lxb/project/loooongson/soft/func_extended/inst/e1_trap_test.S:57
-bfc00c1c:	03e01021 	move	v0,ra
-bfc00c20:	240f0000 	li	t7,0
-bfc00c24:	59e00002 	blezl	t7,bfc00c30 <e1_trap_test+0x3b0>
-bfc00c28:	25ef0001 	addiu	t7,t7,1
-bfc00c2c:	25ef0014 	addiu	t7,t7,20
-bfc00c30:	25ef000a 	addiu	t7,t7,10
-bfc00c34:	0040f821 	move	ra,v0
+bfc00c3c:	03e01021 	move	v0,ra
+bfc00c40:	240f0000 	li	t7,0
+bfc00c44:	59e00002 	blezl	t7,bfc00c50 <e1_trap_test+0x3b0>
+bfc00c48:	25ef0001 	addiu	t7,t7,1
+bfc00c4c:	25ef0014 	addiu	t7,t7,20
+bfc00c50:	25ef000a 	addiu	t7,t7,10
+bfc00c54:	0040f821 	move	ra,v0
 /home/lxb/project/loooongson/soft/func_extended/inst/e1_trap_test.S:58
-bfc00c38:	03e01021 	move	v0,ra
-bfc00c3c:	240ffb2e 	li	t7,-1234
-bfc00c40:	59e00002 	blezl	t7,bfc00c4c <e1_trap_test+0x3cc>
-bfc00c44:	25ef0001 	addiu	t7,t7,1
-bfc00c48:	25ef0014 	addiu	t7,t7,20
-bfc00c4c:	25ef000a 	addiu	t7,t7,10
-bfc00c50:	0040f821 	move	ra,v0
+bfc00c58:	03e01021 	move	v0,ra
+bfc00c5c:	240ffb2e 	li	t7,-1234
+bfc00c60:	59e00002 	blezl	t7,bfc00c6c <e1_trap_test+0x3cc>
+bfc00c64:	25ef0001 	addiu	t7,t7,1
+bfc00c68:	25ef0014 	addiu	t7,t7,20
+bfc00c6c:	25ef000a 	addiu	t7,t7,10
+bfc00c70:	0040f821 	move	ra,v0
 /home/lxb/project/loooongson/soft/func_extended/inst/e1_trap_test.S:59
-bfc00c54:	03e01021 	move	v0,ra
-bfc00c58:	240f04d2 	li	t7,1234
-bfc00c5c:	05f30002 	bgezall	t7,bfc00c68 <e1_trap_test+0x3e8>
-bfc00c60:	25ef0001 	addiu	t7,t7,1
-bfc00c64:	25ef0014 	addiu	t7,t7,20
-bfc00c68:	25ef000a 	addiu	t7,t7,10
-bfc00c6c:	0040f821 	move	ra,v0
+bfc00c74:	03e01021 	move	v0,ra
+bfc00c78:	240f04d2 	li	t7,1234
+bfc00c7c:	05f30002 	bgezall	t7,bfc00c88 <e1_trap_test+0x3e8>
+bfc00c80:	25ef0001 	addiu	t7,t7,1
+bfc00c84:	25ef0014 	addiu	t7,t7,20
+bfc00c88:	25ef000a 	addiu	t7,t7,10
+bfc00c8c:	0040f821 	move	ra,v0
 /home/lxb/project/loooongson/soft/func_extended/inst/e1_trap_test.S:60
-bfc00c70:	03e01021 	move	v0,ra
-bfc00c74:	240f0000 	li	t7,0
-bfc00c78:	05f30002 	bgezall	t7,bfc00c84 <e1_trap_test+0x404>
-bfc00c7c:	25ef0001 	addiu	t7,t7,1
-bfc00c80:	25ef0014 	addiu	t7,t7,20
-bfc00c84:	25ef000a 	addiu	t7,t7,10
-bfc00c88:	0040f821 	move	ra,v0
+bfc00c90:	03e01021 	move	v0,ra
+bfc00c94:	240f0000 	li	t7,0
+bfc00c98:	05f30002 	bgezall	t7,bfc00ca4 <e1_trap_test+0x404>
+bfc00c9c:	25ef0001 	addiu	t7,t7,1
+bfc00ca0:	25ef0014 	addiu	t7,t7,20
+bfc00ca4:	25ef000a 	addiu	t7,t7,10
+bfc00ca8:	0040f821 	move	ra,v0
 /home/lxb/project/loooongson/soft/func_extended/inst/e1_trap_test.S:61
-bfc00c8c:	03e01021 	move	v0,ra
-bfc00c90:	240ffb2e 	li	t7,-1234
-bfc00c94:	05f30002 	bgezall	t7,bfc00ca0 <e1_trap_test+0x420>
-bfc00c98:	25ef0001 	addiu	t7,t7,1
-bfc00c9c:	25ef0014 	addiu	t7,t7,20
-bfc00ca0:	25ef000a 	addiu	t7,t7,10
-bfc00ca4:	0040f821 	move	ra,v0
+bfc00cac:	03e01021 	move	v0,ra
+bfc00cb0:	240ffb2e 	li	t7,-1234
+bfc00cb4:	05f30002 	bgezall	t7,bfc00cc0 <e1_trap_test+0x420>
+bfc00cb8:	25ef0001 	addiu	t7,t7,1
+bfc00cbc:	25ef0014 	addiu	t7,t7,20
+bfc00cc0:	25ef000a 	addiu	t7,t7,10
+bfc00cc4:	0040f821 	move	ra,v0
 /home/lxb/project/loooongson/soft/func_extended/inst/e1_trap_test.S:65
-bfc00ca8:	26730001 	addiu	s3,s3,1
+bfc00cc8:	26730001 	addiu	s3,s3,1
 
-bfc00cac <inst_error>:
+bfc00ccc <inst_error>:
 /home/lxb/project/loooongson/soft/func_extended/inst/e1_trap_test.S:68
-bfc00cac:	00104e00 	sll	t1,s0,0x18
+bfc00ccc:	00104e00 	sll	t1,s0,0x18
 /home/lxb/project/loooongson/soft/func_extended/inst/e1_trap_test.S:69
-bfc00cb0:	01334025 	or	t0,t1,s3
+bfc00cd0:	01334025 	or	t0,t1,s3
 /home/lxb/project/loooongson/soft/func_extended/inst/e1_trap_test.S:70
-bfc00cb4:	ae280000 	sw	t0,0(s1)
+bfc00cd4:	ae280000 	sw	t0,0(s1)
 /home/lxb/project/loooongson/soft/func_extended/inst/e1_trap_test.S:71
-bfc00cb8:	03e00008 	jr	ra
+bfc00cd8:	03e00008 	jr	ra
 /home/lxb/project/loooongson/soft/func_extended/inst/e1_trap_test.S:72
-bfc00cbc:	00000000 	nop
+bfc00cdc:	00000000 	nop
+
+bfc00ce0 <e2_clo_clz_test>:
+/home/lxb/project/loooongson/soft/func_extended/inst/e2_clo_clz.S:8
+bfc00ce0:	26100001 	addiu	s0,s0,1
+/home/lxb/project/loooongson/soft/func_extended/inst/e2_clo_clz.S:9
+bfc00ce4:	40805800 	mtc0	zero,$11
+/home/lxb/project/loooongson/soft/func_extended/inst/e2_clo_clz.S:10
+bfc00ce8:	24120009 	li	s2,9
+/home/lxb/project/loooongson/soft/func_extended/inst/e2_clo_clz.S:11
+bfc00cec:	3c08800d 	lui	t0,0x800d
+/home/lxb/project/loooongson/soft/func_extended/inst/e2_clo_clz.S:12
+bfc00cf0:	ad120000 	sw	s2,0(t0)
+/home/lxb/project/loooongson/soft/func_extended/inst/e2_clo_clz.S:15
+bfc00cf4:	3c08e234 	lui	t0,0xe234
+bfc00cf8:	35085678 	ori	t0,t0,0x5678
+/home/lxb/project/loooongson/soft/func_extended/inst/e2_clo_clz.S:16
+bfc00cfc:	71094821 	0x71094821
+/home/lxb/project/loooongson/soft/func_extended/inst/e2_clo_clz.S:17
+bfc00d00:	71094820 	0x71094820
+/home/lxb/project/loooongson/soft/func_extended/inst/e2_clo_clz.S:18
+bfc00d04:	3c088000 	lui	t0,0x8000
+/home/lxb/project/loooongson/soft/func_extended/inst/e2_clo_clz.S:19
+bfc00d08:	71094821 	0x71094821
+/home/lxb/project/loooongson/soft/func_extended/inst/e2_clo_clz.S:20
+bfc00d0c:	71094820 	0x71094820
+/home/lxb/project/loooongson/soft/func_extended/inst/e2_clo_clz.S:21
+bfc00d10:	3c081926 	lui	t0,0x1926
+bfc00d14:	35080817 	ori	t0,t0,0x817
+/home/lxb/project/loooongson/soft/func_extended/inst/e2_clo_clz.S:22
+bfc00d18:	71094821 	0x71094821
+/home/lxb/project/loooongson/soft/func_extended/inst/e2_clo_clz.S:23
+bfc00d1c:	71094820 	0x71094820
+/home/lxb/project/loooongson/soft/func_extended/inst/e2_clo_clz.S:24
+bfc00d20:	2408000e 	li	t0,14
+/home/lxb/project/loooongson/soft/func_extended/inst/e2_clo_clz.S:25
+bfc00d24:	71094821 	0x71094821
+/home/lxb/project/loooongson/soft/func_extended/inst/e2_clo_clz.S:26
+bfc00d28:	71094820 	0x71094820
+/home/lxb/project/loooongson/soft/func_extended/inst/e2_clo_clz.S:30
+bfc00d2c:	26730001 	addiu	s3,s3,1
+
+bfc00d30 <inst_error>:
+/home/lxb/project/loooongson/soft/func_extended/inst/e2_clo_clz.S:33
+bfc00d30:	00104e00 	sll	t1,s0,0x18
+/home/lxb/project/loooongson/soft/func_extended/inst/e2_clo_clz.S:34
+bfc00d34:	01334025 	or	t0,t1,s3
+/home/lxb/project/loooongson/soft/func_extended/inst/e2_clo_clz.S:35
+bfc00d38:	ae280000 	sw	t0,0(s1)
+/home/lxb/project/loooongson/soft/func_extended/inst/e2_clo_clz.S:36
+bfc00d3c:	03e00008 	jr	ra
+/home/lxb/project/loooongson/soft/func_extended/inst/e2_clo_clz.S:37
+bfc00d40:	00000000 	nop
+	...
+
+bfc00d50 <e3_madd_msub_test>:
+/home/lxb/project/loooongson/soft/func_extended/inst/e3_madd_msub.S:8
+bfc00d50:	26100001 	addiu	s0,s0,1
+/home/lxb/project/loooongson/soft/func_extended/inst/e3_madd_msub.S:9
+bfc00d54:	40805800 	mtc0	zero,$11
+/home/lxb/project/loooongson/soft/func_extended/inst/e3_madd_msub.S:10
+bfc00d58:	24120009 	li	s2,9
+/home/lxb/project/loooongson/soft/func_extended/inst/e3_madd_msub.S:11
+bfc00d5c:	3c08800d 	lui	t0,0x800d
+/home/lxb/project/loooongson/soft/func_extended/inst/e3_madd_msub.S:12
+bfc00d60:	ad120000 	sw	s2,0(t0)
+/home/lxb/project/loooongson/soft/func_extended/inst/e3_madd_msub.S:15
+bfc00d64:	00000013 	mtlo	zero
+/home/lxb/project/loooongson/soft/func_extended/inst/e3_madd_msub.S:16
+bfc00d68:	00000011 	mthi	zero
+/home/lxb/project/loooongson/soft/func_extended/inst/e3_madd_msub.S:17
+bfc00d6c:	24091234 	li	t1,4660
+/home/lxb/project/loooongson/soft/func_extended/inst/e3_madd_msub.S:18
+bfc00d70:	240a5678 	li	t2,22136
+/home/lxb/project/loooongson/soft/func_extended/inst/e3_madd_msub.S:19
+bfc00d74:	712a0000 	0x712a0000
+/home/lxb/project/loooongson/soft/func_extended/inst/e3_madd_msub.S:20
+bfc00d78:	712a0000 	0x712a0000
+/home/lxb/project/loooongson/soft/func_extended/inst/e3_madd_msub.S:21
+bfc00d7c:	00004812 	mflo	t1
+/home/lxb/project/loooongson/soft/func_extended/inst/e3_madd_msub.S:22
+bfc00d80:	00005010 	mfhi	t2
+/home/lxb/project/loooongson/soft/func_extended/inst/e3_madd_msub.S:23
+bfc00d84:	712a0004 	0x712a0004
+/home/lxb/project/loooongson/soft/func_extended/inst/e3_madd_msub.S:24
+bfc00d88:	00004812 	mflo	t1
+/home/lxb/project/loooongson/soft/func_extended/inst/e3_madd_msub.S:25
+bfc00d8c:	00005010 	mfhi	t2
+/home/lxb/project/loooongson/soft/func_extended/inst/e3_madd_msub.S:26
+bfc00d90:	2409fff4 	li	t1,-12
+/home/lxb/project/loooongson/soft/func_extended/inst/e3_madd_msub.S:27
+bfc00d94:	240a0022 	li	t2,34
+/home/lxb/project/loooongson/soft/func_extended/inst/e3_madd_msub.S:28
+bfc00d98:	01200013 	mtlo	t1
+/home/lxb/project/loooongson/soft/func_extended/inst/e3_madd_msub.S:29
+bfc00d9c:	01400011 	mthi	t2
+/home/lxb/project/loooongson/soft/func_extended/inst/e3_madd_msub.S:30
+bfc00da0:	712a0001 	0x712a0001
+/home/lxb/project/loooongson/soft/func_extended/inst/e3_madd_msub.S:31
+bfc00da4:	00004812 	mflo	t1
+/home/lxb/project/loooongson/soft/func_extended/inst/e3_madd_msub.S:32
+bfc00da8:	00005010 	mfhi	t2
+/home/lxb/project/loooongson/soft/func_extended/inst/e3_madd_msub.S:33
+bfc00dac:	2409fff4 	li	t1,-12
+/home/lxb/project/loooongson/soft/func_extended/inst/e3_madd_msub.S:34
+bfc00db0:	240a0022 	li	t2,34
+/home/lxb/project/loooongson/soft/func_extended/inst/e3_madd_msub.S:35
+bfc00db4:	01200013 	mtlo	t1
+/home/lxb/project/loooongson/soft/func_extended/inst/e3_madd_msub.S:36
+bfc00db8:	01400011 	mthi	t2
+/home/lxb/project/loooongson/soft/func_extended/inst/e3_madd_msub.S:37
+bfc00dbc:	712a0000 	0x712a0000
+/home/lxb/project/loooongson/soft/func_extended/inst/e3_madd_msub.S:38
+bfc00dc0:	00004812 	mflo	t1
+/home/lxb/project/loooongson/soft/func_extended/inst/e3_madd_msub.S:39
+bfc00dc4:	00005010 	mfhi	t2
+/home/lxb/project/loooongson/soft/func_extended/inst/e3_madd_msub.S:40
+bfc00dc8:	2409fff4 	li	t1,-12
+/home/lxb/project/loooongson/soft/func_extended/inst/e3_madd_msub.S:41
+bfc00dcc:	240a0022 	li	t2,34
+/home/lxb/project/loooongson/soft/func_extended/inst/e3_madd_msub.S:42
+bfc00dd0:	01200013 	mtlo	t1
+/home/lxb/project/loooongson/soft/func_extended/inst/e3_madd_msub.S:43
+bfc00dd4:	01400011 	mthi	t2
+/home/lxb/project/loooongson/soft/func_extended/inst/e3_madd_msub.S:44
+bfc00dd8:	712a0005 	0x712a0005
+/home/lxb/project/loooongson/soft/func_extended/inst/e3_madd_msub.S:45
+bfc00ddc:	00004812 	mflo	t1
+/home/lxb/project/loooongson/soft/func_extended/inst/e3_madd_msub.S:46
+bfc00de0:	00005010 	mfhi	t2
+/home/lxb/project/loooongson/soft/func_extended/inst/e3_madd_msub.S:47
+bfc00de4:	2409fff4 	li	t1,-12
+/home/lxb/project/loooongson/soft/func_extended/inst/e3_madd_msub.S:48
+bfc00de8:	240a0022 	li	t2,34
+/home/lxb/project/loooongson/soft/func_extended/inst/e3_madd_msub.S:49
+bfc00dec:	01200013 	mtlo	t1
+/home/lxb/project/loooongson/soft/func_extended/inst/e3_madd_msub.S:50
+bfc00df0:	01400011 	mthi	t2
+/home/lxb/project/loooongson/soft/func_extended/inst/e3_madd_msub.S:51
+bfc00df4:	712a0004 	0x712a0004
+/home/lxb/project/loooongson/soft/func_extended/inst/e3_madd_msub.S:52
+bfc00df8:	00004812 	mflo	t1
+/home/lxb/project/loooongson/soft/func_extended/inst/e3_madd_msub.S:53
+bfc00dfc:	00005010 	mfhi	t2
+/home/lxb/project/loooongson/soft/func_extended/inst/e3_madd_msub.S:57
+bfc00e00:	26730001 	addiu	s3,s3,1
+
+bfc00e04 <inst_error>:
+/home/lxb/project/loooongson/soft/func_extended/inst/e3_madd_msub.S:60
+bfc00e04:	00104e00 	sll	t1,s0,0x18
+/home/lxb/project/loooongson/soft/func_extended/inst/e3_madd_msub.S:61
+bfc00e08:	01334025 	or	t0,t1,s3
+/home/lxb/project/loooongson/soft/func_extended/inst/e3_madd_msub.S:62
+bfc00e0c:	ae280000 	sw	t0,0(s1)
+/home/lxb/project/loooongson/soft/func_extended/inst/e3_madd_msub.S:63
+bfc00e10:	03e00008 	jr	ra
+/home/lxb/project/loooongson/soft/func_extended/inst/e3_madd_msub.S:64
+bfc00e14:	00000000 	nop
+	...
 inst_error():
-bfc00cc0:	9e3f7f70 	0x9e3f7f70
+bfc00e20:	9e3f7f70 	0x9e3f7f70
 	...
 
 Disassembly of section .data:
@@ -1059,28 +1233,50 @@ Disassembly of section .debug_aranges:
    8:	00040000 	sll	zero,a0,0x0
    c:	00000000 	nop
   10:	bfc00000 	0xbfc00000
-  14:	00000878 	0x878
+  14:	00000898 	0x898
 	...
   20:	0000001c 	0x1c
   24:	00610002 	0x610002
   28:	00040000 	sll	zero,a0,0x0
   2c:	00000000 	nop
-  30:	bfc00880 	0xbfc00880
+  30:	bfc008a0 	0xbfc008a0
   34:	00000440 	sll	zero,zero,0x11
+	...
+  40:	0000001c 	0x1c
+  44:	00ce0002 	0xce0002
+  48:	00040000 	sll	zero,a0,0x0
+  4c:	00000000 	nop
+  50:	bfc00ce0 	0xbfc00ce0
+  54:	00000064 	0x64
+	...
+  60:	0000001c 	0x1c
+  64:	01390002 	0x1390002
+  68:	00040000 	sll	zero,a0,0x0
+  6c:	00000000 	nop
+  70:	bfc00d50 	0xbfc00d50
+  74:	000000c8 	0xc8
 	...
 
 Disassembly of section .pdr:
 
 00000000 <.pdr>:
-   0:	bfc00880 	0xbfc00880
+   0:	bfc008a0 	0xbfc008a0
 	...
   18:	0000001d 	0x1d
   1c:	0000001f 	0x1f
+  20:	bfc00ce0 	0xbfc00ce0
+	...
+  38:	0000001d 	0x1d
+  3c:	0000001f 	0x1f
+  40:	bfc00d50 	0xbfc00d50
+	...
+  58:	0000001d 	0x1d
+  5c:	0000001f 	0x1f
 
 Disassembly of section .debug_line:
 
 00000000 <.debug_line>:
-   0:	00000175 	0x175
+   0:	0000017d 	0x17d
    4:	001e0002 	srl	zero,s8,0x0
    8:	01010000 	0x1010000
    c:	000d0efb 	0xd0efb
@@ -1157,61 +1353,110 @@ Disassembly of section .debug_line:
  128:	4b4c4b4b 	c2	0x14c4b4b
  12c:	834c4c4b 	lb	t4,19531(k0)
  130:	4d4b4b4b 	0x4d4b4b4b
- 134:	4c4b4b4b 	0x4c4b4b4b
- 138:	4b4d4b83 	c2	0x14d4b83
- 13c:	834d4b4b 	lb	t5,19275(k0)
+ 134:	4b4b4b4b 	c2	0x14b4b4b
+ 138:	4c4b4b4b 	0x4c4b4b4b
+ 13c:	4b4d4b83 	c2	0x14d4b83
  140:	4b4b4b4b 	c2	0x14b4b4b
- 144:	4b4b4c4b 	c2	0x14b4c4b
+ 144:	834d4b4b 	lb	t5,19275(k0)
  148:	4b4b4b4b 	c2	0x14b4b4b
- 14c:	4d4b4c4b 	0x4d4b4c4b
- 150:	834c4b4b 	lb	t4,19275(k0)
- 154:	4b4c8483 	c2	0x14c8483
- 158:	4c4b4b4b 	0x4c4b4b4b
- 15c:	4b83834b 	c2	0x183834b
- 160:	834d4b4d 	lb	t5,19277(k0)
- 164:	4b4b4b4d 	c2	0x14b4b4d
- 168:	4b4b4d4d 	c2	0x14b4d4d
- 16c:	4b4b4b4b 	c2	0x14b4b4b
- 170:	4b4b4b4c 	c2	0x14b4b4c
- 174:	01000402 	0x1000402
- 178:	00009001 	0x9001
- 17c:	25000200 	addiu	zero,t0,512
- 180:	01000000 	0x1000000
- 184:	0d0efb01 	jal	43bec04 <data_size+0x43bebf4>
- 188:	01010100 	0x1010100
- 18c:	00000001 	0x1
- 190:	01000001 	0x1000001
- 194:	5f316500 	0x5f316500
- 198:	70617274 	0x70617274
- 19c:	7365745f 	0x7365745f
- 1a0:	00532e74 	teq	v0,s3,0xb9
- 1a4:	00000000 	nop
- 1a8:	80020500 	lb	v0,1280(zero)
- 1ac:	19bfc008 	0x19bfc008
- 1b0:	4b4b4b4b 	c2	0x14b4b4b
- 1b4:	083d084d 	j	f42134 <data_size+0xf42124>
- 1b8:	08f3f33d 	j	3cfccf4 <data_size+0x3cfcce4>
- 1bc:	f33d083d 	0xf33d083d
- 1c0:	083d08f4 	j	f423d0 <data_size+0xf423c0>
- 1c4:	08f3f33d 	j	3cfccf4 <data_size+0x3cfcce4>
- 1c8:	f33d083d 	0xf33d083d
- 1cc:	083d08f3 	j	f423cc <data_size+0xf423bc>
- 1d0:	08f3f33d 	j	3cfccf4 <data_size+0x3cfcce4>
- 1d4:	f33d083d 	0xf33d083d
- 1d8:	08e508f4 	j	39423d0 <data_size+0x39423c0>
- 1dc:	08e508e5 	j	3942394 <data_size+0x3942384>
- 1e0:	08e508e5 	j	3942394 <data_size+0x3942384>
- 1e4:	08ad08e5 	j	2b42394 <data_size+0x2b42384>
- 1e8:	08ad08ad 	j	2b422b4 <data_size+0x2b422a4>
- 1ec:	08ad08ad 	j	2b422b4 <data_size+0x2b422a4>
+ 14c:	4b4b4c4b 	c2	0x14b4c4b
+ 150:	4b4b4b4b 	c2	0x14b4b4b
+ 154:	4d4b4c4b 	0x4d4b4c4b
+ 158:	834c4b4b 	lb	t4,19275(k0)
+ 15c:	4b4c8483 	c2	0x14c8483
+ 160:	4c4b4b4b 	0x4c4b4b4b
+ 164:	4b83834b 	c2	0x183834b
+ 168:	834d4b4d 	lb	t5,19277(k0)
+ 16c:	4b4b4b4d 	c2	0x14b4b4d
+ 170:	4b4b4d4d 	c2	0x14b4d4d
+ 174:	4b4b4b4b 	c2	0x14b4b4b
+ 178:	4b4b4b4c 	c2	0x14b4b4c
+ 17c:	01000402 	0x1000402
+ 180:	00009001 	0x9001
+ 184:	25000200 	addiu	zero,t0,512
+ 188:	01000000 	0x1000000
+ 18c:	0d0efb01 	jal	43bec04 <data_size+0x43bebf4>
+ 190:	01010100 	0x1010100
+ 194:	00000001 	0x1
+ 198:	01000001 	0x1000001
+ 19c:	5f316500 	0x5f316500
+ 1a0:	70617274 	0x70617274
+ 1a4:	7365745f 	0x7365745f
+ 1a8:	00532e74 	teq	v0,s3,0xb9
+ 1ac:	00000000 	nop
+ 1b0:	a0020500 	sb	v0,1280(zero)
+ 1b4:	19bfc008 	0x19bfc008
+ 1b8:	4b4b4b4b 	c2	0x14b4b4b
+ 1bc:	083d084d 	j	f42134 <data_size+0xf42124>
+ 1c0:	08f3f33d 	j	3cfccf4 <data_size+0x3cfcce4>
+ 1c4:	f33d083d 	0xf33d083d
+ 1c8:	083d08f4 	j	f423d0 <data_size+0xf423c0>
+ 1cc:	08f3f33d 	j	3cfccf4 <data_size+0x3cfcce4>
+ 1d0:	f33d083d 	0xf33d083d
+ 1d4:	083d08f3 	j	f423cc <data_size+0xf423bc>
+ 1d8:	08f3f33d 	j	3cfccf4 <data_size+0x3cfcce4>
+ 1dc:	f33d083d 	0xf33d083d
+ 1e0:	08e508f4 	j	39423d0 <data_size+0x39423c0>
+ 1e4:	08e508e5 	j	3942394 <data_size+0x3942384>
+ 1e8:	08e508e5 	j	3942394 <data_size+0x3942384>
+ 1ec:	08ad08e5 	j	2b42394 <data_size+0x2b42384>
  1f0:	08ad08ad 	j	2b422b4 <data_size+0x2b422a4>
  1f4:	08ad08ad 	j	2b422b4 <data_size+0x2b422a4>
  1f8:	08ad08ad 	j	2b422b4 <data_size+0x2b422a4>
  1fc:	08ad08ad 	j	2b422b4 <data_size+0x2b422a4>
- 200:	4db008ad 	0x4db008ad
- 204:	4b4b4b4b 	c2	0x14b4b4b
- 208:	01000402 	0x1000402
- 20c:	Address 0x000000000000020c is out of bounds.
+ 200:	08ad08ad 	j	2b422b4 <data_size+0x2b422a4>
+ 204:	08ad08ad 	j	2b422b4 <data_size+0x2b422a4>
+ 208:	4db008ad 	0x4db008ad
+ 20c:	4b4b4b4b 	c2	0x14b4b4b
+ 210:	01000402 	0x1000402
+ 214:	00004c01 	0x4c01
+ 218:	23000200 	addi	zero,t8,512
+ 21c:	01000000 	0x1000000
+ 220:	0d0efb01 	jal	43bec04 <data_size+0x43bebf4>
+ 224:	01010100 	0x1010100
+ 228:	00000001 	0x1
+ 22c:	01000001 	0x1000001
+ 230:	5f326500 	0x5f326500
+ 234:	5f6f6c63 	0x5f6f6c63
+ 238:	2e7a6c63 	sltiu	k0,s3,27747
+ 23c:	00000053 	0x53
+ 240:	05000000 	bltz	t0,244 <data_size+0x234>
+ 244:	c00ce002 	ll	t4,-8190(zero)
+ 248:	4b4b19bf 	c2	0x14b19bf
+ 24c:	834d4b4b 	lb	t5,19275(k0)
+ 250:	4b4b4b4b 	c2	0x14b4b4b
+ 254:	4b4b834b 	c2	0x14b834b
+ 258:	4d4e4b4b 	0x4d4e4b4b
+ 25c:	4b4b4b4b 	c2	0x14b4b4b
+ 260:	01000402 	0x1000402
+ 264:	00006901 	0x6901
+ 268:	25000200 	addiu	zero,t0,512
+ 26c:	01000000 	0x1000000
+ 270:	0d0efb01 	jal	43bec04 <data_size+0x43bebf4>
+ 274:	01010100 	0x1010100
+ 278:	00000001 	0x1
+ 27c:	01000001 	0x1000001
+ 280:	5f336500 	0x5f336500
+ 284:	6464616d 	0x6464616d
+ 288:	75736d5f 	jalx	5cdb57c <data_size+0x5cdb56c>
+ 28c:	00532e62 	0x532e62
+ 290:	00000000 	nop
+ 294:	50020500 	beql	zero,v0,1698 <data_size+0x1688>
+ 298:	19bfc00d 	0x19bfc00d
+ 29c:	4b4b4b4b 	c2	0x14b4b4b
+ 2a0:	4b4b4b4d 	c2	0x14b4b4d
+ 2a4:	4b4b4b4b 	c2	0x14b4b4b
+ 2a8:	4b4b4b4b 	c2	0x14b4b4b
+ 2ac:	4b4b4b4b 	c2	0x14b4b4b
+ 2b0:	4b4b4b4b 	c2	0x14b4b4b
+ 2b4:	4b4b4b4b 	c2	0x14b4b4b
+ 2b8:	4b4b4b4b 	c2	0x14b4b4b
+ 2bc:	4b4b4b4b 	c2	0x14b4b4b
+ 2c0:	4b4b4b4b 	c2	0x14b4b4b
+ 2c4:	4e4b4b4b 	c3	0x4b4b4b
+ 2c8:	4b4b4b4d 	c2	0x14b4b4d
+ 2cc:	0004024b 	0x4024b
+ 2d0:	Address 0x00000000000002d0 is out of bounds.
 
 
 Disassembly of section .debug_info:
@@ -1222,7 +1467,7 @@ Disassembly of section .debug_info:
    8:	01040000 	0x1040000
    c:	00000000 	nop
   10:	bfc00000 	0xbfc00000
-  14:	bfc00878 	0xbfc00878
+  14:	bfc00898 	0xbfc00898
   18:	72617473 	0x72617473
   1c:	00532e74 	teq	v0,s3,0xb9
   20:	6d6f682f 	0x6d6f682f
@@ -1244,9 +1489,9 @@ Disassembly of section .debug_info:
   60:	00006980 	sll	t5,zero,0x6
   64:	14000200 	bnez	zero,868 <data_size+0x858>
   68:	04000000 	bltz	zero,6c <data_size+0x5c>
-  6c:	00017901 	0x17901
-  70:	c0088000 	ll	t0,-32768(zero)
-  74:	c00cc0bf 	ll	t4,-16193(zero)
+  6c:	00018101 	0x18101
+  70:	c008a000 	ll	t0,-24576(zero)
+  74:	c00ce0bf 	ll	t4,-8001(zero)
   78:	5f3165bf 	0x5f3165bf
   7c:	70617274 	0x70617274
   80:	7365745f 	0x7365745f
@@ -1268,7 +1513,61 @@ Disassembly of section .debug_info:
   c0:	20534120 	addi	s3,v0,16672
   c4:	38312e32 	xori	s1,at,0x2e32
   c8:	0030352e 	0x30352e
-  cc:	Address 0x00000000000000cc is out of bounds.
+  cc:	00678001 	0x678001
+  d0:	00020000 	sll	zero,v0,0x0
+  d4:	00000028 	0x28
+  d8:	02150104 	0x2150104
+  dc:	0ce00000 	jal	3800000 <data_size+0x37ffff0>
+  e0:	0d44bfc0 	jal	512ff00 <data_size+0x512fef0>
+  e4:	3265bfc0 	andi	a1,s3,0xbfc0
+  e8:	6f6c635f 	0x6f6c635f
+  ec:	7a6c635f 	0x7a6c635f
+  f0:	2f00532e 	sltiu	zero,t8,21294
+  f4:	656d6f68 	0x656d6f68
+  f8:	62786c2f 	0x62786c2f
+  fc:	6f72702f 	0x6f72702f
+ 100:	7463656a 	jalx	18d95a8 <data_size+0x18d9598>
+ 104:	6f6f6c2f 	0x6f6f6c2f
+ 108:	676e6f6f 	0x676e6f6f
+ 10c:	2f6e6f73 	sltiu	t6,k1,28531
+ 110:	74666f73 	jalx	199bdcc <data_size+0x199bdbc>
+ 114:	6e75662f 	0x6e75662f
+ 118:	78655f63 	0x78655f63
+ 11c:	646e6574 	0x646e6574
+ 120:	692f6465 	0x692f6465
+ 124:	0074736e 	0x74736e
+ 128:	20554e47 	addi	s5,v0,20039
+ 12c:	32205341 	andi	zero,s1,0x5341
+ 130:	2e38312e 	sltiu	t8,s1,12590
+ 134:	01003035 	0x1003035
+ 138:	00006980 	sll	t5,zero,0x6
+ 13c:	3c000200 	lui	zero,0x200
+ 140:	04000000 	bltz	zero,144 <data_size+0x134>
+ 144:	00026501 	0x26501
+ 148:	c00d5000 	ll	t5,20480(zero)
+ 14c:	c00e18bf 	ll	t6,6335(zero)
+ 150:	5f3365bf 	0x5f3365bf
+ 154:	6464616d 	0x6464616d
+ 158:	75736d5f 	jalx	5cdb57c <data_size+0x5cdb56c>
+ 15c:	00532e62 	0x532e62
+ 160:	6d6f682f 	0x6d6f682f
+ 164:	786c2f65 	0x786c2f65
+ 168:	72702f62 	0x72702f62
+ 16c:	63656a6f 	0x63656a6f
+ 170:	6f6c2f74 	0x6f6c2f74
+ 174:	6e6f6f6f 	0x6e6f6f6f
+ 178:	6e6f7367 	0x6e6f7367
+ 17c:	666f732f 	0x666f732f
+ 180:	75662f74 	jalx	598bdd0 <data_size+0x598bdc0>
+ 184:	655f636e 	0x655f636e
+ 188:	6e657478 	0x6e657478
+ 18c:	2f646564 	sltiu	a0,k1,25956
+ 190:	74736e69 	jalx	1cdb9a4 <data_size+0x1cdb994>
+ 194:	554e4700 	bnel	t2,t6,11d98 <data_size+0x11d88>
+ 198:	20534120 	addi	s3,v0,16672
+ 19c:	38312e32 	xori	s1,at,0x2e32
+ 1a0:	0030352e 	0x30352e
+ 1a4:	Address 0x00000000000001a4 is out of bounds.
 
 
 Disassembly of section .debug_abbrev:
@@ -1284,3 +1583,13 @@ Disassembly of section .debug_abbrev:
   1c:	1b080301 	0x1b080301
   20:	13082508 	beq	t8,t0,9444 <data_size+0x9434>
   24:	00000005 	0x5
+  28:	10001101 	b	4430 <data_size+0x4420>
+  2c:	12011106 	beq	s0,at,4448 <data_size+0x4438>
+  30:	1b080301 	0x1b080301
+  34:	13082508 	beq	t8,t0,9458 <data_size+0x9448>
+  38:	00000005 	0x5
+  3c:	10001101 	b	4444 <data_size+0x4434>
+  40:	12011106 	beq	s0,at,445c <data_size+0x444c>
+  44:	1b080301 	0x1b080301
+  48:	13082508 	beq	t8,t0,946c <data_size+0x945c>
+  4c:	00000005 	0x5
