@@ -16,6 +16,8 @@
 	.globl	__main
 _start:
 start:
+    mtlo zero
+    mthi zero
     li    t0, 0xffffffff
     addiu t0, zero, 0xffff
 	b	locate
