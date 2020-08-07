@@ -6,6 +6,7 @@ module NTrap(
         input signed [31:0] rt,
         output [31:0] is_trap
     );
+    wire [4:0] Rt;
     assign Rt = instr[20:16];
     wire [5:0] OpCode = instr[31:26],
          Funct = instr[5:0];
