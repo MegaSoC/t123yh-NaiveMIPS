@@ -90,9 +90,11 @@ module SALU(//special alu:clo,clz
     reg state;//0 can accept cal;1 is calling
     reg count_finish;
     wire is_valid;
-    assign is_valid = (clo && salua_reg[31-count_result[4:0]]) || (clz && !salua_reg[31-count_result[4:0]]);
+    assign is_valid = (clo_reg && salua_reg[31-count_result[4:0]]) || (clz_reg && !salua_reg[31-count_result[4:0]]);
     assign salur = count_result;
     assign saluBusy = !count_finish;
+
+    reg clo_reg,clz_reg;
 
     //assign salur = clo ? clor : clzr;
 
@@ -102,6 +104,8 @@ module SALU(//special alu:clo,clz
             count_finish <= 1;
             salua_reg <= 0;
             state <= 0;
+            clo_reg <= 0;
+            clz_reg <= 0;
         end
         else begin
             
@@ -112,6 +116,8 @@ module SALU(//special alu:clo,clz
                         salua_reg <= salua;
                         count_result <= 0;
                         count_finish <= 0;
+                        clo_reg <= clo;
+                        clz_reg <= clz;
                     end
                 end
                 1:begin
@@ -121,6 +127,8 @@ module SALU(//special alu:clo,clz
                     else begin
                         count_finish <= 1;
                         state <= 0;
+                        clo_reg <= 0;
+                        clz_reg <= 0;
                     end
                 end
             endcase

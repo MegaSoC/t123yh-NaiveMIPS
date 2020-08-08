@@ -140,7 +140,7 @@ module instr2bus(
     wire movz    = (OpCode == 6'b000000 && Funct == 6'b001010);
     //movf and movt can only trigger cp1 not found excp
 
-    wire WAIT    = (OpCode == 6'b010000 && Funct == 6'b100000 && MipsInstr[25] == 1'b1);//nop
+    wire my_WAIT    = (OpCode == 6'b010000 && Funct == 6'b100000 && MipsInstr[25] == 1'b1);//nop
     wire PREF    = (OpCode == 6'b110011);//nop
     wire CACHE   = (OpCode == 6'b101111);
     wire SYNC    = (OpCode == 6'h0 && Funct == 6'b001111);//nop

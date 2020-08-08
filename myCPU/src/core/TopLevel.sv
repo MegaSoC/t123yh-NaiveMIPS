@@ -55,6 +55,7 @@ module mycpu_top(
     );
 
     wire D_trap,E_trap;
+    wire salu_busy_real;
 
     wire `INSTR_SET;
     wire dm_stall;
@@ -388,6 +389,7 @@ module mycpu_top(
           .D_stall_Pass(D_stall_Pass),
           .E_XALU_Busy(E_XALU_Busy),
           .D_InDelaySlot(D_InDelaySlot),
+          .salu_busy_real(salu_busy_real),
 
           .I_inst_miss(I_inst_miss),
           .I_inst_illegal(I_inst_illegal),
@@ -457,6 +459,7 @@ module mycpu_top(
           .E_XALU_Busy_real(E_XALU_Busy),
           .D_InDelaySlot(D_InDelaySlot),
           .E_in_delayslot(E_in_delayslot),
+          .salu_busy_real(salu_busy_real),
 
           .D_InstMiss(D_InstMiss),
           .D_IllegalInstruction(D_IllegalInstruction),

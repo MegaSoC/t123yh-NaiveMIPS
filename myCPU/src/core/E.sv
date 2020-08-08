@@ -32,6 +32,8 @@ module E(
         output reg [4:0] E_RegNumber,
         output reg [31:0] E_Data,
 
+        output salu_busy_real,
+
         output reg [8:0] E_ExtType,
         output reg [3:0] E_MemWriteEnable,
         output reg E_MemFamily,
@@ -150,10 +152,26 @@ module E(
     reg mul_MemFamily,mul_OverFlow,mul_data_alignment_err,mul_in_delayslot,mul_inst_miss,mul_inst_illegal,mul_inst_invalid;
     reg [`INSTRBUS_WIDTH-1:0] mul_InstrBus;
 
+    reg [31:0] salu_PC,salu_EPC,salu_WriteMemData;
+    reg [4:0] salu_RtID,salu_RdID;
+    reg [3:0] salu_T;
+    reg salu_WriteRegEnable;
+    reg [4:0] salu_RegId;
+    reg [31:0] salu_Data;
+    reg [8:0] salu_ExtType;
+    reg [3:0] salu_MemWriteEnable;
+    reg salu_trap;
+    reg salu_MemFamily,salu_OverFlow,salu_data_alignment_err,salu_in_delayslot,salu_inst_miss,salu_inst_illegal,salu_inst_invalid;
+    reg [`INSTRBUS_WIDTH-1:0] salu_InstrBus;
+
     assign E_XALU_Busy_real = E_XALU_Busy | mul_in_xalu;
 
     wire [31:0] salur;
     wire salu_busy;
+    reg count_in_salu;
+
+    wire salu_busy_real;
+    assign salu_busy_real = salu_busy | count_in_salu;
 
     SALU my_salu(//special alu:clo,clz
         .clk(Clk),
@@ -170,6 +188,51 @@ module E(
         if(reset | ExceptionFlush | E_CurrentException | E_EstallClear) begin
             E_PC                 <= 0;
             mul_in_xalu          <= 0;
+            count_in_salu        <= 0;
+            E_EPC                <= reset? 0 : D_EPC;
+            E_WriteMemData       <= 0;
+            E_RtID               <= 0;
+            E_RdID               <= 0;
+            E_Sel                <= 0;
+            E_T                  <= 0;
+            E_RegWriteEnable     <= 0;
+            E_RegNumber          <= 0;
+            E_InstMiss           <= 0;
+            E_IllegalInstruction <= 0;
+            E_InvalidInstruction <= 0;
+            E_trap               <= 0;
+            E_Data               <= 0;
+            E_ExtType            <= 0;
+            E_MemWriteEnable     <= 0;
+            E_MemFamily          <= 0;
+            E_InstrBus           <= 1;
+            E_OverFlow           <= 0;
+            E_DataUnaligned      <= 0;
+        end
+        else if(clo||clz && !count_in_salu)begin
+            count_in_salu           <= 1;
+            salu_PC                 <= D_PC;
+            salu_EPC                <= D_EPC;
+            salu_WriteMemData       <= regRT;
+            salu_RtID               <= RtNumber_D;
+            salu_RdID               <= D_RdID;
+            salu_T                  <= D_T ==4'b0 ? 4'b0 : D_T-1;
+            salu_WriteRegEnable     <= D_WriteRegEnable;
+            salu_RegId              <= D_RegId;
+            salu_Data               <= Data_Inter;
+            salu_ExtType            <= ExtType_Inter;
+            salu_MemWriteEnable     <= MemWriteEnable_Inter;
+            salu_MemFamily          <= MemFamily_Inter;
+            salu_InstrBus           <= D_InstrBus;
+            salu_OverFlow           <= D_OverFlow;
+            salu_data_alignment_err <= D_store_alignment_err | D_load_alignment_err;
+            salu_in_delayslot       <= D_InDelaySlot;
+
+            salu_inst_miss          <= D_InstMiss;
+            salu_inst_illegal       <= D_IllegalInstruction;
+            salu_inst_invalid       <= D_InvalidInstruction;
+            salu_trap               <= D_trap;
+            E_PC                 <= 0;
             E_EPC                <= reset? 0 : D_EPC;
             E_WriteMemData       <= 0;
             E_RtID               <= 0;
@@ -213,9 +276,51 @@ module E(
             mul_inst_illegal       <= D_IllegalInstruction;
             mul_inst_invalid       <= D_InvalidInstruction;
             mul_trap               <= D_trap;
+            E_PC                 <= 0;
+            E_EPC                <= reset? 0 : D_EPC;
+            E_WriteMemData       <= 0;
+            E_RtID               <= 0;
+            E_RdID               <= 0;
+            E_Sel                <= 0;
+            E_T                  <= 0;
+            E_RegWriteEnable     <= 0;
+            E_RegNumber          <= 0;
+            E_InstMiss           <= 0;
+            E_IllegalInstruction <= 0;
+            E_InvalidInstruction <= 0;
+            E_trap               <= 0;
+            E_Data               <= 0;
+            E_ExtType            <= 0;
+            E_MemWriteEnable     <= 0;
+            E_MemFamily          <= 0;
+            E_InstrBus           <= 1;
+            E_OverFlow           <= 0;
+            E_DataUnaligned      <= 0;
         end
         else if (!dm_stall) begin
-            if(mul_in_xalu && !E_XALU_Busy)begin
+            if(count_in_salu && !salu_busy)begin
+                count_in_salu        <= 1'b0;
+                E_PC                 <= salu_PC;
+                E_EPC                <= salu_EPC;
+                E_WriteMemData       <= regRT;
+                E_RtID               <= salu_RtID;
+                E_RdID               <= salu_RdID;
+                E_T                  <= salu_T;
+                E_RegWriteEnable     <= salu_WriteRegEnable;
+                E_RegNumber          <= salu_RegId;
+                E_IllegalInstruction <= salu_inst_illegal;
+                E_InvalidInstruction <= salu_inst_invalid;
+                E_trap               <= salu_trap;
+                E_Data               <= salur;
+                E_ExtType            <= salu_ExtType;
+                E_MemWriteEnable     <= salu_MemWriteEnable;
+                E_MemFamily          <= salu_MemFamily;
+                E_InstrBus           <= salu_InstrBus;
+                E_OverFlow           <= salu_OverFlow;
+                E_DataUnaligned      <= salu_data_alignment_err;
+                E_in_delayslot       <= salu_in_delayslot;
+            end
+            else if(mul_in_xalu && !E_XALU_Busy)begin
                 mul_in_xalu          <= 1'b0;
                 E_PC                 <= mul_PC;
                 E_EPC                <= mul_EPC;

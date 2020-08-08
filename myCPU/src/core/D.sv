@@ -10,6 +10,7 @@ module D(
         input [3:0] W_WriteRegEnable,
         input [4:0] W_RegWriteId,
         input [31:0] W_RegWriteData,
+        input salu_busy_real,
 
         input [31:0] I_PC_Pass,
         input [31:0] I_PC,
@@ -135,6 +136,7 @@ module D(
     wire [3:0] T_Inter;
     AT my_at(
            .InstrBus(InstrBus_Inter),
+           .salu_busy_real(salu_busy_real),
            .Rs(Rs_Inter),
            .Rt(Rt_Inter),
            .D_T(D_T),
@@ -143,6 +145,7 @@ module D(
            .E_RegWriteEnable(E_RegWriteEnable),
            .E_RegNumber(E_RegNumber),
            .stall(D_stall_Pass1),
+           .D_InstrBus(D_InstrBus),
            .T(T_Inter),
            .XALU_Busy(E_XALU_Busy),
            .D_MultCalFamily(D_MultCalFamily),

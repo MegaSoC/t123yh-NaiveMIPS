@@ -71,7 +71,7 @@
 						          teq,teqi,tge,tgei,tgeiu,tgeu,tlt,tlti,tltiu,tltu,tne,tnei,\
 						          beql,bgezall,bgezl,bgtzl,blezl,bltzall,bltzl,bnel,\
 						          clo,clz,madd,maddu,msub,msubu,movf,movt,movn,movz,\
-						          CACHE,WAIT,PREF,SYNC,LL,SC
+						          CACHE,my_WAIT,PREF,SYNC,LL,SC
 						          
 `define INSTR_SET `InstrWireSetWithOutNop,nop
  

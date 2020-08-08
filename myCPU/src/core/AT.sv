@@ -11,6 +11,8 @@ module AT(
         input [4:0] E_RegNumber,
         output stall,
         output [3:0] T,
+        input salu_busy_real,
+        input [`INSTRBUS_WIDTH-1:0] D_InstrBus,
 
         input XALU_Busy,
         input D_MultCalFamily,
@@ -49,7 +51,9 @@ module AT(
          stall_Rt = NeedRt && Rt!=5'b0 &&( (D_T>T_Rt && D_RegId==Rt)|| (E_T>T_Rt && E_RegNumber==Rt));
 
     wire stall_XALU;
+    wire clod = D_InstrBus[16];
+    wire clzd = D_InstrBus[15];
     assign stall_XALU = ((XALU_Busy&MultFamily)|(MultFamily&D_MultCalFamily));
-    assign stall = (stall_Rs|stall_Rt|stall_XALU) & !ExceptionFlush ;
+    assign stall = (stall_Rs|stall_Rt|stall_XALU|salu_busy_real|((clod|clzd))) & !ExceptionFlush ;
 
 endmodule
