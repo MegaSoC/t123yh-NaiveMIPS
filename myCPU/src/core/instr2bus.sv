@@ -140,6 +140,14 @@ module instr2bus(
     wire movz    = (OpCode == 6'b000000 && Funct == 6'b001010);
     //movf and movt can only trigger cp1 not found excp
 
+    wire WAIT    = (OpCode == 6'b010000 && Funct == 6'b100000 && MipsInstr[25] == 1'b1);//nop
+    wire PREF    = (OpCode == 6'b110011);//nop
+    wire CACHE   = (OpCode == 6'b101111);
+    wire SYNC    = (OpCode == 6'h0 && Funct == 6'b001111);//nop
+    wire LL      = (OpCode == 6'b110000);//lw + write llbit
+    wire SC      = (OpCode == 6'b111000);//sc + read llbit + write rt
+
+
     assign RegWriteEnable = ~nop & (addi | addiu | add | addu | sub | subu |
                                     ori | lui | my_Or | my_And | my_Xor | my_Nor | Andi |Xori |
                                     lw | lh | lhu | lb | lbu |
@@ -150,10 +158,11 @@ module instr2bus(
                                     mfc0 |
                                     bltzal |bgezal|bgezall|bltzall|
                                     lwl|lwr|clo|clz|
-                                    (movn && (rtdata != 0)) | (movz && (rtdata == 0)));
+                                    (movn && (rtdata != 0)) | (movz && (rtdata == 0))|
+                                    LL | SC);
 
     assign WriteRegId = (addi | addiu | ori | Xori | Andi | lui |
-                         lw | lhu | lh | lbu | lb | slti | sltiu | mfc0|lwl|lwr) ? Rt :
+                         lw | lhu | lh | lbu | lb | slti | sltiu | mfc0|lwl|lwr | SC | LL) ? Rt :
                         (add | addu | sub | subu | mfhi | mflo | mul |
                          sll | srl | sra | sllv | srlv | srav | slt |
                          sltu | my_And | my_Or | my_Xor | my_Nor | jalr|
