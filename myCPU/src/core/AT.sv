@@ -44,7 +44,7 @@ module AT(
            (lwl|lwr) ? 4:
            3;
     wire MultFamily;
-    assign MultFamily = (mult|multu|div|divu|mfhi|mflo|mthi|mtlo|mul);
+    assign MultFamily = (mult|multu|div|divu|mfhi|mflo|mthi|mtlo|mul|madd|maddu|msub|msubu);
     wire stall_Rs = NeedRs && Rs!=5'b0 &&( (D_T>T_Rs && D_RegId==Rs)|| (E_T>T_Rs && E_RegNumber==Rs)),
          stall_Rt = NeedRt && Rt!=5'b0 &&( (D_T>T_Rt && D_RegId==Rt)|| (E_T>T_Rt && E_RegNumber==Rt));
 

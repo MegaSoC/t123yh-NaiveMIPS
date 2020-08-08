@@ -66,10 +66,10 @@ module XALU(
                 {HI, LO} <= $signed($signed({HI, LO}) - $signed(mult_o));
             end
             else if(maddu_o_v)begin
-                {HI, LO} <= {HI, LO} + mult_o;
+                {HI, LO} <= {HI, LO} + multu_o;
             end
             else if(msubu_o_v)begin
-                {HI, LO} <= {HI, LO} - mult_o;
+                {HI, LO} <= {HI, LO} - multu_o;
             end
         end
     end
@@ -81,6 +81,8 @@ module XALU(
             op_v <= 3'b0;
             a_reg <= 32'd0;
             b_reg <= 32'd0;
+            xadd <= 0;
+            xsub <= 0;
         end
         else if (XALU_Start) begin
             ready <= 1'b0;
@@ -100,8 +102,8 @@ module XALU(
     end
 
     //control mult/multu dout_valid
-    assign mult_o_v = (mult_i) && count == `MULT_STAGES;
-    assign multu_o_v = (multu_i) && count == `MULT_STAGES;
+    assign mult_o_v = (mult_i && (!(xadd||xsub))) && count == `MULT_STAGES;
+    assign multu_o_v = (multu_i && (!(xadd||xsub))) && count == `MULT_STAGES;
     assign madd_o_v = (mult_i && xadd) && count == `MULT_STAGES;
     assign msub_o_v = (mult_i && xsub) && count == `MULT_STAGES;
     assign maddu_o_v = (multu_i && xadd) && count == `MULT_STAGES;
