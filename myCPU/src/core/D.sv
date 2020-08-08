@@ -64,19 +64,7 @@ module D(
     wire WriteRegEnable_Inter;
     wire [4:0] WriteRegId_Inter;
 
-    instr2bus my_trans(
-                  .MipsInstr(I_MipsInstr),
-                  .Rs(Rs_Inter),
-                  .Rt(Rt_Inter),
-                  .Rd(Rd_Inter),
-                  .Shamt(Shamt_Inter),
-                  .Imm16(Imm16_Inter),
-                  .Imm26(Imm26_Inter),
-                  .sel(Sel_Inter),
-                  .RegWriteEnable(WriteRegEnable_Inter),
-                  .WriteRegId(WriteRegId_Inter),
-                  .InstrBus(InstrBus_Inter)
-              );
+    
 
     wire [31:0] RsData_Inter,RtData_Inter;
     GRF my_grf(
@@ -95,6 +83,20 @@ module D(
     wire is_trap_inter;
     wire[31:0] regRS = (Rs_Inter!=0 && Rs_Inter==E_RegNumber && E_T==0 && E_RegWriteEnable) ? E_Data: RsData_Inter;
     wire[31:0] regRT = (Rt_Inter!=0 && Rt_Inter==E_RegNumber && E_T==0 && E_RegWriteEnable) ? E_Data: RtData_Inter;
+    instr2bus my_trans(
+                  .MipsInstr(I_MipsInstr),
+                  .Rs(Rs_Inter),
+                  .Rt(Rt_Inter),
+                  .Rd(Rd_Inter),
+                  .Shamt(Shamt_Inter),
+                  .Imm16(Imm16_Inter),
+                  .Imm26(Imm26_Inter),
+                  .sel(Sel_Inter),
+                  .RegWriteEnable(WriteRegEnable_Inter),
+                  .WriteRegId(WriteRegId_Inter),
+                  .rtdata(regRT),
+                  .InstrBus(InstrBus_Inter)
+              );
     NPC my_npc(
             .instr(I_MipsInstr),
             .rs(regRS),

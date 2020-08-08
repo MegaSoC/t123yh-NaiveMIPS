@@ -12,5 +12,81 @@ module SALU(//special alu:clo,clz
         input saluFlush
     );
 
+    wire `INSTR_SET;
+    assign {`INSTR_SET} = instrBus;
+
+    wire [31:0] clor,clzr;
+
+    assign clor = ((salua & 32'hffffffff) == 32'hffffffff) ? 32'd32 : 
+                  ((salua & 32'hfffffffe) == 32'hfffffffe) ? 32'd31 : 
+                  ((salua & 32'hfffffffc) == 32'hfffffffc) ? 32'd30 : 
+                  ((salua & 32'hfffffff8) == 32'hfffffff8) ? 32'd29 : 
+                  ((salua & 32'hfffffff0) == 32'hfffffff0) ? 32'd28 : 
+                  ((salua & 32'hffffffe0) == 32'hffffffe0) ? 32'd27 : 
+                  ((salua & 32'hffffffc0) == 32'hffffffc0) ? 32'd26 : 
+                  ((salua & 32'hffffff80) == 32'hffffff80) ? 32'd25 : 
+                  ((salua & 32'hffffff00) == 32'hffffff00) ? 32'd24 : 
+                  ((salua & 32'hfffffe00) == 32'hfffffe00) ? 32'd23 : 
+                  ((salua & 32'hfffffc00) == 32'hfffffc00) ? 32'd22 : 
+                  ((salua & 32'hfffff800) == 32'hfffff800) ? 32'd21 : 
+                  ((salua & 32'hfffff000) == 32'hfffff000) ? 32'd20 : 
+                  ((salua & 32'hffffe000) == 32'hffffe000) ? 32'd19 : 
+                  ((salua & 32'hffffc000) == 32'hffffc000) ? 32'd18 : 
+                  ((salua & 32'hffff8000) == 32'hffff8000) ? 32'd17 : 
+                  ((salua & 32'hffff0000) == 32'hffff0000) ? 32'd16 : 
+                  ((salua & 32'hfffe0000) == 32'hfffe0000) ? 32'd15 : 
+                  ((salua & 32'hfffc0000) == 32'hfffc0000) ? 32'd14 : 
+                  ((salua & 32'hfff80000) == 32'hfff80000) ? 32'd13 : 
+                  ((salua & 32'hfff00000) == 32'hfff00000) ? 32'd12 : 
+                  ((salua & 32'hffe00000) == 32'hffe00000) ? 32'd11 : 
+                  ((salua & 32'hffc00000) == 32'hffc00000) ? 32'd10 : 
+                  ((salua & 32'hff800000) == 32'hff800000) ? 32'd9  : 
+                  ((salua & 32'hff000000) == 32'hff000000) ? 32'd8  : 
+                  ((salua & 32'hfe000000) == 32'hfe000000) ? 32'd7  : 
+                  ((salua & 32'hfc000000) == 32'hfc000000) ? 32'd6  : 
+                  ((salua & 32'hf8000000) == 32'hf8000000) ? 32'd5  : 
+                  ((salua & 32'hf0000000) == 32'hf0000000) ? 32'd4  : 
+                  ((salua & 32'he0000000) == 32'he0000000) ? 32'd3  : 
+                  ((salua & 32'hc0000000) == 32'hc0000000) ? 32'd2  : 
+                  ((salua & 32'h80000000) == 32'h80000000) ? 32'd1  : 32'd0;
+    
+    wire [31:0] anti_saluta;
+    assign anti_saluta = ~salua;
+    
+    assign clzr = ((anti_saluta & 32'hffffffff) == 32'hffffffff) ? 32'd32 : 
+                  ((anti_saluta & 32'hfffffffe) == 32'hfffffffe) ? 32'd31 : 
+                  ((anti_saluta & 32'hfffffffc) == 32'hfffffffc) ? 32'd30 : 
+                  ((anti_saluta & 32'hfffffff8) == 32'hfffffff8) ? 32'd29 : 
+                  ((anti_saluta & 32'hfffffff0) == 32'hfffffff0) ? 32'd28 : 
+                  ((anti_saluta & 32'hffffffe0) == 32'hffffffe0) ? 32'd27 : 
+                  ((anti_saluta & 32'hffffffc0) == 32'hffffffc0) ? 32'd26 : 
+                  ((anti_saluta & 32'hffffff80) == 32'hffffff80) ? 32'd25 : 
+                  ((anti_saluta & 32'hffffff00) == 32'hffffff00) ? 32'd24 : 
+                  ((anti_saluta & 32'hfffffe00) == 32'hfffffe00) ? 32'd23 : 
+                  ((anti_saluta & 32'hfffffc00) == 32'hfffffc00) ? 32'd22 : 
+                  ((anti_saluta & 32'hfffff800) == 32'hfffff800) ? 32'd21 : 
+                  ((anti_saluta & 32'hfffff000) == 32'hfffff000) ? 32'd20 : 
+                  ((anti_saluta & 32'hffffe000) == 32'hffffe000) ? 32'd19 : 
+                  ((anti_saluta & 32'hffffc000) == 32'hffffc000) ? 32'd18 : 
+                  ((anti_saluta & 32'hffff8000) == 32'hffff8000) ? 32'd17 : 
+                  ((anti_saluta & 32'hffff0000) == 32'hffff0000) ? 32'd16 : 
+                  ((anti_saluta & 32'hfffe0000) == 32'hfffe0000) ? 32'd15 : 
+                  ((anti_saluta & 32'hfffc0000) == 32'hfffc0000) ? 32'd14 : 
+                  ((anti_saluta & 32'hfff80000) == 32'hfff80000) ? 32'd13 : 
+                  ((anti_saluta & 32'hfff00000) == 32'hfff00000) ? 32'd12 : 
+                  ((anti_saluta & 32'hffe00000) == 32'hffe00000) ? 32'd11 : 
+                  ((anti_saluta & 32'hffc00000) == 32'hffc00000) ? 32'd10 : 
+                  ((anti_saluta & 32'hff800000) == 32'hff800000) ? 32'd9  : 
+                  ((anti_saluta & 32'hff000000) == 32'hff000000) ? 32'd8  : 
+                  ((anti_saluta & 32'hfe000000) == 32'hfe000000) ? 32'd7  : 
+                  ((anti_saluta & 32'hfc000000) == 32'hfc000000) ? 32'd6  : 
+                  ((anti_saluta & 32'hf8000000) == 32'hf8000000) ? 32'd5  : 
+                  ((anti_saluta & 32'hf0000000) == 32'hf0000000) ? 32'd4  : 
+                  ((anti_saluta & 32'he0000000) == 32'he0000000) ? 32'd3  : 
+                  ((anti_saluta & 32'hc0000000) == 32'hc0000000) ? 32'd2  : 
+                  ((anti_saluta & 32'h80000000) == 32'h80000000) ? 32'd1  : 32'd0;
+
+    assign salur = clo ? clor : clzr;
+
 
 endmodule

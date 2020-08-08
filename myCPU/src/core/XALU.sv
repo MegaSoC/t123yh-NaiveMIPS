@@ -19,10 +19,11 @@ module XALU(
     wire `INSTR_SET;
     assign {`INSTR_SET} = instrBus;
     reg mult_i, multu_i, div_i, divu_i;
-    wire XALU_Start = (!xaluFlush)&(mult|multu|div|divu|mul);
+    wire XALU_Start = (!xaluFlush)&(mult|multu|div|divu|mul|madd|maddu|msub|msubu);
     reg ready;
     assign xaluBusy = !ready;
     wire div_o_v, divu_o_v, mult_o_v, multu_o_v, dout_v;
+    wire madd_o_v, maddu_o_v, msub_o_v, msubu_o_v;
     wire [63:0] div_o, divu_o, mult_o, multu_o;
     reg [3 :0] op_v;
     reg [2 :0] count;
@@ -30,7 +31,9 @@ module XALU(
 
     reg [31:0] a_reg,b_reg;
 
-    assign dout_v = div_o_v | divu_o_v | mult_o_v | multu_o_v;
+    reg xadd, xsub;
+
+    assign dout_v = div_o_v | divu_o_v | mult_o_v | multu_o_v | madd_o_v | maddu_o_v | msub_o_v | msubu_o_v;
 
     assign xaluHi = HI;
     assign xaluLo = LO;
@@ -56,6 +59,18 @@ module XALU(
             else if (divu_o_v) begin
                 {LO, HI} <= divu_o;
             end
+            else if(madd_o_v)begin
+                {HI, LO} <= $signed($signed({HI, LO}) + $signed(mult_o));
+            end
+            else if(msub_o_v)begin
+                {HI, LO} <= $signed($signed({HI, LO}) - $signed(mult_o));
+            end
+            else if(maddu_o_v)begin
+                {HI, LO} <= {HI, LO} + mult_o;
+            end
+            else if(msubu_o_v)begin
+                {HI, LO} <= {HI, LO} - mult_o;
+            end
         end
     end
 
@@ -71,8 +86,10 @@ module XALU(
             ready <= 1'b0;
             a_reg <= xaluA;
             b_reg <= xaluB;
-            mult_i <= mul || mult;
-            multu_i <= multu;
+            mult_i <= mul || mult || madd || msub;
+            xadd <= madd || maddu;
+            multu_i <= multu || maddu || msubu;
+            xsub <= msub || msubu;
             div_i <= div;
             divu_i <= divu;
         end
@@ -85,6 +102,10 @@ module XALU(
     //control mult/multu dout_valid
     assign mult_o_v = (mult_i) && count == `MULT_STAGES;
     assign multu_o_v = (multu_i) && count == `MULT_STAGES;
+    assign madd_o_v = (mult_i && xadd) && count == `MULT_STAGES;
+    assign msub_o_v = (mult_i && xsub) && count == `MULT_STAGES;
+    assign maddu_o_v = (multu_i && xadd) && count == `MULT_STAGES;
+    assign msubu_o_v = (multu_i && xsub) && count == `MULT_STAGES;
 
     always @(posedge clk) begin
         if (reset || XALU_Start) begin

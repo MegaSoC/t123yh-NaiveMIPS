@@ -152,6 +152,17 @@ module E(
 
     assign E_XALU_Busy_real = E_XALU_Busy | mul_in_xalu;
 
+    wire [31:0] salur;
+
+    SALU my_salu(//special alu:clo,clz
+        .clk(Clk),
+        .reset(reset),
+        .instrBus(D_InstrBus),
+
+        .salua(regRS),
+        .salur(salur)
+    );//it's stupid now, must add flush+ready
+
     always @ (posedge Clk) begin
         if(reset | ExceptionFlush | E_CurrentException | E_EstallClear) begin
             E_PC                 <= 0;
@@ -237,7 +248,7 @@ module E(
                 E_IllegalInstruction <= D_IllegalInstruction;
                 E_InvalidInstruction <= D_InvalidInstruction;
                 E_trap               <= D_trap;
-                E_Data               <= Data_Inter;
+                E_Data               <= ({32{clo|clz}}&salur)|({32{!(clo|clz)}}&Data_Inter);
                 E_ExtType            <= ExtType_Inter;
                 E_MemWriteEnable     <= MemWriteEnable_Inter;
                 E_MemFamily          <= MemFamily_Inter;

@@ -59,7 +59,7 @@
 `define CP0_TagHi0     8'b11101_000
 `define CP0_ErrorEPC   8'b11110_000
 
-`define INSTRBUS_WIDTH  88
+`define INSTRBUS_WIDTH  98
 `define InstrWireSetWithOutNop    lb,lbu,lh,lhu,lw,sb,sh,sw,\
 						          addi,addiu,add,addu,sub,subu,\
 						          lui,ori,my_And,my_Or,my_Xor,my_Nor,Andi,Xori,\
@@ -69,7 +69,8 @@
 						          slt,slti,sltu,sltiu,mfc0,mtc0,eret,\
 						          my_break, syscall, tlbp, tlbr, tlbwi, tlbwr, cache,lwl,lwr,swl,swr,mul,\
 						          teq,teqi,tge,tgei,tgeiu,tgeu,tlt,tlti,tltiu,tltu,tne,tnei,\
-						          beql,bgezall,bgezl,bgtzl,blezl,bltzall,bltzl,bnel
+						          beql,bgezall,bgezl,bgtzl,blezl,bltzall,bltzl,bnel,\
+						          clo,clz,madd,maddu,msub,msubu,movf,movt,movn,movz
 						          
 `define INSTR_SET `InstrWireSetWithOutNop,nop
  

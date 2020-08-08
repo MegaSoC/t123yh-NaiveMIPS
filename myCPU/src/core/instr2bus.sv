@@ -11,6 +11,7 @@ module instr2bus(
         output [2 :0] sel, 
         output RegWriteEnable,
         output [4:0] WriteRegId,
+        input [31:0] rtdata,
         output [`INSTRBUS_WIDTH-1:0] InstrBus
     );
     assign Rs    = MipsInstr[25:21];
@@ -127,6 +128,18 @@ module instr2bus(
     wire bltzl   = (OpCode == 6'h1 && Rt == 5'b00010);
     wire bnel    = (OpCode == 6'b010101);
 
+    wire clo     = (OpCode == 6'b011100 && Funct == 6'b100001);
+    wire clz     = (OpCode == 6'b011100 && Funct == 6'b100000);
+    wire madd    = (OpCode == 6'b011100 && Funct == 6'h0);
+    wire maddu   = (OpCode == 6'b011100 && Funct == 6'b000001);
+    wire msub    = (OpCode == 6'b011100 && Funct == 6'b000100);
+    wire msubu   = (OpCode == 6'b011100 && Funct == 6'b000101);
+    wire movf    = (OpCode == 6'b000000 && Funct == 6'b000001 && MipsInstr[17:16] == 2'b00);
+    wire movn    = (OpCode == 6'b000000 && Funct == 6'b001011);
+    wire movt    = (OpCode == 6'b000000 && Funct == 6'b000001 && MipsInstr[17:16] == 2'b01);
+    wire movz    = (OpCode == 6'b000000 && Funct == 6'b001010);
+    //movf and movt can only trigger cp1 not found excp
+
     assign RegWriteEnable = ~nop & (addi | addiu | add | addu | sub | subu |
                                     ori | lui | my_Or | my_And | my_Xor | my_Nor | Andi |Xori |
                                     lw | lh | lhu | lb | lbu |
@@ -136,13 +149,15 @@ module instr2bus(
                                     slt | slti | sltu | sltiu |
                                     mfc0 |
                                     bltzal |bgezal|bgezall|bltzall|
-                                    lwl|lwr);
+                                    lwl|lwr|clo|clz|
+                                    (movn && (rtdata != 0)) | (movz && (rtdata == 0)));
 
     assign WriteRegId = (addi | addiu | ori | Xori | Andi | lui |
                          lw | lhu | lh | lbu | lb | slti | sltiu | mfc0|lwl|lwr) ? Rt :
                         (add | addu | sub | subu | mfhi | mflo | mul |
                          sll | srl | sra | sllv | srlv | srav | slt |
-                         sltu | my_And | my_Or | my_Xor | my_Nor | jalr)         ? Rd :
+                         sltu | my_And | my_Or | my_Xor | my_Nor | jalr|
+                         clo | clz | (movn && (rtdata != 0)) | (movz && (rtdata == 0)))         ? Rd :
                         (jal | bltzal | bgezal|bgezall|bltzall)                  ? 5'd31 : Rd;
 
     assign InstrBus = {`INSTR_SET};
