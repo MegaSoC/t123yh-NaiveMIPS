@@ -153,12 +153,15 @@ module E(
     assign E_XALU_Busy_real = E_XALU_Busy | mul_in_xalu;
 
     wire [31:0] salur;
+    wire salu_busy;
 
     SALU my_salu(//special alu:clo,clz
         .clk(Clk),
         .reset(reset),
-        .instrBus(D_InstrBus),
-
+        .clo(clo),
+        .clz(clz),
+        .saluBusy(salu_busy),
+        .saluFlush(ExceptionFlush | E_CurrentException),
         .salua(regRS),
         .salur(salur)
     );//it's stupid now, must add flush+ready

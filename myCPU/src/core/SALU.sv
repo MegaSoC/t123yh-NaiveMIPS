@@ -3,7 +3,8 @@
 module SALU(//special alu:clo,clz
         input clk,
         input reset,
-        input [`INSTRBUS_WIDTH-1:0] instrBus,
+        input clo,
+        input clz,
 
         input [31:0] salua,
         output [31:0] salur,
@@ -12,10 +13,8 @@ module SALU(//special alu:clo,clz
         input saluFlush
     );
 
-    wire `INSTR_SET;
-    assign {`INSTR_SET} = instrBus;
 
-    wire [31:0] clor,clzr;
+    /*wire [31:0] clor,clzr;
 
     assign clor = ((salua & 32'hffffffff) == 32'hffffffff) ? 32'd32 : 
                   ((salua & 32'hfffffffe) == 32'hfffffffe) ? 32'd31 : 
@@ -84,9 +83,49 @@ module SALU(//special alu:clo,clz
                   ((anti_saluta & 32'hf0000000) == 32'hf0000000) ? 32'd4  : 
                   ((anti_saluta & 32'he0000000) == 32'he0000000) ? 32'd3  : 
                   ((anti_saluta & 32'hc0000000) == 32'hc0000000) ? 32'd2  : 
-                  ((anti_saluta & 32'h80000000) == 32'h80000000) ? 32'd1  : 32'd0;
+                  ((anti_saluta & 32'h80000000) == 32'h80000000) ? 32'd1  : 32'd0;*/
 
-    assign salur = clo ? clor : clzr;
+    reg [31:0] count_result;
+    reg [31:0] salua_reg;
+    reg state;//0 can accept cal;1 is calling
+    reg count_finish;
+    wire is_valid;
+    assign is_valid = (clo && salua_reg[31-count_result[4:0]]) || (clz && !salua_reg[31-count_result[4:0]]);
+    assign salur = count_result;
+    assign saluBusy = !count_finish;
+
+    //assign salur = clo ? clor : clzr;
+
+    always_ff @(posedge clk)begin
+        if(reset | saluFlush)begin
+            count_result <= 0;
+            count_finish <= 1;
+            salua_reg <= 0;
+            state <= 0;
+        end
+        else begin
+            
+            case (state)
+                0:begin
+                    if(clo || clz)begin
+                        state <= 1;
+                        salua_reg <= salua;
+                        count_result <= 0;
+                        count_finish <= 0;
+                    end
+                end
+                1:begin
+                    if(is_valid && count_result <= 31)begin
+                        count_result <= count_result + 1;
+                    end
+                    else begin
+                        count_finish <= 1;
+                        state <= 0;
+                    end
+                end
+            endcase
+        end
+    end
 
 
 endmodule
