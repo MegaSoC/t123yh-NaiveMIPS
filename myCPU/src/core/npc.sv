@@ -7,7 +7,6 @@ module NPC(
         input [31:0] ipc,
         input ExceptionFlush,
         input [31:0] epc,
-        output last_likely_failed,
         output [31:0] npc
     );
     wire [25:0] Imm26 = instr[25:0];
@@ -50,12 +49,5 @@ module NPC(
     assign normal = !(j_type | jr_type | (b_type & b_valid));
     assign npc = ExceptionFlush ? epc :
            ({32{j_type}}&jpc) | ({32{jr_type}}&jrpc) | ({32{(b_type & b_valid)}}&bpc) | ({32{normal}}&pc4);
-
-    assign last_likely_failed = (beql & (rs!=rt)) || 
-                                (bnel & (rs==rt)) || 
-                                (blezl & (rs>0)) || 
-                                (bgtzl & (rs<=0)) || 
-                                ((bltzl|bltzall) & (rs>=0)) || 
-                                ((bgezl|bgezall) & (rs<0));
 
 endmodule

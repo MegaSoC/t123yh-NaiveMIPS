@@ -59,13 +59,14 @@ module mmu_map(
         output wire uncached
     );
 
-    assign invalid = (en & um & addr_i[31]); // 用户态访问非法地�?
+    assign invalid = (en & um & addr_i[31]); // 用户态访问非法地址
 
     assign uncached = addr_i[31:29] == 3'b101 ? 1'b1 :
-           addr_i[31:29] == 3'b100 ? cp0_kseg0_uncached :
-           1'b0 ;
-    assign addr_o = addr_i[31:29] == 3'b100 ? {3'b000 , addr_i[28:0]} : addr_i[31:29] == 3'b101 ? {3'b000 , addr_i[28:0]} : 32'b0 ;
+                      addr_i[31:29] == 3'b100 ? cp0_kseg0_uncached : 1'b0;
+
+    assign addr_o = addr_i[31:29] == 3'b100 ? {3'b000 , addr_i[28:0]} : 
+                    addr_i[31:29] == 3'b101 ? {3'b000 , addr_i[28:0]} : 32'b0;
+
     assign using_tlb = addr_i[31:29] == 3'b100 ? 1'b0 :
-           addr_i[31:29] == 3'b101 ? 1'b0 :
-           en ;
+                       addr_i[31:29] == 3'b101 ? 1'b0 : en;
 endmodule

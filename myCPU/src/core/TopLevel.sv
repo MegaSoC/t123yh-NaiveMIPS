@@ -336,6 +336,7 @@ module mycpu_top(
     wire [31:0] D_RsData,D_RtData;
     wire [4:0] D_Shamt;
     wire [15:0] D_Imm16;
+    wire [2:0] D_Sel;
     wire [`INSTRBUS_WIDTH-1:0] D_InstrBus;
     wire [31:0] D_PC,M_PC,D_EPC;
     wire [3:0] E_T,D_T;
@@ -375,6 +376,7 @@ module mycpu_top(
           .D_RtData(D_RtData),
           .D_Shamt(D_Shamt),
           .D_Imm16(D_Imm16),
+          .D_Sel(D_Sel),
           .D_InstrBus(D_InstrBus),
           .E_T(E_T),
           .E_RegWriteEnable(E_RegWriteEnable),
@@ -401,6 +403,7 @@ module mycpu_top(
     wire [31:0] E_PC, E_EPC;
     wire [31:0] E_WriteMemData;
     wire [4:0] E_RtID,E_RdID;
+    wire [2:0] E_Sel;
     wire [3:0] E_MemWriteEnable;
     wire [8:0] E_ExtType;
     wire [`INSTRBUS_WIDTH-1:0] E_InstrBus;
@@ -425,6 +428,7 @@ module mycpu_top(
           .D_RtData(D_RtData),
           .D_Shamt(D_Shamt),
           .D_Imm16(D_Imm16),
+          .D_Sel(D_Sel),
           .D_InstrBus(D_InstrBus),
           .D_T(D_T),
           .D_WriteRegEnable(D_WriteRegEnable),
@@ -438,6 +442,7 @@ module mycpu_top(
           .E_WriteMemData(E_WriteMemData),
           .E_RtID(E_RtID),
           .E_RdID(E_RdID),
+          .E_Sel(E_Sel),
           .E_T(E_T),
           .E_RegWriteEnable(E_RegWriteEnable),
           .E_RegNumber(E_RegNumber),
@@ -607,8 +612,9 @@ module mycpu_top(
             .clk(Clk),
             .rst(reset),
             .rd_addr(E_RdID),
-            .we(mtc0),
             .wr_addr(E_RegNumber),
+            .we(mtc0),
+            .sel(E_Sel),
             .data_i(data2cp0),
             .hardware_int(hardware_int_sample),
             .clear_exl(clear_exl),
@@ -619,9 +625,9 @@ module mycpu_top(
             .exp_badvaddr(exp_badvaddr),
             .exp_badvaddr_we(exp_badvaddr_we),
             .tlbwi(tlbwi),
+            .tlbwr(tlbwr),
             .tlbr(tlbr),
             .tlbp(tlbp),
-
 
             .icache_close(icache_close),
             .dcache_close(dcache_close),

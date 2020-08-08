@@ -48,139 +48,217 @@ module exception(
     wire[31:0] EBase  = 32'hBFC00200;
 
     assign E_CurrentException = (allow_int & interrupt_flag != 8'b0) |
-           (DirtyData & data_we) |
-           InstMiss | DataMiss |
-           inst_invalid | data_invalid |
-           IllegalInst | IllegalData |
-           syscall | my_break | unknown_inst| overflow | eret;
+                                (DirtyData & data_we) |
+                                InstMiss | DataMiss |
+                                inst_invalid | data_invalid |
+                                IllegalInst | IllegalData |
+                                syscall | my_break | unknown_inst| overflow | eret | trap;
     always @(posedge clk) begin
         if (reset) begin
-            ExcCode <= 5'b0;
-            flush <= 1'b0;
-            vice_flush1 <= 1'b0;
-            vice_flush2 <= 1'b0;
-            vice_flush3 <= 1'b0;
+            ExcCode        <= 5'b0;
+            badvaddr_we    <= 1'b0;
+            badvaddr       <= 32'b0;
+            flush          <= 1'b0;
+            vice_flush1    <= 1'b0;
+            vice_flush2    <= 1'b0;
+            vice_flush3    <= 1'b0;
             NewExceptionPC <= 32'b0;
-            epc <= 32'b0;
-            CP0_WrExp <= 1'b0;
+            epc            <= 32'b0;
+            CP0_WrExp      <= 1'b0;
+            clear_exl      <= 1'b0;
         end else begin
-            clear_exl <= 1'b0;
-            badvaddr_we <= 1'b0;
-            badvaddr <= 32'b0;
             if (allow_int & interrupt_flag != 8'b0) begin
-                ExcCode <= `EX_INTERRUPT;
-                flush <= 1'b1;
-                vice_flush1 <= 1'b1;
-                vice_flush2 <= 1'b1;
-                vice_flush3 <= 1'b1;
-                NewExceptionPC <= EBase + 32'h180;
-                epc <= E_EPC;
-                CP0_WrExp <= 1'b1;
-            end
-            else if (DirtyData & data_we) begin
-                ExcCode <= `EX_MOD;
-                flush <= 1'b1;
-                vice_flush1 <= 1'b1;
-                vice_flush2 <= 1'b1;
-                vice_flush3 <= 1'b1;
-                NewExceptionPC <= EBase + 32'h180;
-                epc <= E_EPC;
-                CP0_WrExp <= 1'b1;
-                badvaddr_we <= 1'b1;
-                badvaddr <= data_vaddr;
+                ExcCode        <= `EX_INTERRUPT;
+                badvaddr_we    <= 1'b0;
+                badvaddr       <= 32'b0;
+                flush          <= 1'b1;
+                vice_flush1    <= 1'b1;
+                vice_flush2    <= 1'b1;
+                vice_flush3    <= 1'b1;
+                NewExceptionPC <= 32'hBFC00380;
+                epc            <= E_EPC;
+                CP0_WrExp      <= 1'b1;
+                clear_exl      <= 1'b0;
             end
             else if (IllegalInst) begin
-                badvaddr <= pc;
-                badvaddr_we <= 1'b1;
-                ExcCode <= `EX_ADEL;
-                flush <= 1'b1;
-                vice_flush1 <= 1'b1;
-                vice_flush2 <= 1'b1;
-                vice_flush3 <= 1'b1;
-                NewExceptionPC <= EBase + 32'h180;
-                epc <= E_EPC;
-                CP0_WrExp <= 1'b1;
+                ExcCode        <= `EX_ADEL;
+                badvaddr_we    <= 1'b1;
+                badvaddr       <= pc;
+                flush          <= 1'b1;
+                vice_flush1    <= 1'b1;
+                vice_flush2    <= 1'b1;
+                vice_flush3    <= 1'b1;
+                NewExceptionPC <= 32'hBFC00380;
+                epc            <= E_EPC;
+                CP0_WrExp      <= 1'b1;
+                clear_exl      <= 1'b0;
             end
-            else if (IllegalData) begin
-                badvaddr <= data_vaddr;
-                badvaddr_we <= 1'b1;
-                ExcCode <= data_we ? `EX_ADES : `EX_ADEL;
-                flush <= 1'b1;
-                vice_flush1 <= 1'b1;
-                vice_flush2 <= 1'b1;
-                vice_flush3 <= 1'b1;
-                NewExceptionPC <= EBase + 32'h180;
-                epc <= E_EPC;
-                CP0_WrExp <= 1'b1;
+            else if (InstMiss) begin 
+                ExcCode        <= `EX_TLBL;
+                badvaddr_we    <= 1'b1;
+                badvaddr       <= pc;
+                flush          <= 1'b1;
+                vice_flush1    <= 1'b1;
+                vice_flush2    <= 1'b1;
+                vice_flush3    <= 1'b1;
+                NewExceptionPC <= 32'hBFC00200;
+                epc            <= E_EPC;
+                CP0_WrExp      <= 1'b1;
+                clear_exl      <= 1'b0;
             end
-            else if (syscall) begin
-                ExcCode <= `EX_SYS;
-                flush <= 1'b1;
-                vice_flush1 <= 1'b1;
-                vice_flush2 <= 1'b1;
-                vice_flush3 <= 1'b1;
-                NewExceptionPC <= EBase + 32'h180;
-                epc <= E_EPC;
-                CP0_WrExp <= 1'b1;
-            end
-            else if (my_break) begin
-                ExcCode <= `EX_BP;
-                flush <= 1'b1;
-                vice_flush1 <= 1'b1;
-                vice_flush2 <= 1'b1;
-                vice_flush3 <= 1'b1;
-                NewExceptionPC <= EBase + 32'h180;
-                epc <= E_EPC;
-                CP0_WrExp <= 1'b1;
-            end
-            else if (trap) begin
-                ExcCode <= `EX_TRAP;
-                flush <= 1'b1;
-                vice_flush1 <= 1'b1;
-                vice_flush2 <= 1'b1;
-                vice_flush3 <= 1'b1;
-                NewExceptionPC <= EBase + 32'h180;
-                epc <= E_EPC;
-                CP0_WrExp <= 1'b1;
+            else if (inst_invalid) begin
+                ExcCode        <= `EX_TLBL;
+                badvaddr_we    <= 1'b1;
+                badvaddr       <= pc;
+                flush          <= 1'b1;
+                vice_flush1    <= 1'b1;
+                vice_flush2    <= 1'b1;
+                vice_flush3    <= 1'b1;
+                NewExceptionPC <= 32'hBFC00380;
+                epc            <= E_EPC;
+                CP0_WrExp      <= 1'b1;
+                clear_exl      <= 1'b0;
             end
             else if (unknown_inst) begin
-                ExcCode <= `EX_RI;
-                flush <= 1'b1;
-                vice_flush1 <= 1'b1;
-                vice_flush2 <= 1'b1;
-                vice_flush3 <= 1'b1;
-                NewExceptionPC <= EBase + 32'h180;
-                epc <= E_EPC;
-                CP0_WrExp <= 1'b1;
+                ExcCode        <= `EX_RI;
+                badvaddr_we    <= 1'b0;
+                badvaddr       <= 32'b0;
+                flush          <= 1'b1;
+                vice_flush1    <= 1'b1;
+                vice_flush2    <= 1'b1;
+                vice_flush3    <= 1'b1;
+                NewExceptionPC <= 32'hBFC00380;
+                epc            <= E_EPC;
+                CP0_WrExp      <= 1'b1;
+                clear_exl      <= 1'b0;
             end
             else if (overflow) begin
-                ExcCode <= `EX_OV;
-                flush <= 1'b1;
-                vice_flush1 <= 1'b1;
-                vice_flush2 <= 1'b1;
-                vice_flush3 <= 1'b1;
-                NewExceptionPC <= EBase + 32'h180;
-                epc <= E_EPC;
-                CP0_WrExp <= 1'b1;
+                ExcCode        <= `EX_OV;
+                badvaddr_we    <= 1'b0;
+                badvaddr       <= 32'b0;
+                flush          <= 1'b1;
+                vice_flush1    <= 1'b1;
+                vice_flush2    <= 1'b1;
+                vice_flush3    <= 1'b1;
+                NewExceptionPC <= 32'hBFC00380;
+                epc            <= E_EPC;
+                CP0_WrExp      <= 1'b1;
+                clear_exl      <= 1'b0;
+            end
+            else if (syscall) begin
+                ExcCode        <= `EX_SYS;
+                badvaddr_we    <= 1'b0;
+                badvaddr       <= 32'b0;
+                flush          <= 1'b1;
+                vice_flush1    <= 1'b1;
+                vice_flush2    <= 1'b1;
+                vice_flush3    <= 1'b1;
+                NewExceptionPC <= 32'hBFC00380;
+                epc            <= E_EPC;
+                CP0_WrExp      <= 1'b1;
+                clear_exl      <= 1'b0;
+            end
+            else if (my_break) begin
+                ExcCode        <= `EX_BP;
+                badvaddr_we    <= 1'b0;
+                badvaddr       <= 32'b0;
+                flush          <= 1'b1;
+                vice_flush1    <= 1'b1;
+                vice_flush2    <= 1'b1;
+                vice_flush3    <= 1'b1;
+                NewExceptionPC <= 32'hBFC00380;
+                epc            <= E_EPC;
+                CP0_WrExp      <= 1'b1;
+                clear_exl      <= 1'b0;
+            end
+            else if (trap) begin
+                ExcCode        <= `EX_TRAP;
+                badvaddr_we    <= 1'b0;
+                badvaddr       <= 32'b0;
+                flush          <= 1'b1;
+                vice_flush1    <= 1'b1;
+                vice_flush2    <= 1'b1;
+                vice_flush3    <= 1'b1;
+                NewExceptionPC <= 32'hBFC00380;
+                epc            <= E_EPC;
+                CP0_WrExp      <= 1'b1;
+                clear_exl      <= 1'b0;
+            end
+            else if (IllegalData) begin
+                ExcCode        <= data_we ? `EX_ADES : `EX_ADEL;
+                badvaddr_we    <= 1'b1;
+                badvaddr       <= data_vaddr;
+                flush          <= 1'b1;
+                vice_flush1    <= 1'b1;
+                vice_flush2    <= 1'b1;
+                vice_flush3    <= 1'b1;
+                NewExceptionPC <= 32'hBFC00380;
+                epc            <= E_EPC;
+                CP0_WrExp      <= 1'b1;
+                clear_exl      <= 1'b0;
+            end
+            else if (DataMiss) begin
+                ExcCode        <= data_we ? `EX_TLBS : `EX_TLBL;
+                badvaddr_we    <= 1'b1;
+                badvaddr       <= data_vaddr;
+                flush          <= 1'b1;
+                vice_flush1    <= 1'b1;
+                vice_flush2    <= 1'b1;
+                vice_flush3    <= 1'b1;
+                NewExceptionPC <= 32'hBFC00200;
+                epc            <= E_EPC;
+                CP0_WrExp      <= 1'b1;
+                clear_exl      <= 1'b0;
+            end
+            else if (data_invalid) begin
+                ExcCode        <= data_we ? `EX_TLBS : `EX_TLBL;
+                badvaddr_we    <= 1'b1;
+                badvaddr       <= data_vaddr;
+                flush          <= 1'b1;
+                vice_flush1    <= 1'b1;
+                vice_flush2    <= 1'b1;
+                vice_flush3    <= 1'b1;
+                NewExceptionPC <= 32'hBFC00380;
+                epc            <= E_EPC;
+                CP0_WrExp      <= 1'b1;
+                clear_exl      <= 1'b0;
+            end
+            else if (DirtyData & data_we) begin
+                ExcCode        <= `EX_MOD;
+                badvaddr_we    <= 1'b1;
+                badvaddr       <= data_vaddr;
+                flush          <= 1'b1;
+                vice_flush1    <= 1'b1;
+                vice_flush2    <= 1'b1;
+                vice_flush3    <= 1'b1;
+                NewExceptionPC <= 32'hBFC00380;
+                epc            <= E_EPC;
+                CP0_WrExp      <= 1'b1;
+                clear_exl      <= 1'b0;
             end
             else if (eret) begin
-                CP0_WrExp <= 1'b0;
-                clear_exl <= 1'b1;
+                badvaddr_we    <= 1'b0;
+                badvaddr       <= 32'b0;
+                flush          <= 1'b1;
+                vice_flush1    <= 1'b1;
+                vice_flush2    <= 1'b1;
+                vice_flush3    <= 1'b1;
                 NewExceptionPC <= epc_in;
-                flush <= 1'b1;
-                vice_flush1 <= 1'b1;
-                vice_flush2 <= 1'b1;
-                vice_flush3 <= 1'b1;
+                CP0_WrExp      <= 1'b0;
+                clear_exl      <= 1'b1;
             end
             else begin
-                ExcCode <= 0;
-                CP0_WrExp <= 1'b0;
+                badvaddr_we    <= 1'b0;
+                badvaddr       <= 32'b0;
+                ExcCode        <= 0;
+                CP0_WrExp      <= 1'b0;
                 if (inst_sram_data_ok | (!icache_stall & !inst_uncached))begin
-                    flush <= 1'b0;
+                    flush       <= 1'b0;
                     vice_flush1 <= 1'b0;
                     vice_flush2 <= 1'b0;
                     vice_flush3 <= 1'b0;
                 end
+                clear_exl      <= 1'b0;
             end
         end
     end
