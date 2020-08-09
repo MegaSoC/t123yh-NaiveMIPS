@@ -115,6 +115,7 @@ assign lp_c0[0] = 3'b0;
 assign lp_c1[0] = 3'b0;
 assign lp_v0[0] = 1'b0;
 assign lp_v1[0] = 1'b0;
+assign lp_d1[0] = 1'b0;
 
 generate
     for (i = 0; i < TLB_NUM; i = i + 1) begin
@@ -140,6 +141,6 @@ endgenerate
 assign pa0 = lp_pa0[TLB_NUM];
 assign pa1 = lp_pa1[TLB_NUM];
 assign exp_bus0 = {~|match0, lp_v0[TLB_NUM]};
-assign exp_bus1 = {~|match1, lp_v1[TLB_NUM], lp_d1[TLB_NUM]};
+assign exp_bus1 = {~|match1, lp_v1[TLB_NUM], ~lp_d1[TLB_NUM]};
 
 endmodule
