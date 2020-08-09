@@ -23,8 +23,11 @@ module cp0(
         input wire          tlbr,
         input wire          tlbp,
 
+        output wire         SR_BEV,
+        output wire         SR_EXL,
+        output wire [31:0]  ebase,
+
         output wire         allow_int,
-        output wire         in_exl,
 
         output wire [31:0]  epc,
         output reg  [31:0]  data_o,
@@ -79,8 +82,12 @@ module cp0(
     wire [7:0] Cause_IP = {hardware_int, cp0_reg_Cause[9:8]};
     assign allow_int = cp0_reg_Status[2:0] == 3'b001 & !en_exp_i;
     assign interrupt_flag = cp0_reg_Status[15:8] & Cause_IP;
-    assign in_exl    = cp0_reg_Status[1];
     assign epc       = cp0_reg_EPC;
+
+    assign SR_BEV = cp0_reg_Status[22];
+    assign SR_EXL = cp0_reg_Status[1];
+    assign ebase  = cp0_reg_EBase;
+
 
     // TLB related
     wire [4:0] index_w = tlbwr ? cp0_reg_Random[4:0] : cp0_reg_Index[4:0];

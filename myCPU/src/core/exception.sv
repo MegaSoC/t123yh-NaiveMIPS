@@ -21,11 +21,14 @@ module exception(
         input wire unknown_inst,
         input wire in_delayslot,
         input wire overflow,
-        input wire[31:0] epc_in,
+        input wire [31:0] epc_in,
         input wire allow_int,
-        input wire[7:0] interrupt_flag,
+        input wire [7:0] interrupt_flag,
         input wire inst_sram_data_ok,
         input wire icache_stall,
+        input wire SR_BEV,
+        input wire SR_EXL,
+        input wire [31:0] ebase,
 
         output reg flush,
         output reg vice_flush1,
@@ -44,8 +47,7 @@ module exception(
         input wire trap
     );
 
-
-    wire[31:0] EBase  = 32'hBFC00200;
+    wire [31:0] base = SR_BEV ? 32'hbfc00200 : ebase;
 
     assign E_CurrentException = (allow_int & interrupt_flag != 8'b0) |
                                 (DirtyData & data_we) |
@@ -75,7 +77,7 @@ module exception(
                 vice_flush1    <= 1'b1;
                 vice_flush2    <= 1'b1;
                 vice_flush3    <= 1'b1;
-                NewExceptionPC <= 32'hBFC00380;
+                NewExceptionPC <= base + 32'h180;
                 epc            <= E_EPC;
                 CP0_WrExp      <= 1'b1;
                 clear_exl      <= 1'b0;
@@ -88,7 +90,7 @@ module exception(
                 vice_flush1    <= 1'b1;
                 vice_flush2    <= 1'b1;
                 vice_flush3    <= 1'b1;
-                NewExceptionPC <= 32'hBFC00380;
+                NewExceptionPC <= base + 32'h180;
                 epc            <= E_EPC;
                 CP0_WrExp      <= 1'b1;
                 clear_exl      <= 1'b0;
@@ -101,7 +103,7 @@ module exception(
                 vice_flush1    <= 1'b1;
                 vice_flush2    <= 1'b1;
                 vice_flush3    <= 1'b1;
-                NewExceptionPC <= 32'hBFC00200;
+                NewExceptionPC <= SR_EXL? base + 32'h180 : base;
                 epc            <= E_EPC;
                 CP0_WrExp      <= 1'b1;
                 clear_exl      <= 1'b0;
@@ -114,7 +116,7 @@ module exception(
                 vice_flush1    <= 1'b1;
                 vice_flush2    <= 1'b1;
                 vice_flush3    <= 1'b1;
-                NewExceptionPC <= 32'hBFC00380;
+                NewExceptionPC <= base + 32'h180;
                 epc            <= E_EPC;
                 CP0_WrExp      <= 1'b1;
                 clear_exl      <= 1'b0;
@@ -127,7 +129,7 @@ module exception(
                 vice_flush1    <= 1'b1;
                 vice_flush2    <= 1'b1;
                 vice_flush3    <= 1'b1;
-                NewExceptionPC <= 32'hBFC00380;
+                NewExceptionPC <= base + 32'h180;
                 epc            <= E_EPC;
                 CP0_WrExp      <= 1'b1;
                 clear_exl      <= 1'b0;
@@ -140,7 +142,7 @@ module exception(
                 vice_flush1    <= 1'b1;
                 vice_flush2    <= 1'b1;
                 vice_flush3    <= 1'b1;
-                NewExceptionPC <= 32'hBFC00380;
+                NewExceptionPC <= base + 32'h180;
                 epc            <= E_EPC;
                 CP0_WrExp      <= 1'b1;
                 clear_exl      <= 1'b0;
@@ -153,7 +155,7 @@ module exception(
                 vice_flush1    <= 1'b1;
                 vice_flush2    <= 1'b1;
                 vice_flush3    <= 1'b1;
-                NewExceptionPC <= 32'hBFC00380;
+                NewExceptionPC <= base + 32'h180;
                 epc            <= E_EPC;
                 CP0_WrExp      <= 1'b1;
                 clear_exl      <= 1'b0;
@@ -166,7 +168,7 @@ module exception(
                 vice_flush1    <= 1'b1;
                 vice_flush2    <= 1'b1;
                 vice_flush3    <= 1'b1;
-                NewExceptionPC <= 32'hBFC00380;
+                NewExceptionPC <= base + 32'h180;
                 epc            <= E_EPC;
                 CP0_WrExp      <= 1'b1;
                 clear_exl      <= 1'b0;
@@ -179,7 +181,7 @@ module exception(
                 vice_flush1    <= 1'b1;
                 vice_flush2    <= 1'b1;
                 vice_flush3    <= 1'b1;
-                NewExceptionPC <= 32'hBFC00380;
+                NewExceptionPC <= base + 32'h180;
                 epc            <= E_EPC;
                 CP0_WrExp      <= 1'b1;
                 clear_exl      <= 1'b0;
@@ -192,7 +194,7 @@ module exception(
                 vice_flush1    <= 1'b1;
                 vice_flush2    <= 1'b1;
                 vice_flush3    <= 1'b1;
-                NewExceptionPC <= 32'hBFC00380;
+                NewExceptionPC <= base + 32'h180;
                 epc            <= E_EPC;
                 CP0_WrExp      <= 1'b1;
                 clear_exl      <= 1'b0;
@@ -205,7 +207,7 @@ module exception(
                 vice_flush1    <= 1'b1;
                 vice_flush2    <= 1'b1;
                 vice_flush3    <= 1'b1;
-                NewExceptionPC <= 32'hBFC00200;
+                NewExceptionPC <= SR_EXL? base + 32'h180 : base;
                 epc            <= E_EPC;
                 CP0_WrExp      <= 1'b1;
                 clear_exl      <= 1'b0;
@@ -218,7 +220,7 @@ module exception(
                 vice_flush1    <= 1'b1;
                 vice_flush2    <= 1'b1;
                 vice_flush3    <= 1'b1;
-                NewExceptionPC <= 32'hBFC00380;
+                NewExceptionPC <= base + 32'h180;
                 epc            <= E_EPC;
                 CP0_WrExp      <= 1'b1;
                 clear_exl      <= 1'b0;
@@ -231,7 +233,7 @@ module exception(
                 vice_flush1    <= 1'b1;
                 vice_flush2    <= 1'b1;
                 vice_flush3    <= 1'b1;
-                NewExceptionPC <= 32'hBFC00380;
+                NewExceptionPC <= base + 32'h180;
                 epc            <= E_EPC;
                 CP0_WrExp      <= 1'b1;
                 clear_exl      <= 1'b0;

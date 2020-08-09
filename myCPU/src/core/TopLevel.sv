@@ -557,6 +557,9 @@ module mycpu_top(
     wire data_exp_dirty;
     wire data_exp_invalid;
 
+    wire SR_BEV, SR_EXL;
+    wire [31:0] ebase;
+
     exception exception(
                   .flush(ExceptionFlush),
                   .vice_flush1(exp_flush_vice1),
@@ -594,11 +597,13 @@ module mycpu_top(
                   .epc_in(cp0_epc),
                   .allow_int(cp0_allow_int),
                   .interrupt_flag(interrupt_flag),
-                  .inst_sram_data_ok(inst_sram_data_ok) ,
+                  .inst_sram_data_ok(inst_sram_data_ok),
                   .icache_stall(icache_stall),
                   .E_CurrentException(E_CurrentException),
                   .inst_uncached(inst_uncached),
-
+                  .SR_BEV(SR_BEV),
+                  .SR_EXL(SR_EXL),
+                  .ebase(ebase),
                   .trap(E_trap)
               );
 
@@ -615,7 +620,6 @@ module mycpu_top(
     cp0 cp0(
             .epc(cp0_epc),
             .allow_int(cp0_allow_int),
-            .in_exl(),
             .data_o(cp0_reg_value),
             .interrupt_flag(interrupt_flag),
 
@@ -638,6 +642,10 @@ module mycpu_top(
             .tlbwr(tlbwr),
             .tlbr(tlbr),
             .tlbp(tlbp),
+
+            .SR_BEV(SR_BEV),
+            .SR_EXL(SR_EXL),
+            .ebase(ebase),
 
             .icache_close(icache_close),
             .dcache_close(dcache_close),
