@@ -94,7 +94,7 @@ module mycpu_top(
     wire[3:0] data_sram_wen;
 
     wire[1:0] data_size;
-    assign data_size = (sw | lw) ? 2'b10 :
+    assign data_size = ((SC|sw) | (LL|lw)) ? 2'b10 :
            (sh | lh | lhu) ? 2'b01 :
            2'b00 ;
 
@@ -191,6 +191,7 @@ module mycpu_top(
     wire dcache_close;
     wire inst_sram_data_ok;
     reg[3:0] cache_timer;
+    wire [31:0] E_SC_data;
     always @(posedge aclk) begin
         if (Myreset) begin
             icache_close <= 1;
@@ -382,7 +383,7 @@ module mycpu_top(
           .E_T(E_T),
           .E_RegWriteEnable(E_RegWriteEnable),
           .E_RegNumber(E_RegNumber),
-          .E_Data(E_Data),
+          .E_Data(E_SC_data),
           .D_T(D_T),
           .D_WriteRegEnable(D_WriteRegEnable),
           .D_RegId(D_RegId),
@@ -460,6 +461,7 @@ module mycpu_top(
           .D_InDelaySlot(D_InDelaySlot),
           .E_in_delayslot(E_in_delayslot),
           .salu_busy_real(salu_busy_real),
+          .E_SC_data(E_SC_data),
 
           .D_InstMiss(D_InstMiss),
           .D_IllegalInstruction(D_IllegalInstruction),
@@ -499,6 +501,7 @@ module mycpu_top(
           .E_PC(E_PC),
           .E_MemWriteData(E_WriteMemData),
           .E_RtID(E_RtID),
+          .E_SC_data(E_SC_data),
           .E_Data(E_Data),
           .E_ExtType(E_ExtType),
           .E_MemWriteEnable(E_MemWriteEnable),
@@ -569,7 +572,7 @@ module mycpu_top(
                   .pc(E_PC),
                   .mm_pc(M_PC_post),
                   .data_vaddr(E_Data),
-                  .data_we(sb | sh | sw),
+                  .data_we(sb | sh | (SC|sw)),
                   .DataMiss(data_exp_miss),
                   .InstMiss(E_InstMiss),
                   .IllegalData(data_exp_illegal | data_alignment_err),

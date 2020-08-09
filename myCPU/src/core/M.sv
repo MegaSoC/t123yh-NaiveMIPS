@@ -8,6 +8,7 @@ module M(
         input [31:0] E_PC,
         input [31:0] E_MemWriteData,
         input [4:0] E_RtID,
+        input [31:0] E_SC_data,
         input [31:0] E_Data,
         input [8:0] E_ExtType,
         input [3:0] E_MemWriteEnable,
@@ -43,8 +44,8 @@ module M(
     wire [31:0] regRT = (E_RtID!=0 && M_WriteRegEnable && M_RegId==E_RtID) ? M_Data : E_MemWriteData;
     wire [1:0] AddrOffset = E_Data[1:0];
 
-    assign read = (lb|lbu|lh|lhu|lw);
-    assign write = (sb|sh|sw);
+    assign read = (lb|lbu|lh|lhu|(LL|lw));
+    assign write = (sb|sh|(SC|sw));
     assign dm_stall = ((read|write)& uncached & !data_sram_data_ok ) | ( (!uncached) & (!hit));
     assign data2cp0 = regRT;
     assign data_sram_wdata = swl?(regRT>>({(~AddrOffset),3'b0})):
@@ -105,7 +106,7 @@ module M(
             M_MemFamily <= E_MemFamily;
             M_PC <= E_PC;
             M_T <= E_T==0?0:E_T-1;
-            M_Data <= E_Datarrr;
+            M_Data <= SC ? E_SC_data : E_Datarrr;
             M_WriteRegEnableExted <= RegWriteEnable_EExtedrrr;
         end
     end

@@ -14,6 +14,7 @@ module ALU(
         input mul1,
         input [31:0] hi,
         input [31:0] lo,
+        input llbit,
         output OverFlow
     );
     logic `INSTR_SET;
@@ -26,7 +27,7 @@ module ALU(
     assign Imm32 = ({{16'b0},Imm16}&{32{extendop[0]}}) | ({Imm16,{16'b0}}&{32{extendop[1]}}) | ({{16{Imm16[15]}},Imm16}&{32{extendop[2]}});
 
     logic normal;
-    assign normal = (addiu|addu|add|addi|lw|lwl|lwr|sw|swl|swr|lb|lbu|lh|lhu|sb|sh|subu|sub);
+    assign normal = (addiu|addu|add|addi|(LL|lw)|lwl|lwr|(SC|sw)|swl|swr|lb|lbu|lh|lhu|sb|sh|subu|sub);
     logic [31:0] normal_a,normal_b;
     logic isReg;
     assign isReg = ((add|addu)|(sub|subu));

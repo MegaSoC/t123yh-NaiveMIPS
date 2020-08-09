@@ -31,6 +31,7 @@ module E(
         output reg E_RegWriteEnable,
         output reg [4:0] E_RegNumber,
         output reg [31:0] E_Data,
+        output reg [31:0] E_SC_data,
 
         output salu_busy_real,
 
@@ -76,6 +77,8 @@ module E(
          (RtNumber_D!=0 && M_WriteRegEnable && M_T==0 && M_RegId==RtNumber_D) ? M_Data: D_RtData;
     wire [31:0] Data_Inter;
     wire D_OverFlow;
+    reg llbit;
+    reg E_llbit;
 
 
     wire [31:0] XALU_HI, XALU_LO;
@@ -105,19 +108,19 @@ module E(
     wire [1:0] Offset;
     assign Offset = Data_Inter[1:0];
 
-    assign ExtType_Inter         = {lb,lbu,lh,lhu,lw,lwl,lwr,swl,swr};
-    assign MemFamily_Inter       = lb|lbu|lh|lhu|lw|sb|sh|sw;
-    assign D_load_alignment_err  = (lw & Offset[1:0]!=0) | (lh & Offset[0] !=0) | (lhu & Offset[0] !=0) ;
-    assign D_store_alignment_err = (sw & Offset[1:0]!=0) | (sh & Offset[0] !=0) ;
+    assign ExtType_Inter         = {lb,lbu,lh,lhu,(LL|lw),lwl,lwr,swl,swr};
+    assign MemFamily_Inter       = lb|lbu|lh|lhu|(LL|lw)|sb|sh|(SC|sw);
+    assign D_load_alignment_err  = ((LL|lw) & Offset[1:0]!=0) | (lh & Offset[0] !=0) | (lhu & Offset[0] !=0) ;
+    assign D_store_alignment_err = ((SC|sw) & Offset[1:0]!=0) | (sh & Offset[0] !=0) ;
 
     assign MemWriteEnable_Inter = D_store_alignment_err ? 4'b0000:
-                                                          (({4{sw}} & 4'b1111) | ({4{sh}} & (4'b0011<<Offset)) | 
+                                                          (({4{(SC|sw)}} & 4'b1111) | ({4{sh}} & (4'b0011<<Offset)) | 
                                                           ({4{sb}} & (4'b0001<<Offset)) |({4{swl}} & (4'b1111>>(~Offset))) | 
                                                           ({4{swr}} & (4'b1111<<(Offset))));
 
-    assign E_MemReadEnable_Inter = lb|lbu|lh|lhu|lw|lwl|lwr ;
+    assign E_MemReadEnable_Inter = lb|lbu|lh|lhu|(LL|lw)|lwl|lwr ;
 
-    assign E_MemSaveType_Inter = sw|sb|sh ;
+    assign E_MemSaveType_Inter = (SC|sw)|sb|sh ;
 
     wire [3:0] E_T_Inter = (D_T > 0)?D_T-1:0;
 
@@ -137,6 +140,7 @@ module E(
             .hi(XALU_HI),
             .lo(XALU_LO),
             .PC(D_PC),
+            .llbit(llbit),
             .OverFlow(D_OverFlow)
         );
 
@@ -202,6 +206,7 @@ module E(
             E_InvalidInstruction <= 0;
             E_trap               <= 0;
             E_Data               <= 0;
+            E_SC_data            <= 0;
             E_ExtType            <= 0;
             E_MemWriteEnable     <= 0;
             E_MemFamily          <= 0;
@@ -246,6 +251,7 @@ module E(
             E_InvalidInstruction <= 0;
             E_trap               <= 0;
             E_Data               <= 0;
+            E_SC_data            <= 0;
             E_ExtType            <= 0;
             E_MemWriteEnable     <= 0;
             E_MemFamily          <= 0;
@@ -290,6 +296,7 @@ module E(
             E_InvalidInstruction <= 0;
             E_trap               <= 0;
             E_Data               <= 0;
+            E_SC_data            <= 0;
             E_ExtType            <= 0;
             E_MemWriteEnable     <= 0;
             E_MemFamily          <= 0;
@@ -312,6 +319,7 @@ module E(
                 E_InvalidInstruction <= salu_inst_invalid;
                 E_trap               <= salu_trap;
                 E_Data               <= salur;
+                E_SC_data            <= salur;
                 E_ExtType            <= salu_ExtType;
                 E_MemWriteEnable     <= salu_MemWriteEnable;
                 E_MemFamily          <= salu_MemFamily;
@@ -334,6 +342,7 @@ module E(
                 E_InvalidInstruction <= mul_inst_invalid;
                 E_trap               <= mul_trap;
                 E_Data               <= XALU_LO;
+                E_SC_data            <= XALU_LO;
                 E_ExtType            <= mul_ExtType;
                 E_MemWriteEnable     <= mul_MemWriteEnable;
                 E_MemFamily          <= mul_MemFamily;
@@ -358,13 +367,28 @@ module E(
                 E_trap               <= D_trap;
                 E_Data               <= ({32{clo|clz}}&salur)|({32{!(clo|clz)}}&Data_Inter);
                 E_ExtType            <= ExtType_Inter;
-                E_MemWriteEnable     <= MemWriteEnable_Inter;
+                E_MemWriteEnable     <= (SC&&(!llbit)) ? 0 : MemWriteEnable_Inter;
                 E_MemFamily          <= MemFamily_Inter;
                 E_InstrBus           <= D_InstrBus;
                 E_OverFlow           <= D_OverFlow;
                 E_DataUnaligned      <= D_store_alignment_err | D_load_alignment_err;
                 E_in_delayslot       <= D_InDelaySlot;
+                E_llbit <= llbit;
+                E_SC_data            <= SC?{31'd0,llbit}:(({32{clo|clz}}&salur)|({32{!(clo|clz)}}&Data_Inter));
+            end
+        end
+    end
 
+    always @(posedge Clk)begin
+        if(reset) begin
+            llbit <= 0;
+        end
+        else if(!(ExceptionFlush | E_CurrentException | E_EstallClear)&&!dm_stall)begin
+            if(LL)begin
+                llbit <= 1;
+            end
+            else if(SC|eret)begin
+                llbit <= 0;
             end
         end
     end
