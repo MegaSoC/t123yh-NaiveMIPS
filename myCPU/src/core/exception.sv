@@ -104,7 +104,7 @@ module exception(
                 vice_flush2    <= 1'b1;
                 vice_flush3    <= 1'b1;
                 NewExceptionPC <= SR_EXL? base + 32'h180 : base;
-                epc            <= E_EPC;
+                epc            <= SR_EXL? epc_in : E_EPC;
                 CP0_WrExp      <= 1'b1;
                 clear_exl      <= 1'b0;
             end
@@ -208,7 +208,7 @@ module exception(
                 vice_flush2    <= 1'b1;
                 vice_flush3    <= 1'b1;
                 NewExceptionPC <= SR_EXL? base + 32'h180 : base;
-                epc            <= E_EPC;
+                epc            <= SR_EXL? epc_in : E_EPC;
                 CP0_WrExp      <= 1'b1;
                 clear_exl      <= 1'b0;
             end
