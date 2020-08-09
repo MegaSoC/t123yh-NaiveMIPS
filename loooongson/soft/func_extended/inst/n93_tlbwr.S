@@ -110,6 +110,27 @@ test_asid_2:
     ori a3, 0xdc18
     bne a3, v1, inst_error
     nop
+test_tlbp:
+    lui s5, 0x0011
+    ori s5, 0xe000 ##entry hi
+    mtc0 s5, c0_entryhi
+    mtc0 zero, c0_entrylo0
+    mtc0 zero, c0_entrylo1
+    tlbp
+    tlbr
+    mtc0 zero, c0_entryhi
+    mfc0 t3, c0_entrylo0
+    li t4, 0x4007
+    bne t3, t4, inst_error
+    nop
+    mfc0 t3, c0_entrylo1
+    li t4, 0x4007
+    bne t3, t4, inst_error
+    nop
+    mtc0 zero, c0_entrylo0
+    mtc0 zero, c0_entrylo1
+    tlbwi
+    nop
 ###score ++
     addiu s3, s3, 1
 ###output (s0<<24)|s3

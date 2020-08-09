@@ -67,6 +67,10 @@ test_finish:
     ori v1, 0xdc03
     beq v0, v1, tlbwi_ex
     nop   
+    lui v1, 0x8888
+    ori v1, 0xdc03
+    beq v0, v1, tlb_double_fill
+    nop   
     
 /*
  *  exception handle
@@ -104,6 +108,8 @@ test_finish:
     li  k0, 0x09 # trap
     beq k1, k0, trap_ex
     nop
+    li k0, 0x10
+    beq k1, k0, tlb_double_ex
 
 syscall_ex:
     addu  s2, zero, zero
@@ -355,7 +361,38 @@ tlbwi_ex:
     eret
     .set mips1
     nop
-    
+
+tlb_double_ex:
+.set noreorder
+    mfc0 t9, c0_entryhi
+    li t9, 0x8000d007
+    mtc0 t9, c0_entrylo0
+    mtc0 t9, c0_entrylo1
+    tlbwr
+    mfc0 t9, c0_epc
+        .set mips32
+    eret
+        .set mips1
+
+tlb_double_fill: # t7=epc
+    li    t8, 0x800d0000
+    li    s2, 0x10
+    sw    s2, 0(t8)
+    li    t8, 0x000c0000
+    lw    s2, 0(t8)
+    subu s2, s2, 0x9
+    or t0, s2, t0 # s2 should be 0x7
+    or t1, s2, t1
+    mtc0 t0, c0_entrylo0
+    mtc0 t1, c0_entrylo1
+    tlbwr
+        lui v1, 0x3333
+    ori v1, 0xdc15
+
+        .set mips32
+    eret
+        .set mips1
+        nop
 
 locate:
 	.set noreorder
@@ -416,6 +453,8 @@ kseg0_kseg1:
     jal e5_movz_movn    #lui
     nop
     jal e6_mapped_instr
+    nop
+    jal e7_tlb_double_miss
     nop
     
 ###check io access
