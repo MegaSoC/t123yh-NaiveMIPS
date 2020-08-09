@@ -43,6 +43,9 @@ module E(
         output reg E_OverFlow,
         output reg E_DataUnaligned,
 
+        output D_read,
+        output D_write,
+
         input [3:0] M_T,
         input M_WriteRegEnable,
         input [4:0] M_RegId,
@@ -99,6 +102,8 @@ module E(
     assign E_XALU_Busy = XALU_Busy_Inter;
     wire `INSTR_SET;
     assign {`INSTR_SET} = D_InstrBus;
+    assign D_read =  (lb|lbu|lh|lhu|(LL|lw));
+    assign D_write = (sb|sh|(SC|sw));
 
     wire [8:0] ExtType_Inter;
     wire [3:0] MemWriteEnable_Inter;

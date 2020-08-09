@@ -417,6 +417,8 @@ module mycpu_top(
     wire E_EstallClear ;
     wire E_MemSaveType_Inter ;
     wire E_MemLStype_Inter = E_MemReadEnable_Inter | E_MemSaveType_Inter ;
+
+    wire D_dcache_read,D_dcache_write;
     E my_e(
           .Clk(Clk),
           .reset(Myreset),
@@ -462,6 +464,8 @@ module mycpu_top(
           .E_in_delayslot(E_in_delayslot),
           .salu_busy_real(salu_busy_real),
           .E_SC_data(E_SC_data),
+          .D_read(D_dcache_read),
+          .D_write(D_dcache_write),
 
           .D_InstMiss(D_InstMiss),
           .D_IllegalInstruction(D_IllegalInstruction),
