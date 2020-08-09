@@ -415,6 +415,8 @@ kseg0_kseg1:
     nop
     jal e5_movz_movn    #lui
     nop
+    jal e6_mapped_instr
+    nop
     
 ###check io access
     LI  (a0, IO_SIMU_ADDR)
