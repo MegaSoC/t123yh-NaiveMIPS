@@ -2,7 +2,7 @@
 #include <regdef.h>
 #include <cpu_cde.h>
 
-#define TEST_NUM 10
+#define TEST_NUM 12
 
 
 ##s0, number
@@ -16,6 +16,8 @@
 	.globl	__main
 _start:
 start:
+li t0, 0x1800
+mtc0 t0, c0_pagemask
     mtlo zero
     mthi zero
     li    t0, 0xffffffff
@@ -52,6 +54,20 @@ test_finish:
     or    t2, t0, zero
     addu  t3, t5, t6
     lw    t4, 0(t0)
+    
+/* tlb */    
+
+    ebase_entry:
+.org 0x200
+    lui v1, 0xffe8
+    ori v1, 0xdc03
+    beq v0, v1, tlbwr_ex
+    nop
+    lui v1, 0xefe8
+    ori v1, 0xdc03
+    beq v0, v1, tlbwi_ex
+    nop   
+    
 /*
  *  exception handle
  */
@@ -291,6 +307,56 @@ ex_ret:
     .set mips1
     nop
 
+tlbwr_ex:
+    li v1, 0x1
+    beq k0, v1, tlbwr_allbit
+    nop
+    li v1, 0x3
+    beq k0, v1, tlbwr_asid
+    nop
+    addiu t0, 0x0001
+    addiu t1, 0x0001
+    addiu k0, 0x0001
+    j tlbwr_return
+    nop
+tlbwr_allbit:
+    ori t0, 0x7
+    ori t1, 0x7
+    j tlbwr_return
+    nop
+tlbwr_asid:
+    j tlbwr_return
+    nop
+tlbwr_return:
+    mtc0 s5, c0_entryhi
+    mtc0 t0, c0_entrylo0
+    mtc0 t1, c0_entrylo1
+    tlbwr
+    lui v1, 0xed08
+    ori v1, 0xdc15
+    add v1, v1, k0
+    .set mips32
+    eret
+    .set mips1
+tlbwi_ex:
+    mfc0 v1, c0_badvaddr
+    lui a1, 0xffff
+    ori a1, 0xe000
+    and v1, a1, v1
+    mtc0 v1, c0_entryhi
+    li v1, 0x4007
+    mtc0 v1, c0_entrylo0
+    li v1, 0x4007
+    mtc0 v1, c0_entrylo1
+    tlbwi
+    lui v1, 0xed12
+    ori v1, 0x5678
+    .set mips32
+    eret
+    .set mips1
+    nop
+    
+
 locate:
 	.set noreorder
 
@@ -326,6 +392,10 @@ inst_test:
     jal e4_ll_sc    #lui
     nop
     jal e5_movz_movn    #lui
+    nop
+    jal n92_tlbwi_test    #lui
+    nop
+    jal n93_tlbwr_test    #lui
     nop
     
     la t9, kseg0_kseg1 #####

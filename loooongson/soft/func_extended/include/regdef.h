@@ -108,5 +108,6 @@
 #define c0_taghi $29
 #define c0_errorepc $30
 #define c0_desave $31
+#define c0_ebase $15, 1
 
 #endif /* !_MIPS_REGDEF_H_ */

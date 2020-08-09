@@ -31,3 +31,4 @@
     addiu t7, 20; \
 1:  addiu t7, 10; \
     move ra, v0;
+
