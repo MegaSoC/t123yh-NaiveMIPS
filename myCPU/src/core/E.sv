@@ -130,7 +130,9 @@ module E(
 
     wire [3:0] E_T_Inter = (D_T > 0)?D_T-1:0;
 
-    assign E_calLSaddr = (reset | ExceptionFlush | E_CurrentException | E_EstallClear) ? 0 : (!dm_stall) ? Data_Inter : E_Data;
+    wire [31:0] Data_Inter_onlyaddr;
+
+    assign E_calLSaddr = (reset | ExceptionFlush | E_CurrentException | E_EstallClear) ? 0 : (!dm_stall) ? Data_Inter_onlyaddr : E_Data;
     reg mul_in_xalu;
 
     ALU ALU(
@@ -147,6 +149,7 @@ module E(
             .lo(XALU_LO),
             .PC(D_PC),
             .llbit(llbit),
+            .Data_Inter_onlyaddr(Data_Inter_onlyaddr),
             .OverFlow(D_OverFlow)
         );
 

@@ -15,6 +15,7 @@ module ALU(
         input [31:0] hi,
         input [31:0] lo,
         input llbit,
+        output [31:0] Data_Inter_onlyaddr,
         output OverFlow
     );
     logic `INSTR_SET;
@@ -94,6 +95,8 @@ module ALU(
 
     logic type_pc;
     assign type_pc = (jal|jalr|(bltzal||bltzall)|(bgezal||bgezall));
+
+    assign Data_Inter_onlyaddr = add_r;
 
     assign aluresult = ({32{normal}}&normal_r) | ({32{i}}&i_r) | ({32{s}}&s_r) | ({32{cmp}}&cmp_r) | ({32{type_pc}}&(PC+8) | ({32{mov}}&movr));
 
