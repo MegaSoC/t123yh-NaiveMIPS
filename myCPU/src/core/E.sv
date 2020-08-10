@@ -385,10 +385,10 @@ module E(
         end
     end
 
-    assign  tlb_reg_daddr = (reset | ExceptionFlush | E_CurrentException | E_EstallClear|(mul && !mul_in_xalu)|(clo||clz && !count_in_salu)) ? 0 :
+    /*assign  tlb_reg_daddr = (reset | ExceptionFlush | E_CurrentException | E_EstallClear|(mul && !mul_in_xalu)|(clo||clz && !count_in_salu)) ? 0 :
                             ((!dm_stall) && (count_in_salu && !salu_busy)) ? salur:
                             ((!dm_stall) && (mul_in_xalu && !E_XALU_Busy)) ? XALU_LO:
-                            (!dm_stall) ?  ({32{clo|clz}}&salur)|({32{!(clo|clz)}}&Data_Inter) : E_Data;
+                            (!dm_stall) ?  ({32{clo|clz}}&salur)|({32{!(clo|clz)}}&Data_Inter) : E_Data;*/
 
     always @(posedge Clk)begin
         if(reset) begin

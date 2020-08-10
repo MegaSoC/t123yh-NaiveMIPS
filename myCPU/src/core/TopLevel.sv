@@ -669,7 +669,7 @@ module mycpu_top(
             .data_en(E_MemFamily),
             .inst_en(1'b1),
 
-            .daddr_i_tlb(tlb_reg_daddr),
+            .daddr_i_tlb(E_DataLSaddr),
             .iaddr_i_tlb(tlb_reg_iaddr)
         );
     assign data_sram_wen = E_MemWriteEnable;
