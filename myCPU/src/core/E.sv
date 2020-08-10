@@ -130,7 +130,7 @@ module E(
 
     wire [3:0] E_T_Inter = (D_T > 0)?D_T-1:0;
 
-    assign E_calLSaddr = (reset | ExceptionFlush | E_CurrentException | E_EstallClear | dm_stall) ? 0 :Data_Inter;
+    assign E_calLSaddr = (reset | ExceptionFlush | E_CurrentException | E_EstallClear) ? 0 : (!dm_stall) ? Data_Inter : E_Data;
     reg mul_in_xalu;
 
     ALU ALU(
