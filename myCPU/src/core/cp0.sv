@@ -297,7 +297,7 @@ module cp0(
         .entrylo0_o(entrylo0_r),
         .entrylo1_o(entrylo1_r),
         .probe_index_o(index_probe_r),
-        .va0(iaddr_i_tlb),
+        .va0(iaddr_i),
         .pa0(iaddr_tlb),
         .exp_bus0({InstMiss, inst_valid}), //{miss, valid}; 
         .va1(daddr_i_tlb),
