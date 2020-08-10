@@ -138,9 +138,33 @@ generate
     end
 endgenerate
 // COM0&1 OUT
-assign pa0 = lp_pa0[TLB_NUM];
-assign pa1 = lp_pa1[TLB_NUM];
-assign exp_bus0 = {~|match0, lp_v0[TLB_NUM]};
-assign exp_bus1 = {~|match1, lp_v1[TLB_NUM], ~lp_d1[TLB_NUM]};
+reg [31:0] reg_pa0, reg_pa1;
+reg [1:0] reg_exp_bus0;
+reg [2:0] reg_exp_bus1;
+
+always @(posedge clk) begin
+    if (rst) begin
+        reg_pa0      <= 0;
+        reg_pa1      <= 0;
+        reg_exp_bus0 <= 0;
+        reg_exp_bus1 <= 0;
+    end
+    else begin
+        reg_pa0      <= lp_pa0[TLB_NUM];
+        reg_pa1      <= lp_pa1[TLB_NUM];
+        reg_exp_bus0 <= {~|match0, lp_v0[TLB_NUM]};
+        reg_exp_bus1 <= {~|match1, lp_v1[TLB_NUM], ~lp_d1[TLB_NUM]};
+    end
+end
+
+assign pa0      = reg_pa0;     
+assign pa1      = reg_pa1;     
+assign exp_bus0 = reg_exp_bus0;
+assign exp_bus1 = reg_exp_bus1;
+
+//assign pa0      = lp_pa0[TLB_NUM];
+//assign pa1      = lp_pa1[TLB_NUM];
+//assign exp_bus0 = {~|match0, lp_v0[TLB_NUM]};
+//assign exp_bus1 = {~|match1, lp_v1[TLB_NUM], ~lp_d1[TLB_NUM]};
 
 endmodule

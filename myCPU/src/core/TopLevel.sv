@@ -53,6 +53,9 @@ module mycpu_top(
         output [4:0] debug_wb_rf_wnum,
         output [31:0] debug_wb_rf_wdata
     );
+    wire [31:0] tlb_reg_daddr,tlb_reg_iaddr;
+    wire tlb_reg_den,tlb_reg_ien;
+    assign tlb_reg_ien = 1'b1;//ti qian yi zhou qi de im_pc,E_data,E_memfamily
 
     wire D_trap,E_trap;
     wire salu_busy_real;
@@ -322,6 +325,7 @@ module mycpu_top(
           .instIllegal(inst_exp_illegal),
           .instInvalid(inst_exp_invalid),
           .iPcReg(I_PC),
+          .tlb_reg_iaddr(tlb_reg_iaddr),
           .iPcWire(I_PC_Pass),
           .iInstr(I_Instr),
           .iInstMiss(I_inst_miss),
@@ -452,6 +456,8 @@ module mycpu_top(
           .E_RegWriteEnable(E_RegWriteEnable),
           .E_RegNumber(E_RegNumber),
           .E_Data(E_Data),
+          .tlb_reg_daddr(tlb_reg_daddr),
+          .tlb_reg_den(tlb_reg_den),
           .E_ExtType(E_ExtType),
           .E_MemWriteEnable(E_MemWriteEnable),
           .E_MemFamily(E_MemFamily),
@@ -661,10 +667,10 @@ module mycpu_top(
             .data_exp_invalid(data_exp_invalid),
             .inst_exp_invalid(inst_exp_invalid),
 
-            .daddr_i(E_Data),
-            .iaddr_i(im_pc),
-            .data_en(E_MemFamily),
-            .inst_en(1'b1)
+            .daddr_i(tlb_reg_daddr),
+            .iaddr_i(tlb_reg_iaddr),
+            .data_en(tlb_reg_den),
+            .inst_en(tlb_reg_ien)
         );
     assign data_sram_wen = E_MemWriteEnable;
     assign data_sram_en = aresetn;

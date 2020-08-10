@@ -18,6 +18,7 @@ module I(
         input instInvalid,
         output reg [31:0] iPcReg,
         output [31:0] iPcWire,
+        output [31:0] tlb_reg_iaddr,
         output reg [31:0] iInstr,
 
         output reg iInstMiss,
@@ -61,6 +62,7 @@ module I(
             pcReg<=dNpc;
         end
     end
+    assign tlb_reg_iaddr = reset ? `TextAddr : (dStall |dmStall ) ? pcReg : (nextState==`FETCH) ? dNpc : pcReg;
 
 
     assign iNextNotReady = nextState!= `FETCH ;

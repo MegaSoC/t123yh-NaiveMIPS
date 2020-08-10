@@ -52,6 +52,8 @@ module E(
         input [31:0] M_Data,
 
         input dm_stall,
+        output [31:0] tlb_reg_daddr,
+        output tlb_reg_den,
 
         output E_XALU_Busy_real,
         input D_InDelaySlot,
@@ -383,6 +385,15 @@ module E(
             end
         end
     end
+
+    assign  tlb_reg_daddr = (reset | ExceptionFlush | E_CurrentException | E_EstallClear|(mul && !mul_in_xalu)|(clo||clz && !count_in_salu)) ? 0 :
+                            ((!dm_stall) && (count_in_salu && !salu_busy)) ? salur:
+                            ((!dm_stall) && (mul_in_xalu && !E_XALU_Busy)) ? XALU_LO:
+                            (!dm_stall) ?  ({32{clo|clz}}&salur)|({32{!(clo|clz)}}&Data_Inter) : E_Data;
+    assign  tlb_reg_den =   (reset | ExceptionFlush | E_CurrentException | E_EstallClear|(mul && !mul_in_xalu)|(clo||clz && !count_in_salu)) ? 0 :
+                            ((!dm_stall) && (count_in_salu && !salu_busy)) ? salu_MemFamily:
+                            ((!dm_stall) && (mul_in_xalu && !E_XALU_Busy)) ? mul_MemFamily:
+                            (!dm_stall) ?  MemFamily_Inter : E_MemFamily;
 
     always @(posedge Clk)begin
         if(reset) begin
