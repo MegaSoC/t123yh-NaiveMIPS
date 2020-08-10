@@ -61,9 +61,8 @@ module mmu_map(
 
     assign invalid = (en & um & addr_i[31]); // 用户态访问非法地�?
 
-    /*assign uncached = addr_i[31:29] == 3'b101 ? 1'b1 :
-                      addr_i[31:29] == 3'b100 ? cp0_kseg0_uncached : 1'b0;*/
-    assign uncached = 1'b1;
+    assign uncached = addr_i[31:29] == 3'b101 ? 1'b1 :
+                      addr_i[31:29] == 3'b100 ? cp0_kseg0_uncached : 1'b0;
 
     assign addr_o = addr_i[31:29] == 3'b100 ? {3'b000 , addr_i[28:0]} : 
                     addr_i[31:29] == 3'b101 ? {3'b000 , addr_i[28:0]} : 32'b0;
