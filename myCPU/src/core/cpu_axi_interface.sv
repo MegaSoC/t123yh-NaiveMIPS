@@ -103,7 +103,7 @@ module cpu_axi_interface
     wire data_back;
     assign inst_addr_ok = !do_req&&!data_req;
     assign data_addr_ok = !do_req;
-    always @(posedge clk)
+    always_ff @(posedge clk)
     begin
         do_req <= !resetn ? 1'b0 :
                (inst_req||data_req)&&!do_req ? 1'b1 :
@@ -131,7 +131,7 @@ module cpu_axi_interface
     reg wdata_rcv;
 
     assign data_back = addr_rcv && (rvalid&&rready||bvalid&&bready);
-    always @(posedge clk)
+    always_ff @(posedge clk)
     begin
         addr_rcv <= !resetn ? 1'b0 :
                  arvalid&&arready ? 1'b1 :

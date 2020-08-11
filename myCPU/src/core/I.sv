@@ -38,7 +38,7 @@ module I(
     wire [1:0] nextState ;
 
 
-    always @ (posedge clk) begin
+    always_ff @ (posedge clk) begin
         if (reset | expFlush ) begin
             iPcReg <= 0;
             iInstr <= 0;

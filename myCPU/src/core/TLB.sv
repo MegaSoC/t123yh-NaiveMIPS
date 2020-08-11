@@ -48,7 +48,7 @@ reg        v0   [TLB_NUM-1:0];
 reg        v1   [TLB_NUM-1:0];
 
 integer n;
-always @(posedge clk) begin
+always_ff @(posedge clk) begin
     if (rst) begin
         for (n = 0; n < TLB_NUM; n = n + 1) begin
             mask [n] <= 0;
@@ -162,7 +162,7 @@ endgenerate
 reg [31:0] reg_pa0,reg_pa1;
 reg [2:0] reg_exp_bus0,reg_exp_bus1;
 
-always @(posedge clk) begin
+always_ff @(posedge clk) begin
     if (rst) begin
         //reg_pa0      <= 0;
         reg_pa1      <= 0;

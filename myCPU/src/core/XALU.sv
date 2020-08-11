@@ -38,7 +38,7 @@ module XALU(
     assign xaluHi = HI;
     assign xaluLo = LO;
 
-    always @(posedge clk) begin
+    always_ff @(posedge clk) begin
         if (reset) begin
             {HI, LO} <= 64'b0;
         end else if (mthi) begin
@@ -75,7 +75,7 @@ module XALU(
     end
 
     // control ready
-    always @(posedge clk) begin
+    always_ff @(posedge clk) begin
         if (reset) begin
             ready <= 1'b1;
             op_v <= 3'b0;
@@ -109,7 +109,7 @@ module XALU(
     assign maddu_o_v = (multu_i && xadd) && count == `MULT_STAGES;
     assign msubu_o_v = (multu_i && xsub) && count == `MULT_STAGES;
 
-    always @(posedge clk) begin
+    always_ff @(posedge clk) begin
         if (reset || XALU_Start) begin
             count <= 3'b0;
         end

@@ -200,7 +200,7 @@ module E(
         .salur(salur)
     );//it's stupid now, must add flush+ready
 
-    always @ (posedge Clk) begin
+    always_ff @ (posedge Clk) begin
         if(reset | ExceptionFlush | E_CurrentException | E_EstallClear) begin
             E_PC                 <= 0;
             mul_in_xalu          <= 0;
@@ -396,7 +396,7 @@ module E(
                             ((!dm_stall) && (mul_in_xalu && !E_XALU_Busy)) ? XALU_LO:
                             (!dm_stall) ?  ({32{clo|clz}}&salur)|({32{!(clo|clz)}}&Data_Inter) : E_Data;*/
 
-    always @(posedge Clk)begin
+    always_ff @(posedge Clk)begin
         if(reset) begin
             llbit <= 0;
         end

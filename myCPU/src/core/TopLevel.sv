@@ -65,7 +65,7 @@ module mycpu_top(
 
     reg myaresetn ;
     reg [6:0] resetCounter ;
-    always @(posedge Clk) begin
+    always_ff @(posedge Clk) begin
         if(!aresetn) begin
             myaresetn <=1'b0;
             resetCounter <=7'b0;
@@ -193,7 +193,7 @@ module mycpu_top(
     wire inst_sram_data_ok;
     reg[3:0] cache_timer;
     wire [31:0] E_SC_data;
-    always @(posedge aclk) begin
+    always_ff @(posedge aclk) begin
         if (Myreset) begin
             icache_close <= 1;
             cache_timer <= 4'b11;
@@ -611,7 +611,7 @@ module mycpu_top(
 
     reg[5:0] hardware_int_sample;
 
-    always @(posedge Clk) begin
+    always_ff @(posedge Clk) begin
         if (reset) begin
             hardware_int_sample <= 6'b0;
         end else begin

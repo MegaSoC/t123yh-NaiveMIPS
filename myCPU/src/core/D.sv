@@ -151,7 +151,7 @@ module D(
            .D_MultCalFamily(D_MultCalFamily),
            .ExceptionFlush(ExceptionFlush)
        );
-    always @(posedge Clk ) begin
+    always_ff @(posedge Clk ) begin
         if (reset) begin
             D_EPC <= 0;
         end
@@ -159,7 +159,7 @@ module D(
             D_EPC <= D_is_branch? I_PC - 4 : I_PC;
         end
     end
-    always @ (posedge Clk) begin
+    always_ff @ (posedge Clk) begin
         if (reset) begin
             D_is_branch        <= 0;
             D_InDelaySlot      <= 0;

@@ -84,7 +84,7 @@ module M(
     assign pnormal = !(lwl|lwr);
     assign RegWriteEnable_EExtedrrr = ({32{lwr}}&(WritePreExted>>Offset_Inter)) | ({32{lwl}}&( WritePreExted<<(~Offset_Inter))) | ({32{pnormal}}&(WritePreExted));
 
-    always @ (posedge Clk) begin
+    always_ff @ (posedge Clk) begin
         if(reset | (ExceptionFlush) ) begin
             M_WriteRegEnable <= 0;
             M_RegId <= 0;
