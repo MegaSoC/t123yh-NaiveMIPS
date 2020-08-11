@@ -55,7 +55,7 @@ module exception(
                                 inst_invalid | data_invalid |
                                 IllegalInst | IllegalData |
                                 syscall | my_break | unknown_inst| overflow | eret | trap;
-    always @(posedge clk) begin
+    always_ff @(posedge clk) begin
         if (reset) begin
             ExcCode        <= 5'b0;
             badvaddr_we    <= 1'b0;
