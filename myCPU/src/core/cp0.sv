@@ -38,7 +38,9 @@ module cp0(
         input wire          data_en,
         input wire          inst_en,
 
-        input wire  [31:0]  daddr_i_tlb,
+        input wire  [31:0]  daddr_i_tlb_is_dm_stall,
+        input wire  [31:0]  daddr_i_tlb_not_dm_stall,
+        input wire          dm_stall,
         input wire  [31:0]  iaddr_i_tlb,
 
         output wire [31:0]  daddr_o,
@@ -300,10 +302,11 @@ module cp0(
         .va0(iaddr_i),
         .pa0(iaddr_tlb),
         .exp_bus0({InstMiss, inst_valid}), //{miss, valid}; 
-        .va1(daddr_i_tlb),
+        .va1(daddr_i_tlb_is_dm_stall),
+        .va1_bak(daddr_i_tlb_not_dm_stall),
+        .va1_choice(dm_stall),
         .pa1(daddr_tlb),
         .exp_bus1({DataMiss, data_valid, data_dirt})  //{miss, valid, dirty};
     );
     
 endmodule
-

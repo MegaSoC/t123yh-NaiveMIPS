@@ -25,6 +25,8 @@ module TLB #(
     output [1 :0] exp_bus0, //{miss, valid}; 
     // COM 2 load/store
     input  [31:0] va1,
+    input  [31:0] va1_bak,
+    input   va1_choice,
     output [31:0] pa1,
     output [2 :0] exp_bus1  //{miss, valid, dirty};
 );
@@ -97,25 +99,34 @@ generate
 endgenerate
 
 assign probe_index_o = ((~|match) << 31) | index[TLB_NUM];
-wire [TLB_NUM-1:0] match0, match1;
-wire [TLB_NUM-1:0] sel0, sel1;
+wire [TLB_NUM-1:0] match0, match1, match1_bak;
+wire [TLB_NUM-1:0] sel0, sel1, sel1_bak;
 wire [19:0] pfn_com0 [TLB_NUM-1:0];
 wire [19:0] pfn_com1 [TLB_NUM-1:0];
+wire [19:0] pfn_com1_bak [TLB_NUM-1:0];
 wire [31:0] lp_pa0   [TLB_NUM:0];
 wire [31:0] lp_pa1   [TLB_NUM:0];
+wire [31:0] lp_pa1_bak   [TLB_NUM:0];
 wire [2 :0] lp_c0    [TLB_NUM:0];
 wire [2 :0] lp_c1    [TLB_NUM:0];
+wire [2 :0] lp_c1_bak    [TLB_NUM:0];
 wire        lp_v0    [TLB_NUM:0];
 wire        lp_v1    [TLB_NUM:0];
 wire        lp_d1    [TLB_NUM:0];
+wire        lp_v1_bak    [TLB_NUM:0];
+wire        lp_d1_bak    [TLB_NUM:0];
 
 assign lp_pa0[0] = 32'b0;
 assign lp_pa1[0] = 32'b0;
+assign lp_pa1_bak[0] = 32'b0;
 assign lp_c0[0] = 3'b0;
 assign lp_c1[0] = 3'b0;
+assign lp_c1_bak[0] = 3'b0;
 assign lp_v0[0] = 1'b0;
 assign lp_v1[0] = 1'b0;
 assign lp_d1[0] = 1'b0;
+assign lp_v1_bak[0] = 1'b0;
+assign lp_d1_bak[0] = 1'b0;
 
 generate
     for (i = 0; i < TLB_NUM; i = i + 1) begin
@@ -135,6 +146,15 @@ generate
         assign lp_c1[i+1]  = lp_c1[i]  | { 3{match1[i]}} & (sel1[i]? c1[i] : c0[i]);
         assign lp_v1[i+1]  = lp_v1[i]  | match1[i] & (sel1[i]? v1[i] : v0[i]);
         assign lp_d1[i+1]  = lp_d1[i]  | match1[i] & (sel1[i]? d1[i] : d0[i]);
+
+        //COM1_bak
+        assign match1_bak[i]   = (va1_bak[31:13] & ~mask[i]) == (vpn2[i] & ~mask[i]) && (G[i] || asid[i] == entryhi_i[7:0]);
+        assign sel1_bak[i]     = (va1_bak[24:12] & {mask[i], 1'b1}) != (va1_bak[24:12] & {1'b0, mask[i]});
+        assign pfn_com1_bak[i] = sel1_bak[i]? pfn1[i] : pfn0[i];
+        assign lp_pa1_bak[i+1] = lp_pa1_bak[i] | {32{match1_bak[i]}} & (((pfn_com1_bak[i] & ~mask[i]) << 12) | (va1_bak & {mask[i], 12'hfff}));
+        assign lp_c1_bak[i+1]  = lp_c1_bak[i]  | { 3{match1_bak[i]}} & (sel1_bak[i]? c1[i] : c0[i]);
+        assign lp_v1_bak[i+1]  = lp_v1_bak[i]  | match1_bak[i] & (sel1_bak[i]? v1[i] : v0[i]);
+        assign lp_d1_bak[i+1]  = lp_d1_bak[i]  | match1_bak[i] & (sel1_bak[i]? d1[i] : d0[i]);
     end
 endgenerate
 // COM0&1 OUT
@@ -150,9 +170,9 @@ always @(posedge clk) begin
     end
     else begin
         //reg_pa0      <= lp_pa0[TLB_NUM];
-        reg_pa1      <= lp_pa1[TLB_NUM];
+        reg_pa1      <= va1_choice ? lp_pa1[TLB_NUM] : lp_pa1_bak[TLB_NUM];
         //reg_exp_bus0 <= {~|match0, lp_v0[TLB_NUM]};
-        reg_exp_bus1 <= {~|match1, lp_v1[TLB_NUM], ~lp_d1[TLB_NUM]};
+        reg_exp_bus1 <= va1_choice ? {~|match1, lp_v1[TLB_NUM], ~lp_d1[TLB_NUM]} : {~|match1_bak, lp_v1_bak[TLB_NUM], ~lp_d1_bak[TLB_NUM]};
     end
 end
 

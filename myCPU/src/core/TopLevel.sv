@@ -414,7 +414,7 @@ module mycpu_top(
     wire [`INSTRBUS_WIDTH-1:0] E_InstrBus;
     wire E_OverFlow;
     wire data_alignment_err;
-    wire [31:0] E_DataLSaddr;
+    wire [31:0] E_calLSaddr_not_dm_stall,E_calLSaddr_is_dm_stall;
     wire E_MemReadEnable_Inter;
     wire E_EstallClear ;
     wire E_MemSaveType_Inter ;
@@ -480,7 +480,8 @@ module mycpu_top(
           .E_trap(E_trap),
 
           .E_CurrentException(E_CurrentException),
-          .E_calLSaddr(E_DataLSaddr),
+          .E_calLSaddr_is_dm_stall(E_calLSaddr_is_dm_stall),
+          .E_calLSaddr_not_dm_stall(E_calLSaddr_not_dm_stall),
           .E_MemReadEnable_Inter(E_MemReadEnable_Inter),
           .E_EstallClear(E_EstallClear),
           .E_MemSaveType_Inter(E_MemSaveType_Inter)
@@ -669,7 +670,9 @@ module mycpu_top(
             .data_en(E_MemFamily),
             .inst_en(1'b1),
 
-            .daddr_i_tlb(E_DataLSaddr),
+            .daddr_i_tlb_not_dm_stall(E_calLSaddr_not_dm_stall),
+            .daddr_i_tlb_is_dm_stall(E_calLSaddr_is_dm_stall),
+            .dm_stall(dm_stall),
             .iaddr_i_tlb(tlb_reg_iaddr)
         );
     assign data_sram_wen = E_MemWriteEnable;
@@ -692,7 +695,7 @@ module mycpu_top(
                   .reset(reset) ,
                   .clk(Clk) ,
 
-                  .i_p_addr(E_DataLSaddr) ,
+                  .i_p_addr(dm_stall ? E_calLSaddr_is_dm_stall : E_calLSaddr_not_dm_stall) ,
                   .i_p_tag_bit_raddr(E_Data[11:5]),
                   .i_p_addrAfterTrans(data_sram_addr) ,
                   .i_p_byte_en(E_MemWriteEnable) ,

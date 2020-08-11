@@ -69,7 +69,8 @@ module E(
         output reg E_trap,
 
         input wire E_CurrentException,
-        output wire [31:0] E_calLSaddr,
+        output wire [31:0] E_calLSaddr_not_dm_stall,
+        output wire [31:0] E_calLSaddr_is_dm_stall,
         input wire E_EstallClear,
         output wire E_MemReadEnable_Inter,
         output wire E_MemSaveType_Inter
@@ -132,7 +133,9 @@ module E(
 
     wire [31:0] Data_Inter_onlyaddr;
 
-    assign E_calLSaddr = (reset | ExceptionFlush | E_CurrentException | E_EstallClear) ? 0 : (!dm_stall) ? Data_Inter_onlyaddr : E_Data;
+    assign E_calLSaddr_not_dm_stall = (reset | ExceptionFlush | E_CurrentException | E_EstallClear) ? 0 : Data_Inter_onlyaddr;
+    assign E_calLSaddr_is_dm_stall  = (reset | ExceptionFlush | E_CurrentException | E_EstallClear) ? 0 : E_Data;;
+    
     reg mul_in_xalu;
 
     ALU ALU(
