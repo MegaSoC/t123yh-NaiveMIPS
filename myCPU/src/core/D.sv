@@ -238,7 +238,6 @@ module D(
             if(!D_stall_Pass && !I_nextNotReady && !last_likely_failed) begin                
                 last_likely_failed   <= npc_last_likely_failed;
             end
-            end
         end
     end
 
