@@ -165,7 +165,8 @@ module D(
             D_InDelaySlot      <= 0;
             last_likely_failed <= 0;
         end
-        if(reset || ExceptionFlush || (D_stall_Pass && !dm_stall) || (!dm_stall & I_nextNotReady))begin
+
+        if(reset || ExceptionFlush )begin
             D_PC                 <= 0;
             RsNumber_D           <= 0;
             RtNumber_D           <= 0;
@@ -185,8 +186,8 @@ module D(
             D_trap               <= 0;
             D_InvalidInstruction <= 0;
         end
-        else if (!dm_stall & !I_nextNotReady ) begin
-            if(last_likely_failed)begin
+        else if(!dm_stall)begin
+            if(D_stall_Pass || I_nextNotReady)begin
                 D_PC                 <= 0;
                 RsNumber_D           <= 0;
                 RtNumber_D           <= 0;
@@ -205,32 +206,54 @@ module D(
                 D_IllegalInstruction <= 0;
                 D_trap               <= 0;
                 D_InvalidInstruction <= 0;
-                last_likely_failed   <= 0;
             end
             else begin
-                D_PC                 <= I_PC;
-                RsNumber_D           <= Rs_Inter;
-                RtNumber_D           <= Rt_Inter;
-                D_RdID               <= Rd_Inter;
-                D_RsData             <= regRS; 
-                D_RtData             <= regRT;
-                D_Shamt              <= Shamt_Inter;
-                D_Imm16              <= Imm16_Inter;
-                D_Sel                <= Sel_Inter;
-                D_InstrBus           <= InstrBus_Inter;
-                D_T                  <= T_Inter==4'b0 ? 4'b0 : T_Inter-1;
-                D_WriteRegEnable     <= WriteRegEnable_Inter;
-                D_RegId              <= WriteRegId_Inter;
+                if(last_likely_failed)begin
+                    D_PC                 <= 0;
+                    RsNumber_D           <= 0;
+                    RtNumber_D           <= 0;
+                    D_RsData             <= 0;
+                    D_RtData             <= 0;
+                    D_Shamt              <= 0;
+                    D_Imm16              <= 0;
+                    D_Sel                <= 0;
+                    D_InstrBus           <= 1;
+                    D_T                  <= 0;
+                    D_WriteRegEnable     <= 0;
+                    D_RegId              <= 0;
+                    D_MultCalFamily      <= 0;
 
-                D_MultCalFamily      <= MultCalFamily_Inter;
-                D_is_branch          <= is_branch;
-                D_InDelaySlot        <= D_is_branch;
+                    D_InstMiss           <= 0;
+                    D_IllegalInstruction <= 0;
+                    D_trap               <= 0;
+                    D_InvalidInstruction <= 0;
+                    last_likely_failed   <= 0;
+                end
+                else begin
+                    D_PC                 <= I_PC;
+                    RsNumber_D           <= Rs_Inter;
+                    RtNumber_D           <= Rt_Inter;
+                    D_RdID               <= Rd_Inter;
+                    D_RsData             <= regRS; 
+                    D_RtData             <= regRT;
+                    D_Shamt              <= Shamt_Inter;
+                    D_Imm16              <= Imm16_Inter;
+                    D_Sel                <= Sel_Inter;
+                    D_InstrBus           <= InstrBus_Inter;
+                    D_T                  <= T_Inter==4'b0 ? 4'b0 : T_Inter-1;
+                    D_WriteRegEnable     <= WriteRegEnable_Inter;
+                    D_RegId              <= WriteRegId_Inter;
 
-                D_InstMiss           <= I_inst_miss;
-                D_IllegalInstruction <= I_inst_illegal;
-                D_trap               <= is_trap_inter;
-                D_InvalidInstruction <= I_inst_invalid;
-                last_likely_failed   <= npc_last_likely_failed;
+                    D_MultCalFamily      <= MultCalFamily_Inter;
+                    D_is_branch          <= is_branch;
+                    D_InDelaySlot        <= D_is_branch;
+
+                    D_InstMiss           <= I_inst_miss;
+                    D_IllegalInstruction <= I_inst_illegal;
+                    D_trap               <= is_trap_inter;
+                    D_InvalidInstruction <= I_inst_invalid;
+                    last_likely_failed   <= npc_last_likely_failed;
+                end
             end
         end
     end
