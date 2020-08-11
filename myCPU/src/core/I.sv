@@ -18,6 +18,7 @@ module I(
         input instInvalid,
         output reg [31:0] iPcReg,
         output [31:0] iPcWire,
+        output [31:0] iPcWire2,
         output [31:0] tlb_reg_iaddr,
         output reg [31:0] iInstr,
 
@@ -31,8 +32,9 @@ module I(
     );
 
 
-    reg [31:0] pcReg;
+    reg [31:0] pcReg,pcReg2;
     assign iPcWire = pcReg;
+    assign iPcWire2 = pcReg2;
     wire [1:0] nextState ;
 
 
@@ -53,16 +55,18 @@ module I(
         end
         if(reset) begin
             pcReg<=`TextAddr;
+            pcReg2<=`TextAddr;
         end
 
         else if (dStall |dmStall ) begin
             pcReg<=pcReg;
+            pcReg2<=`pcReg2;
         end
         else if (nextState==`FETCH) begin
             pcReg<=dNpc;
+            pcReg2<=`dNpc;
         end
     end
-    assign tlb_reg_iaddr = reset ? `TextAddr : (dStall |dmStall ) ? pcReg : (nextState==`FETCH) ? dNpc : pcReg;
 
 
     assign iNextNotReady = (dStall | dmStall | ((!instUncached | !instSramValid ) & (instUncached | icacheStall ))) ;

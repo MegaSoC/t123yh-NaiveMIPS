@@ -293,7 +293,7 @@ module mycpu_top(
                       );
 
     wire [31:0] I_PC,I_Instr;
-    wire [31:0] D_NewPC_Pass,I_PC_Pass;
+    wire [31:0] D_NewPC_Pass,I_PC_Pass,I_PC_Pass2;
     wire [31:0] E_Data;
     wire E_MemFamily;
     wire [31:0] im_pc;
@@ -309,7 +309,7 @@ module mycpu_top(
     wire inst_exp_miss;
     wire inst_exp_illegal;
     wire inst_exp_invalid;
-    assign im_pc = I_PC_Pass;
+    assign im_pc = I_PC_Pass2;
     I my_i(
           .clk(Clk),
           .reset(Myreset),
@@ -325,6 +325,7 @@ module mycpu_top(
           .iPcReg(I_PC),
           .tlb_reg_iaddr(tlb_reg_iaddr),
           .iPcWire(I_PC_Pass),
+          .iPcWire2(I_PC_Pass2),
           .iInstr(I_Instr),
           .iInstMiss(I_inst_miss),
           .iInstIllegal(I_inst_illegal),
