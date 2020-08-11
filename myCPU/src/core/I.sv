@@ -44,7 +44,7 @@ module I(
             pcReg<=`TextAddr;
             pcReg2<=`TextAddr;
         end
-        else if(flush)begin
+        else if(expFlush)begin
             iPcReg <= 0;
             iInstr <= 0;
             iInstMiss <= 0;
