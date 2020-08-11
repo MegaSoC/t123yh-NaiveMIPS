@@ -60,11 +60,11 @@ module I(
 
         else if (dStall |dmStall ) begin
             pcReg<=pcReg;
-            pcReg2<=`pcReg2;
+            pcReg2<=pcReg2;
         end
         else if (nextState==`FETCH) begin
             pcReg<=dNpc;
-            pcReg2<=`dNpc;
+            pcReg2<=dNpc;
         end
     end
 
