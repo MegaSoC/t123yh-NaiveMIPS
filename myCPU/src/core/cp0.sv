@@ -9,6 +9,7 @@ module cp0(
         input wire          we,
         input wire [2:0]    sel,
         input wire [31:0]   data_i,
+        input wire o_p_EstallClear,
 
         input wire [5:0]    hardware_int,
         input wire          clear_exl,
@@ -288,6 +289,7 @@ module cp0(
     TLB TLB(
         .clk(clk),
         .rst(rst),
+        .o_p_EstallClear(o_p_EstallClear),
         .we(tlbwi || tlbwr),        //1:TLBWI | TLBWR
         .index_i(index_w), 	      
         .mask_i(cp0_reg_PageMask[28:13]),        

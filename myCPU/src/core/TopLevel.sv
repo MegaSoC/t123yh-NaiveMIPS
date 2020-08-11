@@ -646,6 +646,7 @@ module mycpu_top(
             .tlbwr(tlbwr),
             .tlbr(tlbr),
             .tlbp(tlbp),
+            .o_p_EstallClear(E_EstallClear),
 
             .SR_BEV(SR_BEV),
             .SR_EXL(SR_EXL),

@@ -6,6 +6,7 @@ module TLB #(
 )(
     input 		 clk,
     input        rst,
+    input wire o_p_EstallClear,
     // TLB entry i_we
     input 	     we,        //1:TLBWI
     input [IDX_BITS-1:0] index_i, 	      
@@ -170,9 +171,9 @@ always @(posedge clk) begin
     end
     else begin
         //reg_pa0      <= lp_pa0[TLB_NUM];
-        reg_pa1      <= va1_choice ? lp_pa1[TLB_NUM] : lp_pa1_bak[TLB_NUM];
+        reg_pa1      <= o_p_EstallClear ? 0 : va1_choice ? lp_pa1[TLB_NUM] : lp_pa1_bak[TLB_NUM];
         //reg_exp_bus0 <= {~|match0, lp_v0[TLB_NUM]};
-        reg_exp_bus1 <= va1_choice ? {~|match1, lp_v1[TLB_NUM], ~lp_d1[TLB_NUM]} : {~|match1_bak, lp_v1_bak[TLB_NUM], ~lp_d1_bak[TLB_NUM]};
+        reg_exp_bus1 <= o_p_EstallClear ? 0 : va1_choice ? {~|match1, lp_v1[TLB_NUM], ~lp_d1[TLB_NUM]} : {~|match1_bak, lp_v1_bak[TLB_NUM], ~lp_d1_bak[TLB_NUM]};
     end
 end
 
