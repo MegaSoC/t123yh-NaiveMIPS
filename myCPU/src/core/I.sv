@@ -65,7 +65,7 @@ module I(
     assign tlb_reg_iaddr = reset ? `TextAddr : (dStall |dmStall ) ? pcReg : (nextState==`FETCH) ? dNpc : pcReg;
 
 
-    assign iNextNotReady = nextState!= `FETCH ;
+    assign iNextNotReady = (!dStall & !dmStall & ((instUncached & instSramValid ) | (!instUncached & !icacheStall ))) ;
     assign nextState = (!dStall & !dmStall & ((instUncached & instSramValid ) | (!instUncached & !icacheStall ))) ? `FETCH : `IDLE ;
 
 endmodule
