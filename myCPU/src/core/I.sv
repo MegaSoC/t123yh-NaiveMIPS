@@ -16,7 +16,6 @@ module I(
         input instInvalid,
         output reg [31:0] iPcReg,
         output [31:0] iPcWire,
-        output [31:0] iPcWire2,
         output [31:0] tlb_reg_iaddr,
         output reg [31:0] iInstr,
 
@@ -30,9 +29,8 @@ module I(
     );
 
 
-    reg [31:0] pcReg,pcReg2;
+    reg [31:0] pcReg;
     assign iPcWire = pcReg;
-    assign iPcWire2 = pcReg2;
 
     always_ff @ (posedge clk)begin
         if(reset)begin
@@ -42,7 +40,6 @@ module I(
             iInstIllegal <= 0;
             iInstInvalid <= 0;
             pcReg<=`TextAddr;
-            pcReg2<=`TextAddr;
         end
         else if(expFlush)begin
             iPcReg <= 0;
@@ -52,13 +49,11 @@ module I(
             iInstInvalid <= 0;
             if  (!dStall & !dmStall & ((instUncached & instSramValid ) | (!instUncached & !icacheStall ))) begin
                 pcReg<=dNpc;
-                pcReg2<=dNpc;
             end
         end
         else begin
             if  (!dStall & !dmStall & ((instUncached & instSramValid ) | (!instUncached & !icacheStall ))) begin
                 pcReg<=dNpc;
-                pcReg2<=dNpc;
                 iPcReg <= pcReg;
                 iInstr <=(instUncached)? instSramData: iIcacheRdata;
                 iInstMiss <= instMiss;
