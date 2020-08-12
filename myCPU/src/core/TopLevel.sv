@@ -53,7 +53,7 @@ module mycpu_top(
         output [4:0] debug_wb_rf_wnum,
         output [31:0] debug_wb_rf_wdata
     );
-    wire [31:0] tlb_reg_daddr,tlb_reg_iaddr;
+    wire [31:0] tlb_reg_daddr,tlb_reg_iaddr_is_dm_stall,tlb_reg_iaddr_not_dm_stall;
 
     wire D_trap,E_trap;
     wire salu_busy_real;
@@ -238,7 +238,8 @@ module mycpu_top(
           .instIllegal(inst_exp_illegal),
           .instInvalid(inst_exp_invalid),
           .iPcReg(I_PC),
-          .tlb_reg_iaddr(tlb_reg_iaddr),
+          .tlb_reg_iaddr_is_dm_stall(tlb_reg_iaddr_is_dm_stall),
+          .tlb_reg_iaddr_not_dm_stall(tlb_reg_iaddr_not_dm_stall),
           .iPcWire(I_PC_Pass),
           .iInstr(I_Instr),
           .iInstMiss(I_inst_miss),
@@ -587,7 +588,9 @@ module mycpu_top(
             .daddr_i_tlb_not_dm_stall(E_calLSaddr_not_dm_stall),
             .daddr_i_tlb_is_dm_stall(E_calLSaddr_is_dm_stall),
             .dm_stall(dm_stall),
-            .iaddr_i_tlb(tlb_reg_iaddr)
+            .I_nextnotready(I_nextNotReady),
+            .iaddr_i_tlb_is_dm_stall(tlb_reg_iaddr_is_dm_stall),
+            .iaddr_i_tlb_not_dm_stall(tlb_reg_iaddr_not_dm_stall)
         );
     assign data_sram_wen = E_MemWriteEnable;
     assign data_sram_en = aresetn;

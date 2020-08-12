@@ -42,7 +42,9 @@ module cp0(
         input wire  [31:0]  daddr_i_tlb_is_dm_stall,
         input wire  [31:0]  daddr_i_tlb_not_dm_stall,
         input wire          dm_stall,
-        input wire  [31:0]  iaddr_i_tlb,
+        input wire  [31:0]  iaddr_i_tlb_is_dm_stall,
+        input wire  [31:0]  iaddr_i_tlb_not_dm_stall,
+        input wire          I_nextnotready,
 
         output wire [31:0]  daddr_o,
         output wire [31:0]  iaddr_o,
@@ -301,7 +303,9 @@ module cp0(
         .entrylo0_o(entrylo0_r),
         .entrylo1_o(entrylo1_r),
         .probe_index_o(index_probe_r),
-        .va0(iaddr_i),
+        .va0(iaddr_i_tlb_is_dm_stall),
+        .va0_bak(iaddr_i_tlb_not_dm_stall),
+        .va0_choice(I_nextnotready),
         .pa0(iaddr_tlb),
         .exp_bus0({InstMiss, inst_valid}), //{miss, valid}; 
         .va1(daddr_i_tlb_is_dm_stall),
