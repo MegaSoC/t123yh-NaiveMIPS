@@ -201,8 +201,8 @@ always_ff @(posedge clk) begin
     else begin
         reg_pa0      <= ({32{va0_choice}}&a0y)|({32{~va0_choice}}&a0n);
         reg_pa1      <= o_p_EstallClear ? 0 : ({32{va1_choice}}&a1y)|({32{~va1_choice}}&a1n);
-        reg_exp_bus0 <= ({3{va0_choice}}&b0y)|({3{va0_choice}}&b0n) ;
-        reg_exp_bus1 <= o_p_EstallClear ? 0 : ({3{va1_choice}}&b1y)|({3{va1_choice}}&b1n);
+        reg_exp_bus0 <= ({3{va0_choice}}&b0y)|({3{~va0_choice}}&b0n) ;
+        reg_exp_bus1 <= o_p_EstallClear ? 0 : ({3{va1_choice}}&b1y)|({3{~va1_choice}}&b1n);
     end
 end
 
