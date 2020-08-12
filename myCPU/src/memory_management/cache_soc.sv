@@ -43,6 +43,14 @@ module cache_soc #(
     output word  o_dsram_outdata,
     output logic o_dsram_valid,
 
+	input [DCACHE_TAG_WIDTH - 1 : 0] i_dcache_instr_tag,
+	input logic [1:0] i_dcache_instr, //m级传入
+    input word i_dcache_instr_addr, 
+    
+    input logic [1:0] i_icache_instr, //m级传入
+	input word i_icache_instr_addr,   //m级传入
+	input [ICACHE_TAG_WIDTH - 1 : 0] i_icache_instr_tag,
+
     output logic [3 :0] arid ,
     output logic [31:0] araddr ,
     output logic [7 :0] arlen ,
@@ -150,9 +158,9 @@ icache1(
     .o_inn_stall(o_i_stall),
     .o_mdata_data(o_icache_inst),
 
-    .i_cache_instr('0),
-    .i_cache_instr_addr('0),
-    .i_cache_instr_tag('0),
+    .i_cache_instr(i_icache_instr),
+    .i_cache_instr_addr(i_icache_instr_addr),
+    .i_cache_instr_tag(i_icache_instr_tag),
 
     .i_resp(w_resp), //TODO
     .i_memread_empty(w_inst_empty),// TODO
@@ -195,9 +203,9 @@ dcache1(
     .o_inn_stall(o_d_stall),
     .o_mdata_data(i_dcache_outdata),
 
-    .i_cache_instr('0),
-    .i_cache_instr_addr('0),
-    .i_cache_instr_tag('0),
+    .i_cache_instr(i_dcache_instr),
+    .i_cache_instr_addr(i_dcache_instr_addr),
+    .i_cache_instr_tag(i_dcache_instr_tag),
 
     .i_resp(w_resp), //TODO
     .i_memread_empty(w_data_empty),// TODO
