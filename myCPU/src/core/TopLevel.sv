@@ -603,6 +603,10 @@ module mycpu_top(
     wire rest_out2;
     wire rest_out3;
 
+    word w_dcache_instr_addr, w_icache_instr_addr;
+    logic [19:0] w_dcache_tag, w_icache_tag;
+    logic [1:0]  w_icache_instr, w_dcache_instr;
+
 
      cache_soc 
 //    #(
@@ -649,6 +653,14 @@ module mycpu_top(
                   .i_dsram_indata(data_sram_wdata),
                   .o_dsram_outdata(data_sram_rdata),
                   .o_dsram_valid(data_sram_data_ok),
+
+                  .i_dcache_instr_tag('0),
+	              .i_dcache_instr('0), //m级传入
+                  .i_dcache_instr_addr('0), 
+                
+                  .i_icache_instr('0), //m级传入
+	              .i_icache_instr_addr('0),   //m级传入
+	              .i_icache_instr_tag('0),
 
                   .arid,
                   .araddr,
