@@ -3,11 +3,11 @@ module cache_soc #(
 	parameter ICACHE_WORD_PER_LINE = 16, //cache?????line??????????????,??DATA_OUT_NUM??????????2????????????????? 4 8 16 32
 	parameter ICACHE_SET_ASSOC  = 2, //?????????????? 2?????4 
 	parameter ICACHE_SIZE = 8 * 1024, //byte
-    parameter ICACHE_TAG_WIDTH = 32- $clog2(ICACHE_SIZE/ICACHE_SET_ASSOC), //equals to PFN
+    parameter ICACHE_TAG_WIDTH = 30- $clog2(ICACHE_SIZE/ICACHE_SET_ASSOC/4), //equals to PFN
     parameter DCACHE_LINE_WORD_NUM = 16,
     parameter DCACHE_SET_ASSOC = 2,
     parameter DCACHE_SIZE = 8 * 1024,
-    parameter DCACHE_TAG_WIDTH = 32 - $clog2(DCACHE_SIZE/DCACHE_SET_ASSOC),
+    parameter DCACHE_TAG_WIDTH = 30 - $clog2(DCACHE_SIZE/DCACHE_SET_ASSOC/4),
     parameter MEM_WRITE_FIFO_DEPTH = 8
 )(
     input logic i_clk,

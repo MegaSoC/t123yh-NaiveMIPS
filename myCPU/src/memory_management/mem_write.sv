@@ -143,25 +143,7 @@ always_ff @(posedge i_clk) begin
             if(w_key_select)
                 r_data[0] <= w_sram_data;
             else begin
-                r_data[0] <= i_dcache_data[0];
-                r_data[1] <= i_dcache_data[1];
-                r_data[2] <= i_dcache_data[1];
-                r_data[3] <= i_dcache_data[1];
-                r_data[4] <= i_dcache_data[1];
-                r_data[5] <= i_dcache_data[1];
-                r_data[6] <= i_dcache_data[1];
-                r_data[7] <= i_dcache_data[1];
-                if(BUFFER_NUM == 16) begin
-                    r_data[8] <= i_dcache_data[8];
-                    r_data[9] <= i_dcache_data[8];
-                    r_data[10] <= i_dcache_data[8];
-                    r_data[11] <= i_dcache_data[8];
-                    r_data[12] <= i_dcache_data[8];
-                    r_data[13] <= i_dcache_data[8];
-                    r_data[14] <= i_dcache_data[8];
-                    r_data[15] <= i_dcache_data[8];
-                end
-
+                r_data <= i_dcache_data;
             end
         end
         if(axi_bus_resp.bvalid && r_write_process)begin
