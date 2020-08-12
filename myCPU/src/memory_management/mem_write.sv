@@ -98,7 +98,7 @@ assign w_pop = axi_bus_resp.bvalid && r_write_process;
 assign o_sram_end = w_pop && w_key_select;
 assign o_dcache_end = w_pop && ~w_key_select;
 assign o_write_process = r_write_process;
-assign o_write_address = w_out_req.addr;
+assign o_write_address = w_empty ? '0: w_out_req.addr;
 
 always_ff @(posedge i_clk) begin
     if(i_rst)begin
