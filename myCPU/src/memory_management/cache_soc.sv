@@ -95,6 +95,8 @@ module cache_soc #(
 
 logic [$clog2(MEM_WRITE_FIFO_DEPTH) - 1 : 0] w_key;
 logic [$clog2(MEM_WRITE_FIFO_DEPTH) - 2 : 0] w_dcache_lock;
+logic w_write_process;
+word w_write_addr;
 mem_read_resp w_resp;
 mem_read_req w_dcache_rreq, w_icache_rreq, w_isram_req, w_dsram_rreq;
 logic w_data_empty,w_dcache_start,w_dcache_end,w_memread_stall;
@@ -251,6 +253,8 @@ mem_read # (
     .i_clk,
     .i_rst,
     .i_flush(0),
+    .i_write_process(w_write_process),
+    .i_write_address(w_write_addr),
     .i_instr_req(w_isram_valid ? w_isram_req : w_icache_rreq),
     .i_icache_we(w_icache_memread_we),
     .i_isram_we(w_isram_valid),
@@ -279,6 +283,8 @@ mem_write #(
 )mem_write(
     .i_clk,
     .i_rst,
+    .o_write_process(w_write_process),
+    .o_write_address(w_write_addr),
     .i_dcache_we(w_dcache_memwrite_we),
     .i_sram_we(w_dsram_write),
     .i_dcache_data(w_dcache_memwrite_data),

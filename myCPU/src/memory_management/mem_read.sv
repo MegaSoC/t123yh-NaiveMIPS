@@ -44,9 +44,9 @@ always_comb begin
         axi_bus_req.arvalid = 0;
     end
     else begin
-        axi_bus_req.arvalid = r_axi_arvalid && !(i_memread_stall && w_dout.status == 2'b10);
-        // axi_bus_req.arvalid = r_axi_arvalid && !(i_memread_stall && w_dout.status == 2'b10) 
-        // && !(i_write_process && i_write_process[31:LINE_BYTE_OFFSET]==w_dout.startaddr[31:LINE_BYTE_OFFSET]);
+        //axi_bus_req.arvalid = r_axi_arvalid && !(i_memread_stall && w_dout.status == 2'b10);
+        axi_bus_req.arvalid = r_axi_arvalid && !(i_memread_stall && w_dout.status == 2'b10) 
+        && !(i_write_process && i_write_address[31:LINE_BYTE_OFFSET]==w_dout.startaddr[31:LINE_BYTE_OFFSET]);
 
     end
 end
