@@ -607,22 +607,23 @@ module mycpu_top(
     wire rest_out3;
 
     word w_dcache_instr_addr, w_icache_instr_addr;
-    logic [19:0] w_dcache_tag, w_icache_tag;
+    logic [`ICACHE_TAG_WIDTH - 1 : 0] w_icache_instr_tag;
+    logic [`DCACHE_TAG_WIDTH - 1 : 0] w_dcache_instr_tag;
     logic [1:0]  w_icache_instr, w_dcache_instr;
 
 
      cache_soc 
-//    #(
-//        .ICACHE_WORD_PER_LINE(`ICACHE_WORD_PER_LINE),
-//        .ICACHE_SET_ASSOC(`ICACHE_SET_ASSOC),
-//        .ICACHE_SIZE(`ICACHE_SIZE),
-//        .ICACHE_TAG_WIDTH(`ICACHE_TAG_WIDTH),
-//        .DCACHE_LINE_WORD_NUM(`DCACHE_WORD_PER_LINE),
-//        .DCACHE_SET_ASSOC(`DCACHE_SET_ASSOC),
-//        .DCACHE_SIZE(`DCACHE_SIZE),
-//        .DCACHE_TAG_WIDTH(`DCACHE_TAG_WIDTH),
-//        .MEM_WRITE_FIFO_DEPTH(`MEM_WRITE_FIFO_DEPTH)
-//    )
+   #(
+       .ICACHE_WORD_PER_LINE(`ICACHE_WORD_PER_LINE),
+       .ICACHE_SET_ASSOC(`ICACHE_SET_ASSOC),
+       .ICACHE_SIZE(`ICACHE_SIZE),
+       .ICACHE_TAG_WIDTH(`ICACHE_TAG_WIDTH),
+       .DCACHE_LINE_WORD_NUM(`DCACHE_WORD_PER_LINE),
+       .DCACHE_SET_ASSOC(`DCACHE_SET_ASSOC),
+       .DCACHE_SIZE(`DCACHE_SIZE),
+       .DCACHE_TAG_WIDTH(`DCACHE_TAG_WIDTH),
+       .MEM_WRITE_FIFO_DEPTH(`MEM_WRITE_FIFO_DEPTH)
+   )
     cache_soc(
                   .i_clk(Clk),
                   .i_rst(reset||!myaresetn),
@@ -658,11 +659,11 @@ module mycpu_top(
                   .o_dsram_valid(data_sram_data_ok),
 
                   .i_dcache_instr_tag('0),
-	              .i_dcache_instr('0), //m级传入
+	              .i_dcache_instr('0), //m级传�?
                   .i_dcache_instr_addr('0), 
                 
-                  .i_icache_instr('0), //m级传入
-	              .i_icache_instr_addr('0),   //m级传入
+                  .i_icache_instr('0), //m级传�?
+	              .i_icache_instr_addr('0),   //m级传�?
 	              .i_icache_instr_tag('0),
 
                   .arid,

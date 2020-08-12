@@ -99,10 +99,6 @@ function logic [SET_ASSOC - 1 : 0] get_cache_inst_way(input word addr);
 	end
 endfunction
 
-function logic [LINE_WORD_OFFSET - 1 : 0] get_line_word_offset(input word addr);
-	return addr[2 + LINE_WORD_OFFSET - 1 : 2];
-endfunction
-
 function logic [TAG_WIDTH-1:0] get_tag( input word addr );
 	return addr[31 : LINE_BYTE_OFFSET + INDEX_WIDTH];
 endfunction
@@ -205,12 +201,10 @@ function word byte_fill(input word r_data, input word w_data,input logic [3:0] s
 endfunction
 
 //goabal signal
-logic w_inn_stall; //w_inn_stall：内部阻塞信�?????????????
 state w_state,r_state;
 index r_reset_cnt=0;
 logic w_idle_miss,w_receiving_hit,w_idle_hita; //ir: idle_receiving
 word w_data, r_data;
-logic r_stall_flag, r_stall_flag_flag;
 
 //pipe1 signal
 index w_indexa, w_cache_inst_index;
@@ -240,6 +234,7 @@ logic [SET_ASSOC : 0] [$clog2(SET_ASSOC) - 1 : 0]w_whichway_hita;
 logic [$clog2(SET_ASSOC) - 1 : 0] w_hit_way;
 logic w_pipe_hit, w_pipe_miss;
 word w_phy_addr;
+logic [TAG_WIDTH - 1 : 0] w_phy_tag;
 
 // pipe 2-3 signal
 index w_data_indexa, w_data_indexb ;
@@ -315,10 +310,8 @@ always_ff @(posedge i_clk) begin
 		r_reset_cnt <= 0;
 		r_state <= INVALIDATING;
 		r_data <= 0;
-		r_stall_flag <= 0;
 	end
 	else begin
-		r_stall_flag <= r_state == INVALIDATING ? 0 : w_inn_stall;
 		r_state <= w_state;
 		r_data <= w_data;
 	end
@@ -395,8 +388,7 @@ end
 
 // assign o_mdata_data = r_receiving_hit ? r_data : w_data;
 assign o_mdata_data = w_data;
-assign w_inn_stall = w_state != IDLE_RECEIVING && w_state != IDLE;
-assign o_inn_stall = w_inn_stall;
+assign o_inn_stall = w_state != IDLE_RECEIVING && w_state != IDLE;
 assign o_memread_stall = w_state == WRITE_WAITING;
 
 //pipeline1 process 
@@ -440,7 +432,7 @@ end
 
 //pipeline1-2 
 always_ff @(posedge i_clk) begin
-	if(i_rst || w_inn_stall)begin
+	if(i_rst || o_inn_stall)begin
 		r_pipe1_va <= '0;
 		r_tag_num <= '0;
 		r_indexa <= '0;
@@ -465,11 +457,12 @@ end
 //pipeline2 process
 //assign web_w = (|r_pipe1_wena) && (|w_way_hita) && !w_rbuffer_hita && (r_state == IDLE || r_state == IDLE_RECEIVING) && w_tag_num;
 assign web_w = (|i_wen) && w_pipe_hit; 
+assign w_phy_tag = get_tag(w_phy_addr);
 assign w_phy_addr = i_phy_addr;
 assign w_tag_num = i_valid;
 assign w_whichway_hita[0] = 0;
 for(genvar i = 0; i < SET_ASSOC; ++i) begin : iswayhit
-	assign w_way_hita[i] = w_tag_res[i].tag == get_tag(w_phy_addr) && w_tag_res[i].valid; 
+	assign w_way_hita[i] = w_tag_res[i].tag == w_phy_tag && w_tag_res[i].valid; 
 	assign w_whichway_hita[i+1] = w_whichway_hita[i] | (w_way_hita[i]?i:0);
 end
 assign w_pipe_hit = |w_way_hita && (r_state == IDLE || r_state == IDLE_RECEIVING) && w_tag_num;
@@ -541,7 +534,7 @@ always_ff @(posedge i_clk) begin
 		// r_save_dirty <= r_dirty[w_lru_select][w_indexa];
 		r_save_index <= get_index(r_pipe1_va);
 		r_save_tag <= w_tag_res[w_lru_select]; //old tag
-		r_save_new_tag.tag <= get_tag(w_phy_addr);
+		r_save_new_tag.tag <= w_phy_tag;
 		r_save_new_tag.valid <= 1;
 		r_cache_hit_flag <= w_cache_inst_hit;
 	end
@@ -624,7 +617,7 @@ always_comb begin
 	w_waita = 0;
 	w_waitb = 0;
 	if( r_state == IDLE_RECEIVING  && w_tag_num)begin
-		if(get_tag(w_phy_addr) == r_rbuffer_tag.tag && get_index(r_pipe1_va) == r_rbuffer_index1 && r_rbuffer_tag.valid && r_rbuffer_valid1) begin
+		if(w_phy_tag == r_rbuffer_tag.tag && get_index(r_pipe1_va) == r_rbuffer_index1 && r_rbuffer_tag.valid && r_rbuffer_valid1) begin
 			w_rbuffer_hita =  r_rbuffer_valid[r_start_offseta] || (cnt_rbuffer == r_start_offseta && w_resp.valid2); 
 			w_waita = ~w_rbuffer_hita;
 		end
@@ -674,7 +667,7 @@ assign r_wbuffer_full = &r_wbuffer_r;
 assign w_wbuffer_hitidx[0] = 0;
 assign w_key = i_key[$clog2(FIFO_DEPTH) - 2 : 0];
 for(genvar i = 0; i < WBUFFER_NUM; i++)begin: hit
-	assign w_wbuffer_hits[i] = get_index(r_pipe1_va) == r_wbuffer_index[i] && get_tag(w_phy_addr) == r_wbuffer_tag[i].tag 
+	assign w_wbuffer_hits[i] = get_index(r_pipe1_va) == r_wbuffer_index[i] && w_phy_tag == r_wbuffer_tag[i].tag 
 		&& r_wbuffer_tag[i].valid && r_wbuffer_v[i] && !(w_memwrite_start&&i==w_key);
     assign w_wbuffer_hitidx[i+1] = w_wbuffer_hitidx[i] | (w_wbuffer_hits[i] ? i : 0);
 end
