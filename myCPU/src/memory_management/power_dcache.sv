@@ -229,10 +229,10 @@ logic [LINE_WORD_OFFSET - 1 : 0] r_start_offseta, r_end_offseta;
 
 //pipe 2 signal
 logic  w_tag_num;
-logic [SET_ASSOC - 1 : 0] w_way_hita, w_way_hitb;
+logic [SET_ASSOC - 1 : 0] w_way_hita;
 logic [SET_ASSOC : 0] [$clog2(SET_ASSOC) - 1 : 0]w_whichway_hita;
 logic [$clog2(SET_ASSOC) - 1 : 0] w_hit_way;
-logic w_pipe_hit, w_pipe_miss;
+logic w_pipe_hit;
 word w_phy_addr;
 logic [TAG_WIDTH - 1 : 0] w_phy_tag;
 
@@ -283,7 +283,7 @@ logic w_rbuffer_hita, w_waita, w_waitb;
 
 
 //wbuffer
-localparam int WBUFFER_NUM =  FIFO_DEPTH >> 1; //16
+localparam int WBUFFER_NUM =  FIFO_DEPTH >> 1; //2
 word [WBUFFER_NUM - 1 : 0][WORD_PER_LINE - 1 :0] r_mem_wbuffer;
 tag [WBUFFER_NUM - 1 : 0] r_wbuffer_tag;
 logic [WBUFFER_NUM - 1 : 0] r_wbuffer_r, r_wbuffer_v, w_wbuffer_hits; //r_wbuffer_r : 0:replaceable,1:not replaceable
@@ -592,7 +592,8 @@ always_ff @(posedge i_clk) begin
 			r_old_tag <= r_save_tag;
 			r_rbuffer_valid1 <=1;
 			r_rbuffer_index1 <= get_index(r_save_addr);
-			r_rbuffer_tag <= r_save_new_tag;
+			r_rbuffer_tag.tag <= r_save_new_tag.tag;
+			r_rbuffer_tag.valid <= ~r_cache_hit_flag;
 			cnt_rbuffer <= {LINE_WORD_OFFSET{~r_cache_hit_flag}}&r_reqstart_offset;
 			r_rbuffer_way <= r_save_select_way;
 			r_rbuffer_onehot_way <= r_save_onehot_way;
