@@ -9,7 +9,7 @@
 `define INIT_PRID       32'H00004220
 `define INIT_EBASE 		32'H80000000
 `define INIT_STATUS     32'H00400000
-`define INIT_CONF0 		{1'b1,3'b0,3'b0,9'b0,1'b0,2'b0,3'b0,3'b1,3'b0,1'b0,3'b11}
+`define INIT_CONF0 		{1'b1,3'b0,3'b0,9'b0,1'b0,2'b0,3'b0,3'b1,3'b0,1'b0,3'd3}
 `define INIT_CONF1   	{1'b0,6'd31,3'd0,3'd5,3'd2,3'd0,3'd5,3'd2,7'd0}
 `define INIT_SRSCTRL    32'H00000000
 `define INIT_SRSMAP     32'H00000000

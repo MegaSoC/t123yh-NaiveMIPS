@@ -26,12 +26,14 @@ module TLB #(
     input   va0_choice,
     output [31:0] pa0,
     output [1 :0] exp_bus0, //{miss, valid}; 
+    output [2 :0] c_com0,
     // COM 2 load/store
     input  [31:0] va1,
     input  [31:0] va1_bak,
     input   va1_choice,
     output [31:0] pa1,
-    output [2 :0] exp_bus1  //{miss, valid, dirty};
+    output [2 :0] exp_bus1,  //{miss, valid, dirty};
+    output [2 :0] c_com1
 );
 
 reg [11:0] mask [TLB_NUM-1:0];
@@ -59,8 +61,8 @@ always_ff @(posedge clk) begin
             G    [n] <= 0;
             pfn0 [n] <= 0;
             pfn1 [n] <= 0;
-            c0   [n] <= 0;
-            c1   [n] <= 0;
+            c0   [n] <= 3;
+            c1   [n] <= 3;
             d0   [n] <= 0;
             d1   [n] <= 0;
             v0   [n] <= 0;
@@ -177,7 +179,7 @@ generate
 endgenerate
 // COM0&1 OUT
 reg [31:0] reg_pa0,reg_pa1;
-reg [2:0] reg_exp_bus0,reg_exp_bus1;
+reg [2:0] reg_exp_bus0,reg_exp_bus1,reg_exp_c0,reg_exp_c1;
 
 always_ff @(posedge clk) begin
     if (rst) begin
@@ -185,12 +187,16 @@ always_ff @(posedge clk) begin
         reg_pa1      <= 0;
         reg_exp_bus0 <= 0;
         reg_exp_bus1 <= 0;
+        reg_exp_c0   <= 3;
+        reg_exp_c1   <= 3;
     end
     else begin
         reg_pa0      <= va0_choice ? lp_pa0[TLB_NUM] : lp_pa0_bak[TLB_NUM];
         reg_pa1      <= o_p_EstallClear ? 0 : va1_choice ? lp_pa1[TLB_NUM] : lp_pa1_bak[TLB_NUM];
         reg_exp_bus0 <= va0_choice ? {~|match0, lp_v0[TLB_NUM]} : {~|match0_bak, lp_v0_bak[TLB_NUM]};
         reg_exp_bus1 <= o_p_EstallClear ? 0 : va1_choice ? {~|match1, lp_v1[TLB_NUM], ~lp_d1[TLB_NUM]} : {~|match1_bak, lp_v1_bak[TLB_NUM], ~lp_d1_bak[TLB_NUM]};
+        reg_exp_c0   <= va0_choice ? lp_c0[TLB_NUM] : lp_c0_bak[TLB_NUM];
+        reg_exp_c1   <= o_p_EstallClear ? 3 : va1_choice ? lp_c1[TLB_NUM] : lp_c1_bak[TLB_NUM];
     end
 end
 
@@ -198,6 +204,8 @@ assign pa0      = reg_pa0;
 assign pa1      = reg_pa1;     
 assign exp_bus0 = reg_exp_bus0;
 assign exp_bus1 = reg_exp_bus1;
+assign c_com0   = reg_exp_c0;
+assign c_com1   = reg_exp_c1;
 
 //assign pa0      = lp_pa0[TLB_NUM];
 //assign pa1      = lp_pa1[TLB_NUM];

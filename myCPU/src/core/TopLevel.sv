@@ -91,7 +91,9 @@ module mycpu_top(
     wire[31:0] data_sram_rdata;
     wire[31:0] data_sram_wdata;
     wire[31:0] data_sram_addr;
-    wire inst_sram_addr_ok; wire data_sram_addr_ok; wire data_sram_data_ok;
+    wire inst_sram_addr_ok; 
+    wire data_sram_addr_ok; 
+    wire data_sram_data_ok;
     wire[3:0] data_sram_wen;
 
     wire[2:0] data_size;
@@ -185,6 +187,8 @@ module mycpu_top(
     wire [31:0] rdata_icache;
 
     wire data_uncached ;
+
+    wire [1:0] data_test = {data_uncached, |data_sram_wen};
 
     wire total_uncache;
     reg icache_close;
@@ -478,7 +482,7 @@ module mycpu_top(
     wire data_exp_dirty;
     wire data_exp_invalid;
 
-    wire SR_BEV, SR_EXL;
+    wire SR_BEV, SR_EXL, CAUSE_IV;
     wire [31:0] ebase;
 
     exception exception(
@@ -521,6 +525,7 @@ module mycpu_top(
                   .inst_uncached(inst_uncached),
                   .SR_BEV(SR_BEV),
                   .SR_EXL(SR_EXL),
+                  .CAUSE_IV(CAUSE_IV),
                   .ebase(ebase),
                   .trap(E_trap)
               );
@@ -564,6 +569,7 @@ module mycpu_top(
 
             .SR_BEV(SR_BEV),
             .SR_EXL(SR_EXL),
+            .CAUSE_IV(CAUSE_IV),
             .ebase(ebase),
 
             .icache_close(icache_close),
