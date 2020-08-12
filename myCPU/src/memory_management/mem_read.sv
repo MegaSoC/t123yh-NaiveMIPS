@@ -66,7 +66,7 @@ always_comb begin
     if(w_axi_arvalid == 0 && ((w_push1||w_push2) & w_empty) || (r_pop & ~w_empty))begin
             w_axi_arvalid = 1;
     end
-    else if(w_axi_arvalid == 1 && axi_bus_resp.arready)
+    else if(w_axi_arvalid == 1 && axi_bus_resp.arready && axi_bus_req.arvalid)
             w_axi_arvalid = 0;
 end
 
