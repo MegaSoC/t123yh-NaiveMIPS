@@ -26,6 +26,7 @@ module cp0(
 
         output wire         SR_BEV,
         output wire         SR_EXL,
+        output wire         CAUSE_IV,
         output wire [31:0]  ebase,
 
         output wire         allow_int,
@@ -94,6 +95,7 @@ module cp0(
 
     assign SR_BEV = cp0_reg_Status[22];
     assign SR_EXL = cp0_reg_Status[1];
+    assign CAUSE_IV = cp0_reg_Cause[23];
     assign ebase  = cp0_reg_EBase;
 
 
@@ -286,7 +288,7 @@ module cp0(
         .inst_en(inst_en),
         .data_c(data_c),
         .inst_c(inst_c),
-        .user_mode(0),
+        .user_mode(cp0_reg_Status[4]),
         .cp0_kseg0_uncached(~cp0_reg_Conf0[0])
     ); 
     

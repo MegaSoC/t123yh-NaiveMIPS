@@ -482,7 +482,7 @@ module mycpu_top(
     wire data_exp_dirty;
     wire data_exp_invalid;
 
-    wire SR_BEV, SR_EXL;
+    wire SR_BEV, SR_EXL, CAUSE_IV;
     wire [31:0] ebase;
 
     exception exception(
@@ -525,6 +525,7 @@ module mycpu_top(
                   .inst_uncached(inst_uncached),
                   .SR_BEV(SR_BEV),
                   .SR_EXL(SR_EXL),
+                  .CAUSE_IV(CAUSE_IV),
                   .ebase(ebase),
                   .trap(E_trap)
               );
@@ -568,6 +569,7 @@ module mycpu_top(
 
             .SR_BEV(SR_BEV),
             .SR_EXL(SR_EXL),
+            .CAUSE_IV(CAUSE_IV),
             .ebase(ebase),
 
             .icache_close(icache_close),

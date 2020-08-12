@@ -28,6 +28,7 @@ module exception(
         input wire icache_stall,
         input wire SR_BEV,
         input wire SR_EXL,
+        input wire CAUSE_IV,
         input wire [31:0] ebase,
 
         output reg flush,
@@ -77,7 +78,7 @@ module exception(
                 vice_flush1    <= 1'b1;
                 vice_flush2    <= 1'b1;
                 vice_flush3    <= 1'b1;
-                NewExceptionPC <= base + 32'h180;
+                NewExceptionPC <= CAUSE_IV ? base + 32'h200 : base + 32'h180;
                 epc            <= E_EPC;
                 CP0_WrExp      <= 1'b1;
                 clear_exl      <= 1'b0;
