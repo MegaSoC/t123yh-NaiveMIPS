@@ -16,7 +16,8 @@ module I(
         input instInvalid,
         output reg [31:0] iPcReg,
         output [31:0] iPcWire,
-        output [31:0] tlb_reg_iaddr,
+        output [31:0] tlb_reg_iaddr_is_dm_stall,
+        output [31:0] tlb_reg_iaddr_not_dm_stall,
         output reg [31:0] iInstr,
 
         output reg iInstMiss,
@@ -62,7 +63,8 @@ module I(
             end
         end
     end
-
+    assign tlb_reg_iaddr_is_dm_stall = reset ? `TextAddr : pcReg;
+    assign tlb_reg_iaddr_not_dm_stall = reset ? `TextAddr : dNpc;
 
     assign iNextNotReady = (dStall | dmStall | ((!instUncached | !instSramValid ) & (instUncached | icacheStall ))) ;
 
