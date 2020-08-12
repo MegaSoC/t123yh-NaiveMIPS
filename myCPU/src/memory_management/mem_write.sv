@@ -161,7 +161,7 @@ always_ff @(posedge i_clk) begin
                 //     r_data[13] <= i_dcache_data[13];
                 //     r_data[14] <= i_dcache_data[14];
                 //     r_data[15] <= i_dcache_data[15];
-                end
+                //end
             end
         end
         if(axi_bus_resp.bvalid && r_write_process)begin
