@@ -251,10 +251,11 @@ module cp0(
         end
     end
 
-    wire[31:0] iaddr_direct;
-    wire[31:0] daddr_direct;
-    wire[31:0] daddr_tlb;
-    wire[31:0] iaddr_tlb;
+    wire [31:0] iaddr_direct;
+    wire [31:0] daddr_direct;
+    wire [31:0] daddr_tlb;
+    wire [31:0] iaddr_tlb;
+    wire [2 :0] inst_c, data_c;
     wire data_tlb_map, inst_tlb_map, data_mmu_uncached, inst_mmu_uncached,
          DataMiss, InstMiss, data_dirt, data_valid, inst_valid;
     assign daddr_o          = data_tlb_map ? daddr_tlb : daddr_direct;
@@ -283,8 +284,10 @@ module cp0(
         .iaddr_i(iaddr_i),
         .data_en(data_en),
         .inst_en(inst_en),
+        .data_c(data_c),
+        .inst_c(inst_c),
         .user_mode(0),
-        .cp0_kseg0_uncached(0)
+        .cp0_kseg0_uncached(~cp0_reg_Conf0[0])
     ); 
     
     // TLB
@@ -308,11 +311,13 @@ module cp0(
         .va0_choice(I_nextnotready),
         .pa0(iaddr_tlb),
         .exp_bus0({InstMiss, inst_valid}), //{miss, valid}; 
+        .c_com0(inst_c),
         .va1(daddr_i_tlb_is_dm_stall),
         .va1_bak(daddr_i_tlb_not_dm_stall),
         .va1_choice(dm_stall),
         .pa1(daddr_tlb),
-        .exp_bus1({DataMiss, data_valid, data_dirt})  //{miss, valid, dirty};
+        .exp_bus1({DataMiss, data_valid, data_dirt}),  //{miss, valid, dirty};
+        .c_com1(data_c)
     );
     
 endmodule

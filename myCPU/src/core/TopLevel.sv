@@ -91,7 +91,9 @@ module mycpu_top(
     wire[31:0] data_sram_rdata;
     wire[31:0] data_sram_wdata;
     wire[31:0] data_sram_addr;
-    wire inst_sram_addr_ok; wire data_sram_addr_ok; wire data_sram_data_ok;
+    wire inst_sram_addr_ok; 
+    wire data_sram_addr_ok; 
+    wire data_sram_data_ok;
     wire[3:0] data_sram_wen;
 
     wire[2:0] data_size;
@@ -185,6 +187,8 @@ module mycpu_top(
     wire [31:0] rdata_icache;
 
     wire data_uncached ;
+
+    wire [1:0] data_test = {data_uncached, |data_sram_wen};
 
     wire total_uncache;
     reg icache_close;
