@@ -179,6 +179,18 @@ endgenerate
 reg [31:0] reg_pa0,reg_pa1;
 reg [2:0] reg_exp_bus0,reg_exp_bus1;
 
+wire [31:0] a0y,a0n,a1y,a1n;
+wire [2:0] b0y,b0n,b1y,b1n;
+assign a0y = lp_pa0[TLB_NUM];
+assign a0n = lp_pa0_bak[TLB_NUM];
+assign a1y = lp_pa1[TLB_NUM];
+assign a1n = lp_pa1_bak[TLB_NUM];
+
+assign b0y = {~|match0, lp_v0[TLB_NUM]};
+assign b0n = {~|match0_bak, lp_v0_bak[TLB_NUM]};
+assign b1y = {~|match1, lp_v1[TLB_NUM], ~lp_d1[TLB_NUM]};
+assign b1n = {~|match1_bak, lp_v1_bak[TLB_NUM], ~lp_d1_bak[TLB_NUM]};
+
 always_ff @(posedge clk) begin
     if (rst) begin
         reg_pa0      <= 0;
@@ -187,10 +199,10 @@ always_ff @(posedge clk) begin
         reg_exp_bus1 <= 0;
     end
     else begin
-        reg_pa0      <= va0_choice ? lp_pa0[TLB_NUM] : lp_pa0_bak[TLB_NUM];
-        reg_pa1      <= o_p_EstallClear ? 0 : va1_choice ? lp_pa1[TLB_NUM] : lp_pa1_bak[TLB_NUM];
-        reg_exp_bus0 <= va0_choice ? {~|match0, lp_v0[TLB_NUM]} : {~|match0_bak, lp_v0_bak[TLB_NUM]};
-        reg_exp_bus1 <= o_p_EstallClear ? 0 : va1_choice ? {~|match1, lp_v1[TLB_NUM], ~lp_d1[TLB_NUM]} : {~|match1_bak, lp_v1_bak[TLB_NUM], ~lp_d1_bak[TLB_NUM]};
+        reg_pa0      <= ({32{va0_choice}}&a0y)|({32{~va0_choice}}&a0n);
+        reg_pa1      <= o_p_EstallClear ? 0 : ({32{va1_choice}}&a1y)|({32{~va1_choice}}&a1n);
+        reg_exp_bus0 <= ({3{va0_choice}}&b0y)|({3{va0_choice}}&b0n) ;
+        reg_exp_bus1 <= o_p_EstallClear ? 0 : ({3{va1_choice}}&b1y)|({3{va1_choice}}&b1n);
     end
 end
 
