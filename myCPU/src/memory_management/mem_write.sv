@@ -144,6 +144,34 @@ always_ff @(posedge i_clk) begin
                 r_data[0] <= w_sram_data;
             else begin
                 r_data <= i_dcache_data;
+                if(LINE_WORD_NUM == 8) begin
+                    r_data[0] <= i_dcache_data[0];
+                    r_data[1] <= i_dcache_data[1];
+                    r_data[2] <= i_dcache_data[2];
+                    r_data[3] <= i_dcache_data[3];
+                    r_data[4] <= i_dcache_data[4];
+                    r_data[5] <= i_dcache_data[5];
+                    r_data[6] <= i_dcache_data[6];
+                    r_data[7] <= i_dcache_data[7];
+                end
+                else if(LINE_WORD_NUM == 16)begin
+                    r_data[0] <=  i_dcache_data[0];
+                    r_data[1] <=  i_dcache_data[1];
+                    r_data[2] <=  i_dcache_data[2];
+                    r_data[3] <=  i_dcache_data[3];
+                    r_data[4] <=  i_dcache_data[4];
+                    r_data[5] <=  i_dcache_data[5];
+                    r_data[6] <=  i_dcache_data[6];
+                    r_data[7] <=  i_dcache_data[7];
+                    r_data[8] <=  i_dcache_data[8];
+                    r_data[9] <=  i_dcache_data[9];
+                    r_data[10] <= i_dcache_data[10];
+                    r_data[11] <= i_dcache_data[11];
+                    r_data[12] <= i_dcache_data[12];
+                    r_data[13] <= i_dcache_data[13];
+                    r_data[14] <= i_dcache_data[14];
+                    r_data[15] <= i_dcache_data[15];
+                end
                 // r_data[0] <= i_dcache_data[0];
                 // r_data[1] <= i_dcache_data[1];
                 // r_data[2] <= i_dcache_data[2];

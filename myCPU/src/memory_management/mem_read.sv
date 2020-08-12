@@ -43,9 +43,6 @@ always_comb begin
     if(w_empty)begin
         axi_bus_req.arvalid = 0;
     end
-    else if(i_flush && w_dout.status[1] == 0)begin
-        axi_bus_req.arvalid = 0;
-    end 
     else begin
         axi_bus_req.arvalid = r_axi_arvalid && !(i_memread_stall && w_dout.status == 2'b10);
         // axi_bus_req.arvalid = r_axi_arvalid && !(i_memread_stall && w_dout.status == 2'b10) 
@@ -62,15 +59,12 @@ assign o_icache_end = r_end && r_status == 0;
 assign o_dcache_end = r_end && r_status == 2'b10;
 
 logic w_empty1, w_empty2;
-logic r_valid_flag, r_flush_waiting, r_waiting_flag;
+logic r_valid_flag;
 assign w_empty = w_empty1 && w_empty2;
 always_comb begin
     w_axi_arvalid = r_axi_arvalid;
-    if(w_axi_arvalid == 0 && !r_flush_waiting && ((w_push1||w_push2) & w_empty) || (r_pop & ~w_empty))begin
+    if(w_axi_arvalid == 0 && ((w_push1||w_push2) & w_empty) || (r_pop & ~w_empty))begin
             w_axi_arvalid = 1;
-    end
-    else if(w_axi_arvalid == 0&&!r_flush_waiting && r_waiting_flag && ~w_empty)begin
-        w_axi_arvalid = 1;
     end
     else if(w_axi_arvalid == 1 && axi_bus_resp.arready)
             w_axi_arvalid = 0;
@@ -80,23 +74,14 @@ end
 always_ff @(posedge i_clk) begin
     if(i_rst)begin
     r_valid_flag <= 0;
-    r_waiting_flag <= 0;
-    r_flush_waiting <= 0;
     end
     else begin
         if(axi_bus_req.arvalid)begin
             r_valid_flag <= 1;
         end
-        else if(i_flush&&!w_empty&& !(axi_bus_resp.rlast && axi_bus_resp.rvalid))begin
-            if(r_valid_flag && w_dout.status[1] == 0)begin
-                r_flush_waiting <= 1;
-            end
-        end
         else if(axi_bus_resp.rlast && axi_bus_resp.rvalid) begin
-            r_flush_waiting <= 0;
             r_valid_flag <= 0;
         end
-        r_waiting_flag <= r_flush_waiting;
     end
 end
 logic [4:0] r_icache_req_num, r_dcache_req_num, w_icache_req_num, w_dcache_req_num;
@@ -147,10 +132,7 @@ always_ff @(posedge i_clk) begin
         r_status <= 2'b00;
     end
     else begin
-        if(i_flush)begin
-            r_instr_req <= '0;
-        end
-        else if(w_instr_we) begin
+        if(w_instr_we) begin
             r_instr_req <= i_instr_req;
             r_instid <= r_instid == 4'b0111 ? '0 : r_instid + 1; 
         end
@@ -158,7 +140,7 @@ always_ff @(posedge i_clk) begin
             r_data_req <= i_data_req;
             r_dataid <= r_dataid == 4'b1111 ? 4'b1000 : r_dataid + 1;
         end
-        r_push2 <= ~i_flush && w_push2;
+        r_push2 <= w_push2;
         r_status <= w_empty ? 0 :w_dout.status;
         r_push1 <= w_push1;
         r_pop <= w_pop;
@@ -166,17 +148,7 @@ always_ff @(posedge i_clk) begin
             r_axi_arvalid <= 0;
         end
         else begin
-            if(w_empty && (w_instr_we || w_data_we))begin
-                if(w_instr_we && i_instr_req.status[1] == 0 && i_flush) begin
-                    r_axi_arvalid <= 0;
-                end
-                else begin
-                    r_axi_arvalid <= w_axi_arvalid;
-                end
-            end
-            else begin
-                r_axi_arvalid <= (i_flush && w_dout.status[1] == 0) ? 0 :w_axi_arvalid;
-            end
+            r_axi_arvalid <= w_axi_arvalid;
         end
         r_end <= w_empty ? 0:(axi_bus_resp.rlast && axi_bus_resp.rvalid );
     end
@@ -206,7 +178,7 @@ assign axi_bus_req.araddr = w_dout.startaddr;
 assign axi_bus_req.rready  =1'b1;
 
 always_ff @(posedge i_clk) begin
-    if(i_rst || (i_flush && w_dout.status[1] == 0)) begin
+    if(i_rst ) begin
         r_va <= 0;
         r_addr <= 0;
         r_burst_process <= 0;
@@ -228,12 +200,6 @@ assign w_push1 = w_data_we;
 always_comb begin
     w_pop = 0;
     if(axi_bus_resp.rlast && ~w_empty && axi_bus_resp.rvalid)begin
-        w_pop = 1;
-    end
-    else if(i_flush && w_empty)begin
-        w_pop = 0;
-    end
-    else if(i_flush && ~w_empty && w_dout.status[1] == 0) begin
         w_pop = 1;
     end
 end
@@ -259,7 +225,7 @@ fifo_instance(
     .full_o1(full),
     .full_o2(),
     .flush_i1(0),
-    .flush_i2(i_flush)
+    .flush_i2(0)
 );
     
 endmodule
