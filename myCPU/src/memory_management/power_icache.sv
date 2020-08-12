@@ -141,7 +141,7 @@ word w_mdata_start_va;
 //pipe1 signal
 index w_indexa, w_cache_inst_index;
 logic [SET_ASSOC - 1 : 0] w_cache_inst_way;
-logic [$clog2(SET_ASSOC) - 1 : 0] r_save_select_way, r_rbuffer_way2,w_cache_inst_hitway;
+logic [$clog2(SET_ASSOC) - 1 : 0] r_save_select_way, r_rbuffer_way2;
 logic [SET_ASSOC - 1 : 0] r_save_onehot_way;
 logic [SET_ASSOC - 1 : 0][GROUP_NUM - 1 : 0] r_dirty;
 logic tag_num;
@@ -311,7 +311,6 @@ assign w_cache_inst_way = get_cache_inst_way(i_cache_instr_addr);
 assign w_cache_inst_tag.tag = i_cache_instr_tag;
 assign w_cache_inst_tag.valid = i_cache_instr != 2'b01;
 assign w_cache_inst_tag_wen = i_cache_instr == 2'b01 || i_cache_instr == 2'b10;
-assign w_cache_inst_hitway = (w_hit_way & {2{w_pipe_hit}}) | (r_rbuffer_way & ({2{w_waita}} | {2{w_rbuffer_hita}}));
 
 always_comb begin
 	w_va_end = i_va;

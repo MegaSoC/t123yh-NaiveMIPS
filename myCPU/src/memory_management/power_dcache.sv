@@ -368,7 +368,9 @@ always_comb begin
 			end
 		end
 		READ_WAITING: begin
-			if(w_resp.last && w_resp.valid2)
+			if((w_resp.last && w_resp.valid2)&& r_old_tag.valid)
+				w_state = WRITE_WAITING;
+			else if(w_resp.last && w_resp.valid2)
 				w_state = REFILL;
 			else if(w_receiving_hit && !(w_resp.last && w_resp.valid2))
 				w_state = IDLE_RECEIVING;
