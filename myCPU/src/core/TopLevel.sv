@@ -94,15 +94,14 @@ module mycpu_top(
     wire inst_sram_addr_ok; wire data_sram_addr_ok; wire data_sram_data_ok;
     wire[3:0] data_sram_wen;
 
-    wire[1:0] data_size;
-    assign data_size = ((SC|sw) | (LL|lw)) ? 2'b10 :
-           (sh | lh | lhu) ? 2'b01 :
-           2'b00 ;
+    wire[2:0] data_size;
+    assign data_size = ((SC|sw) | (LL|lw)) ? 3'b010 :
+           (sh | lh | lhu) ? 3'b001 :
+           3'b000 ;
 
     assign wid = awid;
 
-    axi_req req_i;
-    axi_resp resp_i;
+
 
 
     wire [3 :0] arid_d ;
@@ -206,91 +205,7 @@ module mycpu_top(
         end
     end
     assign total_uncache = icache_close | dcache_close;
-    wire axi_arready;
-    assign axi_arready = total_uncache ? arready : arready_uncache;
 
-    wire [3 :0] axi_rid;
-    assign axi_rid = total_uncache ? rid : rid_uncache;
-    wire [31:0] axi_rdata;
-    assign axi_rdata = total_uncache ? rdata : rdata_uncache;
-    wire [1 :0] axi_rresp;
-    assign axi_rresp = total_uncache ? rresp : rresp_uncache;
-    wire axi_rlast;
-    assign axi_rlast = total_uncache ? rlast : rlast_uncache;
-    wire axi_rvalid;
-    assign axi_rvalid = total_uncache ? rvalid : rvalid_uncache;
-    wire axi_awready;
-    assign axi_awready = total_uncache ? awready : awready_uncache;
-    wire axi_wready;
-    assign axi_wready = total_uncache ? wready : wready_uncache;
-    wire [3 :0] axi_bid;
-    assign axi_bid = total_uncache ? bid : bid_uncache;
-    wire [1 :0] axi_bresp;
-    assign axi_bresp = total_uncache ? bresp : bready_uncache;
-    wire axi_bvalid;
-    assign axi_bvalid = total_uncache ? bvalid : bvalid_uncache;
-    cpu_axi_interface cpu_axi_interface(
-                          .clk(aclk),
-                          .resetn(aresetn ),
-
-                          .inst_req( inst_uncached & inst_sram_en),
-                          .inst_wr(|inst_sram_wen),
-                          .inst_size(2'b10),
-                          .inst_wdata(inst_sram_wdata),
-                          .inst_addr(inst_sram_addr),
-                          .inst_rdata(inst_sram_rdata),
-                          .inst_addr_ok(inst_sram_addr_ok),
-                          .inst_data_ok(inst_sram_data_ok),
-                          .data_req( data_uncached &(read|write) & !E_CurrentException ),
-                          .data_wr(|data_sram_wen) ,
-                          .data_size(data_size),
-                          .data_wdata(data_sram_wdata),
-                          .data_addr(data_sram_addr),
-                          .data_rdata(data_sram_rdata),
-                          .data_addr_ok(data_sram_addr_ok),
-                          .data_data_ok(data_sram_data_ok),
-
-                          .arid(arid_uncache),
-                          .araddr(araddr_uncache),
-                          .arlen(arlen_uncache),
-                          .arsize(arsize_uncache),
-                          .arburst(arburst_uncache),
-                          .arlock(arlock_uncache),
-                          .arcache(arcache_uncache),
-                          .arprot(arprot_uncache),
-                          .arvalid(arvalid_uncache),
-                          .arready(axi_arready),
-
-                          .rid(axi_rid),
-                          .rdata(axi_rdata),
-                          .rresp(axi_rresp),
-                          .rlast(axi_rlast),
-                          .rvalid(axi_rvalid),
-                          .rready(rready_uncache),
-
-                          .awid(awid_uncache),
-                          .awaddr(awaddr_uncache),
-                          .awlen(awlen_uncache),
-                          .awsize(awsize_uncache),
-                          .awburst(awburst_uncache),
-                          .awlock(awlock_uncache),
-                          .awcache(awcache_uncache),
-                          .awprot(awprot_uncache),
-                          .awvalid(awvalid_uncache),
-                          .awready(axi_awready),
-
-                          .wid(wid_uncache),
-                          .wdata(wdata_uncache),
-                          .wstrb(wstrb_uncache),
-                          .wlast(wlast_uncache),
-                          .wvalid(wvalid_uncache),
-                          .wready(axi_wready),
-
-                          .bid(axi_bid),
-                          .bresp(axi_bresp),
-                          .bvalid(axi_bvalid),
-                          .bready(bready_uncache)
-                      );
 
     wire [31:0] I_PC,I_Instr;
     wire [31:0] D_NewPC_Pass,I_PC_Pass;
@@ -300,7 +215,7 @@ module mycpu_top(
 
 
     wire ExceptionFlush;
-    wire ExceptionFlush,ExceptionFlush,ExceptionFlush;
+    wire ExceptionFlush;
 
 
     wire[31:0] NewExceptionPC;
@@ -417,6 +332,7 @@ module mycpu_top(
     wire [31:0] E_calLSaddr_not_dm_stall,E_calLSaddr_is_dm_stall;
     wire E_MemReadEnable_Inter;
     wire E_EstallClear ;
+    assign E_EstallClear = 0;
     wire E_MemSaveType_Inter ;
     wire E_MemLStype_Inter = E_MemReadEnable_Inter | E_MemSaveType_Inter ;
 
@@ -688,335 +604,93 @@ module mycpu_top(
     wire rest_out3;
 
 
-    my_dcache dcache(
-                  .cache_reset(myaresetn),
-                  .reset(reset) ,
-                  .clk(Clk) ,
+     cache_soc 
+//    #(
+//        .ICACHE_WORD_PER_LINE(`ICACHE_WORD_PER_LINE),
+//        .ICACHE_SET_ASSOC(`ICACHE_SET_ASSOC),
+//        .ICACHE_SIZE(`ICACHE_SIZE),
+//        .ICACHE_TAG_WIDTH(`ICACHE_TAG_WIDTH),
+//        .DCACHE_LINE_WORD_NUM(`DCACHE_WORD_PER_LINE),
+//        .DCACHE_SET_ASSOC(`DCACHE_SET_ASSOC),
+//        .DCACHE_SIZE(`DCACHE_SIZE),
+//        .DCACHE_TAG_WIDTH(`DCACHE_TAG_WIDTH),
+//        .MEM_WRITE_FIFO_DEPTH(`MEM_WRITE_FIFO_DEPTH)
+//    )
+    cache_soc(
+                  .i_clk(Clk),
+                  .i_rst(reset||!myaresetn),
 
-                  .i_p_addr(dm_stall ? E_calLSaddr_is_dm_stall : E_calLSaddr_not_dm_stall) ,
-                  .i_p_tag_bit_raddr(E_Data[11:5]),
-                  .i_p_addrAfterTrans(data_sram_addr) ,
-                  .i_p_byte_en(E_MemWriteEnable) ,
-                  .i_p_nextIsRead(E_MemReadEnable_Inter) ,
-                  .i_p_nextIsLS(E_MemLStype_Inter),
-                  .i_p_nextIsSave(E_MmeSaveTypeInter) ,
-                  .i_p_read((!data_uncached) &read & !E_CurrentException) ,
-                  .i_p_write((!data_uncached) &write & !E_CurrentException),
+                  .i_icache_npc(D_NewPC_Pass),
+                  .i_icache_phyaddr(inst_sram_addr),
+                  .i_icache_valid1(!dm_stall && !D_stall_Pass),
+                  .i_icache_valid2(!inst_uncached),
+                  .o_icache_inst(rdata_icache),
+                  .o_i_stall(icache_stall),
 
-                  .i_p_wrdata(data_sram_wdata),
-                  .o_p_rddata(rdata_dcache),
-                  .o_p_stall(not_hit),
-                  .o_p_EstallClear(E_EstallClear),
+                  .i_isram_addr(inst_sram_addr),
+                  .i_isram_valid(inst_uncached & inst_sram_en),
+                  .o_isram_valid(inst_sram_data_ok),
+                  .o_isram_inst(inst_sram_rdata),
 
-                  .arid(arid_d),
-                  .araddr(araddr_d) ,
-                  .arlen(arlen_d) ,
-                  .arsize(arsize_d) ,
-                  .arburst(arburst_d) ,
-                  .arlock(arlock_d) ,
-                  .arcache(arcache_d) ,
-                  .arprot(arprot_d) ,
-                  .arvalid(arvalid_d) ,
-                  .arready(arready_d) ,
+                  .i_dcache_va(E_DataLSaddr),
+                  .i_dcache_phyaddr(data_sram_addr),
+                  .i_dcache_byteen(E_MemWriteEnable),
+                  .i_dcache_read((!data_uncached) &read & !E_CurrentException),
+                  .i_dcache_write((!data_uncached) &write & !E_CurrentException),
+                  .i_dcache_indata(data_sram_wdata),
+                  .i_dcache_outdata(rdata_dcache),
+                  .o_d_stall(not_hit),
 
-                  .rid(rid_d) ,
-                  .rdata(rdata_d) ,
-                  .rresp(rresp_d) ,
-                  .rlast(rlast_d) ,
-                  .rvalid (rvalid_d) ,
-                  .rready(rready_d) ,
+                  .i_dsram_addr(data_sram_addr),
+                  .i_dsram_read(data_uncached &read & !E_CurrentException ),
+                  .i_dsram_write(data_uncached &write & !E_CurrentException ),
+                  .i_dsram_byteen(data_sram_wen),
+                  .i_dsram_size(data_size),
+                  .i_dsram_indata(data_sram_wdata),
+                  .o_dsram_outdata(data_sram_rdata),
+                  .o_dsram_valid(data_sram_data_ok),
 
-                  .awid(awid_d) ,
-                  .awaddr(awaddr_d) ,
-                  .awlen(awlen_d) ,
-                  .awsize(awsize_d) ,
-                  .awburst(awburst_d) ,
-                  .awlock(awlock_d) ,
-                  .awcache(awcache_d) ,
-                  .awprot(awprot_d) ,
-                  .awvalid(awvalid_d) ,
-                  .awready(awready_d) ,
+                  .arid,
+                  .araddr,
+                  .arlen,
+                  .arsize,
+                  .arburst,
+                  .arlock,
+                  .arcache,
+                  .arprot,
+                  .arvalid,
+                  .arready,
 
-                  .wid(wid_d) ,
-                  .wdata(wdata_d) ,
-                  .wstrb(wstrb_d) ,
-                  .wlast(wlast_d) ,
-                  .wvalid(wvalid_d) ,
-                  .wready(wready_d) ,
+                  .rid,
+                  .rdata,
+                  .rresp,
+                  .rlast,
+                  .rvalid,
+                  .rready,
 
-                  .bid(bid_d) ,
-                  .bresp(bresp_d) ,
-                  .bvalid(bvalid_d) ,
-                  .bready(bready_d)
-              );
+                  .awid,
+                  .awaddr,
+                  .awlen,
+                  .awsize,
+                  .awburst,
+                  .awlock,
+                  .awcache,
+                  .awprot,
+                  .awvalid,
+                  .awready,
 
+                  .wid,
+                  .wdata,
+                  .wstrb,
+                  .wlast,
+                  .wvalid,
+                  .wready,
 
-    my_icache icache(
-                  .cache_reset(myaresetn),
-                  .reset(reset) ,
-                  .clk(Clk),
-                  .dm_stall(dm_stall | D_stall_Pass ),
-                  .i_p_addr(D_NewPC_Pass),
-                  .i_p_tag_bit_raddr(I_PC_Pass[11:5]),
-                  .i_p_byte_en(4'b0),
-                  .i_p_read((!inst_uncached)& 1'b1 ),
-                  .i_p_write(1'b0),
-                  .i_p_addrAfterTrans(inst_sram_addr),
+                  .bid,
+                  .bresp,
+                  .bvalid,
+                  .bready
 
-                  .i_p_wrdata(32'b0),
-                  .o_p_rddata(rdata_icache),
-                  .o_p_stall(icache_stall),
+    );
 
-                  .arid(req_i.arid),
-                  .araddr(req_i.araddr) ,
-                  .arlen(req_i.arlen) ,
-                  .arsize(req_i.arsize) ,
-                  .arburst(req_i.arburst) ,
-                  .arlock(req_i.arlock) ,
-                  .arcache(req_i.arcache) ,
-                  .arprot(req_i.arprot) ,
-                  .arvalid(req_i.arvalid) ,
-                  .arready(resp_i.arready) ,
-
-                  .rid(resp_i.rid) ,
-                  .rdata(resp_i.rdata) ,
-                  .rresp(resp_i.rresp) ,
-                  .rlast(resp_i.rlast) ,
-                  .rvalid (resp_i.rvalid) ,
-                  .rready(req_i.rready) ,
-
-                  .awid(req_i.awid) ,
-                  .awaddr(req_i.awaddr) ,
-                  .awlen(req_i.awlen) ,
-                  .awsize(req_i.awsize) ,
-                  .awburst(req_i.awburst) ,
-                  .awlock(req_i.awlock) ,
-                  .awcache(req_i.awcache) ,
-                  .awprot(req_i.awprot) ,
-                  .awvalid(req_i.awvalid) ,
-                  .awready(resp_i.awready) ,
-
-                  .wid(req_i.wid) ,
-                  .wdata(req_i.wdata) ,
-                  .wstrb(req_i.wstrb) ,
-                  .wlast(req_i.wlast) ,
-                  .wvalid(req_i.wvalid) ,
-                  .wready(resp_i.wready) ,
-
-                  .bid(resp_i.bid) ,
-                  .bresp(resp_i.bresp) ,
-                  .bvalid(resp_i.bvalid) ,
-                  .bready(req_i.bready)
-              );
-    wire [3 :0] ip_arid;
-    assign arid = total_uncache ? arid_uncache : ip_arid;
-    wire [31:0] ip_araddr;
-    assign araddr = total_uncache ? araddr_uncache : ip_araddr;
-    wire [3 :0] ip_arlen;
-    assign arlen = total_uncache ? arlen_uncache : ip_arlen;
-    wire [2 :0] ip_arsize;
-    assign arsize = total_uncache ? arsize_uncache : ip_arsize;
-    wire [1 :0] ip_arburst;
-    assign arburst = total_uncache ? arburst_uncache : ip_arburst;
-    wire [1 :0] ip_arlock;
-    assign arlock = total_uncache ? arlock_uncache : ip_arlock;
-    wire [3 :0] ip_arcache;
-    assign arcache = total_uncache ? arcache_uncache : ip_arcache;
-    wire [2 :0] ip_arprot;
-    assign arprot = total_uncache ? arprot_uncache : ip_arprot;
-    wire ip_arvalid;
-    assign arvalid = total_uncache ? arvalid_uncache : ip_arvalid;
-    wire ip_rready;
-    assign rready = total_uncache ? rready_uncache : ip_rready;
-    wire [3 :0] ip_awid;
-    assign awid = total_uncache ? awid_uncache : ip_awid;
-    wire [31:0] ip_awaddr;
-    assign awaddr = total_uncache ? awaddr_uncache : ip_awaddr;
-    wire [3 :0] ip_awlen;
-    assign awlen = total_uncache ? awlen_uncache : ip_awlen;
-    wire [2 :0] ip_awsize;
-    assign awsize = total_uncache ? awsize_uncache : ip_awsize;
-    wire [1 :0] ip_awburst;
-    assign awburst = total_uncache ? awburst_uncache : ip_awburst;
-    wire [1 :0] ip_awlock;
-    assign awlock = total_uncache ? awlock_uncache : ip_awlock;
-    wire [3 :0] ip_awcache;
-    assign awcache = total_uncache ? awcache_uncache : ip_awcache;
-    wire [2 :0] ip_awprot;
-    assign awprot = total_uncache ? awprot_uncache : ip_awprot;
-    wire ip_awvalid;
-    assign awvalid = total_uncache ? awvalid_uncache : ip_awvalid;
-    wire [31:0] ip_wdata;
-    assign wdata = total_uncache ? wdata_uncache : ip_wdata;
-    wire [3 :0] ip_wstrb;
-    assign wstrb = total_uncache ? wstrb_uncache : ip_wstrb;
-    wire ip_wlast;
-    assign wlast = total_uncache ? wlast_uncache : ip_wlast;
-    wire ip_wvalid;
-    assign wvalid = total_uncache ? wvalid_uncache : ip_wvalid;
-    wire ip_bready;
-    assign bready = total_uncache ? bready_uncache : ip_bready;
-
-    axi_interconnect_0 my_axi_extender (
-                           .INTERCONNECT_ACLK(Clk),
-                           .INTERCONNECT_ARESETN(aresetn ),
-
-                           .S00_AXI_ARESET_OUT_N(rest_out),
-                           .S00_AXI_ACLK(Clk),
-                           .S00_AXI_AWID(1'b0),
-                           .S00_AXI_AWADDR(req_i.awaddr),
-                           .S00_AXI_AWLEN({4'b0,req_i.awlen}),
-                           .S00_AXI_AWSIZE(req_i.awsize),
-                           .S00_AXI_AWBURST(req_i.awburst),
-                           .S00_AXI_AWLOCK(req_i.awlock[0]),
-                           .S00_AXI_AWCACHE(req_i.awcache),
-                           .S00_AXI_AWPROT(req_i.awprot),
-                           .S00_AXI_AWQOS(4'b0000),
-                           .S00_AXI_AWVALID(req_i.awvalid),
-                           .S00_AXI_AWREADY(resp_i.awready),
-                           .S00_AXI_WDATA(req_i.wdata),
-                           .S00_AXI_WSTRB(req_i.wstrb),
-                           .S00_AXI_WLAST(req_i.wlast),
-                           .S00_AXI_WVALID(req_i.wvalid),
-                           .S00_AXI_WREADY(resp_i.wready),
-                           .S00_AXI_BID(resp_i.bid[0]),
-                           .S00_AXI_BRESP(resp_i.bresp),
-                           .S00_AXI_BVALID(resp_i.bvalid),
-                           .S00_AXI_BREADY(req_i.bready),
-                           .S00_AXI_ARID(req_i.arid[0]),
-                           .S00_AXI_ARADDR(req_i.araddr),
-                           .S00_AXI_ARLEN(req_i.arlen),
-                           .S00_AXI_ARSIZE(req_i.arsize),
-                           .S00_AXI_ARBURST(req_i.arburst),
-                           .S00_AXI_ARLOCK(req_i.arlock[0]),
-                           .S00_AXI_ARCACHE(req_i.arcache),
-                           .S00_AXI_ARPROT(req_i.arprot),
-                           .S00_AXI_ARQOS(4'b0011),
-                           .S00_AXI_ARVALID(req_i.arvalid),
-                           .S00_AXI_ARREADY(resp_i.arready),
-                           .S00_AXI_RID(resp_i.rid),
-                           .S00_AXI_RDATA(resp_i.rdata),
-                           .S00_AXI_RRESP(resp_i.rresp),
-                           .S00_AXI_RLAST(resp_i.rlast),
-                           .S00_AXI_RVALID(resp_i.rvalid),
-                           .S00_AXI_RREADY(req_i.rready),
-
-                           .S01_AXI_ARESET_OUT_N(rest_out1),
-                           .S01_AXI_ACLK(Clk),
-                           .S01_AXI_AWID(1'b0),
-                           .S01_AXI_AWADDR(awaddr_d),
-                           .S01_AXI_AWLEN({4'b0,awlen_d}),
-                           .S01_AXI_AWSIZE(awsize_d),
-                           .S01_AXI_AWBURST(awburst_d),
-                           .S01_AXI_AWLOCK(awlock_d[0]),
-                           .S01_AXI_AWCACHE(awcache_d),
-                           .S01_AXI_AWPROT(awprot_d),
-                           .S01_AXI_AWQOS(4'b1100),
-                           .S01_AXI_AWVALID(awvalid_d),
-                           .S01_AXI_AWREADY(awready_d),
-                           .S01_AXI_WDATA(wdata_d),
-                           .S01_AXI_WSTRB(wstrb_d),
-                           .S01_AXI_WLAST(wlast_d),
-                           .S01_AXI_WVALID(wvalid_d),
-                           .S01_AXI_WREADY(wready_d),
-                           .S01_AXI_BID(bid_d[0]),
-                           .S01_AXI_BRESP(bresp_d),
-                           .S01_AXI_BVALID(bvalid_d),
-                           .S01_AXI_BREADY(bready_d),
-                           .S01_AXI_ARID(arid_d[0]),
-                           .S01_AXI_ARADDR(araddr_d),
-                           .S01_AXI_ARLEN(arlen_d),
-                           .S01_AXI_ARSIZE(arsize_d),
-                           .S01_AXI_ARBURST(arburst_d),
-                           .S01_AXI_ARLOCK(arlock_d[0]),
-                           .S01_AXI_ARCACHE(arcache_d),
-                           .S01_AXI_ARPROT(arprot_d),
-                           .S01_AXI_ARQOS(4'b1100),
-                           .S01_AXI_ARVALID(arvalid_d),
-                           .S01_AXI_ARREADY(arready_d),
-                           .S01_AXI_RID(rid_d[0]),
-                           .S01_AXI_RDATA(rdata_d),
-                           .S01_AXI_RRESP(rresp_d),
-                           .S01_AXI_RLAST(rlast_d),
-                           .S01_AXI_RVALID(rvalid_d),
-                           .S01_AXI_RREADY(rready_d),
-
-                           .S02_AXI_ARESET_OUT_N(rest_out3),
-                           .S02_AXI_ACLK(Clk),
-                           .S02_AXI_AWID(1'b0),
-                           .S02_AXI_AWADDR(awaddr_uncache),
-                           .S02_AXI_AWLEN({4'b0,awlen_uncache}),
-                           .S02_AXI_AWSIZE(awsize_uncache),
-                           .S02_AXI_AWBURST(awburst_uncache),
-                           .S02_AXI_AWLOCK(awlock_uncache),
-                           .S02_AXI_AWCACHE(awcache_uncache),
-                           .S02_AXI_AWPROT(awprot_uncache),
-                           .S02_AXI_AWQOS(4'b0000),
-                           .S02_AXI_AWVALID(awvalid_uncache),
-                           .S02_AXI_AWREADY(awready_uncache),
-                           .S02_AXI_WDATA(wdata_uncache),
-                           .S02_AXI_WSTRB(wstrb_uncache),
-                           .S02_AXI_WLAST(wlast_uncache),
-                           .S02_AXI_WVALID(wvalid_uncache),
-                           .S02_AXI_WREADY(wready_uncache),
-                           .S02_AXI_BID(bid_uncache[0]),
-                           .S02_AXI_BRESP(bresp_uncache),
-                           .S02_AXI_BVALID(bvalid_uncache),
-                           .S02_AXI_BREADY(bready_uncache),
-                           .S02_AXI_ARID(arid_uncache),
-                           .S02_AXI_ARADDR(araddr_uncache),
-                           .S02_AXI_ARLEN(8'b0),
-                           .S02_AXI_ARSIZE(arsize_uncache),
-                           .S02_AXI_ARBURST(arburst_uncache),
-                           .S02_AXI_ARLOCK(arlock_uncache),
-                           .S02_AXI_ARCACHE(arcache_uncache),
-                           .S02_AXI_ARPROT(arprot_uncache),
-                           .S02_AXI_ARQOS(4'b0011),
-                           .S02_AXI_ARVALID(arvalid_uncache & !total_uncache ),
-                           .S02_AXI_ARREADY(arready_uncache),
-                           .S02_AXI_RID(rid_uncache),
-                           .S02_AXI_RDATA(rdata_uncache),
-                           .S02_AXI_RRESP(rresp_uncache),
-                           .S02_AXI_RLAST(rlast_uncache),
-                           .S02_AXI_RVALID(rvalid_uncache),
-                           .S02_AXI_RREADY(rready_uncache),
-
-                           .M00_AXI_ARESET_OUT_N(rest_out2),
-                           .M00_AXI_ACLK(Clk),
-                           .M00_AXI_AWID(ip_awid),
-                           .M00_AXI_AWADDR(ip_awaddr),
-                           .M00_AXI_AWLEN(ip_awlen),
-                           .M00_AXI_AWSIZE(ip_awsize),
-                           .M00_AXI_AWBURST(ip_awburst),
-                           .M00_AXI_AWLOCK(ip_awlock),
-                           .M00_AXI_AWCACHE(ip_awcache),
-                           .M00_AXI_AWPROT(ip_awprot),
-                           .M00_AXI_AWVALID(ip_awvalid),
-                           .M00_AXI_AWREADY(awready),
-                           .M00_AXI_WDATA(ip_wdata),
-                           .M00_AXI_WSTRB(ip_wstrb),
-                           .M00_AXI_WLAST(ip_wlast),
-                           .M00_AXI_WVALID(ip_wvalid),
-                           .M00_AXI_WREADY(wready),
-                           .M00_AXI_BID(bid),
-                           .M00_AXI_BRESP(bresp),
-                           .M00_AXI_BVALID(bvalid),
-                           .M00_AXI_BREADY(ip_bready),
-                           .M00_AXI_ARID(ip_arid),
-                           .M00_AXI_ARADDR(ip_araddr),
-                           .M00_AXI_ARLEN(ip_arlen),
-                           .M00_AXI_ARSIZE(ip_arsize),
-                           .M00_AXI_ARBURST(ip_arburst),
-                           .M00_AXI_ARLOCK(ip_arlock),
-                           .M00_AXI_ARCACHE(ip_arcache),
-                           .M00_AXI_ARPROT(ip_arprot),
-                           .M00_AXI_ARVALID(ip_arvalid),
-                           .M00_AXI_ARREADY(arready),
-                           .M00_AXI_RID(rid),
-                           .M00_AXI_RDATA(rdata),
-                           .M00_AXI_RRESP(rresp),
-                           .M00_AXI_RLAST(rlast& !total_uncache),
-                           .M00_AXI_RVALID(rvalid & !total_uncache),
-                           .M00_AXI_RREADY(ip_rready)
-                       );
 endmodule
