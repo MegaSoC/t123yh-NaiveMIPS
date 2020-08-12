@@ -632,7 +632,7 @@ module mycpu_top(
                   .o_isram_valid(inst_sram_data_ok),
                   .o_isram_inst(inst_sram_rdata),
 
-                  .i_dcache_va(E_DataLSaddr),
+                  .i_dcache_va(dm_stall ? E_calLSaddr_is_dm_stall : E_calLSaddr_not_dm_stall),
                   .i_dcache_phyaddr(data_sram_addr),
                   .i_dcache_byteen(E_MemWriteEnable),
                   .i_dcache_read((!data_uncached) &read & !E_CurrentException),
