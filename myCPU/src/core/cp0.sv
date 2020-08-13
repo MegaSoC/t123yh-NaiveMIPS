@@ -84,8 +84,8 @@ module cp0(
     reg [31:0] cp0_reg_TagLo0   ;   // 28.0
     reg [31:0] cp0_reg_TagHi0   ;   // 29.0
 
-    wire [8:0] raddr = {rd_addr, sel};
-    wire [8:0] waddr = {wr_addr, sel};
+    wire [7:0] raddr = {rd_addr, sel};
+    wire [7:0] waddr = {wr_addr, sel};
 
     reg timer_int;
     wire [7:0] Cause_IP = {hardware_int, cp0_reg_Cause[9:8]};
