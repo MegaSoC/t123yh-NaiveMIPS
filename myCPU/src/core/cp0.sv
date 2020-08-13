@@ -157,6 +157,7 @@ module cp0(
         end
         else begin
             cp0_reg_Cause[30] <= timer_int; 
+            cp0_reg_Cause[15:10] <= hardware_int; 
             count_add     <= ~count_add;
             cp0_reg_Count <= cp0_reg_Count + {31'd0, count_add};
             if (cp0_reg_Compare == cp0_reg_Count) begin
