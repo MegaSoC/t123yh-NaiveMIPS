@@ -84,8 +84,8 @@ module cp0(
     reg [31:0] cp0_reg_TagLo0   ;   // 28.0
     reg [31:0] cp0_reg_TagHi0   ;   // 29.0
 
-    wire [8:0] raddr = {rd_addr, sel};
-    wire [8:0] waddr = {wr_addr, sel};
+    wire [7:0] raddr = {rd_addr, sel};
+    wire [7:0] waddr = {wr_addr, sel};
 
     reg timer_int;
     wire [7:0] Cause_IP = {hardware_int, cp0_reg_Cause[9:8]};
@@ -95,8 +95,10 @@ module cp0(
 
     assign SR_BEV = cp0_reg_Status[22];
     assign SR_EXL = cp0_reg_Status[1];
+    wire SR_ERL = cp0_reg_Status[0];
     assign CAUSE_IV = cp0_reg_Cause[23];
     assign ebase  = cp0_reg_EBase;
+    wire mmu_kernel_mode = !cp0_reg_Status[4] || SR_EXL || SR_ERL;
 
 
     // TLB related
@@ -288,7 +290,7 @@ module cp0(
         .inst_en(inst_en),
         .data_c(data_c),
         .inst_c(inst_c),
-        .user_mode(cp0_reg_Status[4]),
+        .user_mode(~mmu_kernel_mode),
         .cp0_kseg0_uncached(~cp0_reg_Conf0[0])
     ); 
     
