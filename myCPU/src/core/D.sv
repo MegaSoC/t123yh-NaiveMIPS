@@ -68,6 +68,7 @@ module D(
     wire npc_last_likely_failed;
 
     reg last_is_eret;
+    reg after_exc;
 
     
 
@@ -190,6 +191,9 @@ module D(
             D_trap               <= 0;
             D_InvalidInstruction <= 0;
             D_clear_exl          <= 0;
+            if(ExceptionFlush && last_is_eret)begin
+                after_exc <= 1;
+            end
         end
         else if(!dm_stall)begin
             if(D_stall_Pass || I_nextNotReady || last_likely_failed)begin
@@ -236,12 +240,13 @@ module D(
                 D_IllegalInstruction <= I_inst_illegal;
                 D_trap               <= is_trap_inter;
                 D_InvalidInstruction <= I_inst_invalid;
-                D_clear_exl          <= last_is_eret;
+                D_clear_exl          <= last_is_eret && after_exc;
                 if(eret)begin
                     last_is_eret <= 1;
                 end
-                else begin
+                if(last_is_eret && after_exc)begin
                     last_is_eret <= 0;
+                    after_exc <= 0;
                 end
             end
 
