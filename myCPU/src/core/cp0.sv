@@ -109,6 +109,7 @@ module cp0(
     wire [11:0] mask_r;
     wire [31:0] entryhi_r, entrylo0_r, entrylo1_r;
     wire [`TLB_IDX_BITS-1:0] nRandom = cp0_reg_Random[`TLB_IDX_BITS-1:0] + 1'b1;
+    wire [31:0] cp0_reg_CauseR = { cp0_reg_Cause[31:16], Cause_IP, cp0_reg_Cause[7:0] };
     //read
     assign data_o = ({32{raddr == `CP0_Index    }} & cp0_reg_Index    ) |
                     ({32{raddr == `CP0_Random   }} & cp0_reg_Random   ) |
@@ -122,7 +123,7 @@ module cp0(
                     ({32{raddr == `CP0_EntryHi  }} & cp0_reg_EntryHi  ) |
                     ({32{raddr == `CP0_Compare  }} & cp0_reg_Compare  ) |
                     ({32{raddr == `CP0_Status   }} & cp0_reg_Status   ) |
-                    ({32{raddr == `CP0_Cause    }} & cp0_reg_Cause    ) |
+                    ({32{raddr == `CP0_Cause    }} & cp0_reg_CauseR   ) |
                     ({32{raddr == `CP0_EPC      }} & cp0_reg_EPC      ) |
                     ({32{raddr == `CP0_PRId     }} & cp0_reg_PRId     ) |
                     ({32{raddr == `CP0_EBase    }} & cp0_reg_EBase    ) |
@@ -161,8 +162,6 @@ module cp0(
         end
         else begin
             clear_exl_reg <= clear_exl;
-            cp0_reg_Cause[30] <= timer_int; 
-            cp0_reg_Cause[14:10] <= hardware_int; 
             count_add     <= ~count_add;
             cp0_reg_Count <= cp0_reg_Count + {31'd0, count_add};
             if (cp0_reg_Compare != 32'b0 && cp0_reg_Compare == cp0_reg_Count) begin
