@@ -95,7 +95,7 @@ module cp0(
 
     assign SR_BEV = cp0_reg_Status[22];
     assign SR_EXL = cp0_reg_Status[1];
-    wire SR_ERL = cp0_reg_Status[0];
+    wire SR_ERL = cp0_reg_Status[2];
     assign CAUSE_IV = cp0_reg_Cause[23];
     assign ebase  = cp0_reg_EBase;
     wire mmu_kernel_mode = !cp0_reg_Status[4] || SR_EXL || SR_ERL;
