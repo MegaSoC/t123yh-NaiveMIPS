@@ -273,6 +273,7 @@ module mycpu_top(
 
     wire E_XALU_Busy;
     wire D_InDelaySlot;
+    wire D_clear_exl,E_clear_exl;
 
     wire [3:0] M_WriteRegEnableExted;
     D my_d(
@@ -313,6 +314,7 @@ module mycpu_top(
           .E_XALU_Busy(E_XALU_Busy),
           .D_InDelaySlot(D_InDelaySlot),
           .salu_busy_real(salu_busy_real),
+          .D_clear_exl(D_clear_exl),
 
           .I_inst_miss(I_inst_miss),
           .I_inst_illegal(I_inst_illegal),
@@ -390,6 +392,7 @@ module mycpu_top(
           .E_SC_data(E_SC_data),
           .D_read(D_dcache_read),
           .D_write(D_dcache_write),
+          .D_clear_exl(D_clear_exl),
 
           .D_InstMiss(D_InstMiss),
           .D_IllegalInstruction(D_IllegalInstruction),
@@ -399,6 +402,7 @@ module mycpu_top(
           .E_InvalidInstruction(E_InvalidInstruction),
           .D_trap(D_trap),
           .E_trap(E_trap),
+          .E_clear_exl(E_clear_exl),
 
           .E_CurrentException(E_CurrentException),
           .E_calLSaddr_is_dm_stall(E_calLSaddr_is_dm_stall),
@@ -554,7 +558,7 @@ module mycpu_top(
             .sel(E_Sel),
             .data_i(data2cp0),
             .hardware_int(hardware_int_sample),
-            .clear_exl(clear_exl),
+            .clear_exl(E_clear_exl),
             .en_exp_i(cp0_CP0_WrExp),
             .exp_bd(E_in_delayslot),
             .exp_epc(exp_epc),

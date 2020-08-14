@@ -29,6 +29,7 @@ module D(
         output reg [15:0] D_Imm16,
         output reg [2:0] D_Sel,
         output reg [`INSTRBUS_WIDTH-1:0] D_InstrBus,
+        output reg D_clear_exl,
 
         input [3:0] E_T,
         input E_RegWriteEnable,
@@ -65,6 +66,8 @@ module D(
     wire WriteRegEnable_Inter;
     wire [4:0] WriteRegId_Inter;
     wire npc_last_likely_failed;
+
+    reg last_is_eret;
 
     
 
@@ -164,6 +167,7 @@ module D(
             D_is_branch        <= 0;
             D_InDelaySlot      <= 0;
             last_likely_failed <= 0;
+            last_is_eret       <= 0;
         end
 
         if(reset || ExceptionFlush )begin
@@ -185,6 +189,7 @@ module D(
             D_IllegalInstruction <= 0;
             D_trap               <= 0;
             D_InvalidInstruction <= 0;
+            D_clear_exl          <= 0;
         end
         else if(!dm_stall)begin
             if(D_stall_Pass || I_nextNotReady || last_likely_failed)begin
@@ -206,6 +211,7 @@ module D(
                 D_IllegalInstruction <= 0;
                 D_trap               <= 0;
                 D_InvalidInstruction <= 0;
+                D_clear_exl          <= 0;
             end
             else begin
                 D_PC                 <= I_PC;
@@ -230,6 +236,13 @@ module D(
                 D_IllegalInstruction <= I_inst_illegal;
                 D_trap               <= is_trap_inter;
                 D_InvalidInstruction <= I_inst_invalid;
+                D_clear_exl          <= last_is_eret;
+                if(eret)begin
+                    last_is_eret <= 1;
+                end
+                else begin
+                    last_is_eret <= 0;
+                end
             end
 
             if(!D_stall_Pass && !I_nextNotReady && last_likely_failed)begin
