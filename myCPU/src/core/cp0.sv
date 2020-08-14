@@ -11,7 +11,7 @@ module cp0(
         input wire [31:0]   data_i,
         input wire o_p_EstallClear,
 
-        input wire [5:0]    hardware_int,
+        input wire [4:0]    hardware_int,
         input wire          clear_exl,
         input wire          en_exp_i,
         input wire          exp_bd,
@@ -88,7 +88,7 @@ module cp0(
     wire [7:0] waddr = {wr_addr, sel};
 
     reg timer_int;
-    wire [7:0] Cause_IP = {hardware_int, cp0_reg_Cause[9:8]};
+    wire [7:0] Cause_IP = {timer_int, hardware_int, cp0_reg_Cause[9:8]};
     assign allow_int = cp0_reg_Status[2:0] == 3'b001 & !en_exp_i;
     assign interrupt_flag = cp0_reg_Status[15:8] & Cause_IP;
     assign epc       = cp0_reg_EPC;
@@ -154,15 +154,17 @@ module cp0(
             cp0_reg_TagHi0   <= 32'b0;
             dcache_close     <= 0;
             count_add        <= 1'b0;
+            timer_int        <= 1'b0;
         end
         else begin
             cp0_reg_Cause[30] <= timer_int; 
-            cp0_reg_Cause[15:10] <= hardware_int; 
+            cp0_reg_Cause[14:10] <= hardware_int; 
             count_add     <= ~count_add;
             cp0_reg_Count <= cp0_reg_Count + {31'd0, count_add};
-            if (cp0_reg_Compare == cp0_reg_Count) begin
-                timer_int         <= 1'b1;
-                cp0_reg_Cause[30] <= 1'b1;
+            if (cp0_reg_Compare != 32'b0 && cp0_reg_Compare == cp0_reg_Count) begin
+                timer_int <= 1'b1;
+            end else if (we && waddr == `CP0_Compare) begin
+                timer_int <= 1'b0;
             end
             if (we) begin
                 case(waddr)
@@ -194,8 +196,6 @@ module cp0(
                     end
                     `CP0_Compare: begin
                         cp0_reg_Compare                  <= data_i;
-                        timer_int                        <= (data_i == cp0_reg_Count);
-                        cp0_reg_Cause[30]                <= (data_i == cp0_reg_Count);
                     end
                     `CP0_Status: begin
                         cp0_reg_Status[28]               <= data_i[28];

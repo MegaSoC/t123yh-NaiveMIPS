@@ -2,7 +2,7 @@
 `include "def.svh"
 
 module mycpu_top(
-        input [5:0] ext_int,
+        input [5:0] ext_int, // ext_int[5] is ignored!
 
         input aclk,
         input aresetn,
@@ -530,13 +530,13 @@ module mycpu_top(
                   .trap(E_trap)
               );
 
-    reg[5:0] hardware_int_sample;
+    reg[4:0] hardware_int_sample;
 
     always_ff @(posedge Clk) begin
         if (reset) begin
-            hardware_int_sample <= 6'b0;
+            hardware_int_sample <= 5'b0;
         end else begin
-            hardware_int_sample <= ext_int;
+            hardware_int_sample <= ext_int[4:0];
         end
     end
 
@@ -665,11 +665,11 @@ module mycpu_top(
                   .o_dsram_valid(data_sram_data_ok),
 
                   .i_dcache_instr_tag('0),
-	              .i_dcache_instr('0), //m级传�?
+	              .i_dcache_instr('0), //m级传�?
                   .i_dcache_instr_addr('0), 
                 
-                  .i_icache_instr('0), //m级传�?
-	              .i_icache_instr_addr('0),   //m级传�?
+                  .i_icache_instr('0), //m级传�?
+	              .i_icache_instr_addr('0),   //m级传�?
 	              .i_icache_instr_tag('0),
 
                   .arid,
