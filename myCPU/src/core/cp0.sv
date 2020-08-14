@@ -87,8 +87,6 @@ module cp0(
     wire [7:0] raddr = {rd_addr, sel};
     wire [7:0] waddr = {wr_addr, sel};
 
-    reg clear_exl_reg;
-
     reg timer_int;
     wire [7:0] Cause_IP = {timer_int, hardware_int, cp0_reg_Cause[9:8]};
     assign allow_int = cp0_reg_Status[2:0] == 3'b001 & !en_exp_i;
@@ -135,7 +133,6 @@ module cp0(
     reg count_add;
     always_ff @(posedge clk) begin
         if (rst) begin
-            clear_exl_reg <= 0;
             cp0_reg_Index    <= 32'b0;
             cp0_reg_Random   <= `INIT_Random;
             cp0_reg_EntryLo0 <= 32'b0;
@@ -161,7 +158,6 @@ module cp0(
             timer_int        <= 1'b0;
         end
         else begin
-            clear_exl_reg <= clear_exl;
             count_add     <= ~count_add;
             cp0_reg_Count <= cp0_reg_Count + {31'd0, count_add};
             if (cp0_reg_Compare != 32'b0 && cp0_reg_Compare == cp0_reg_Count) begin
@@ -252,7 +248,7 @@ module cp0(
                     cp0_reg_EPC            <= exp_epc;
                     cp0_reg_Status[1]      <= 1'b1; 
                 end
-                if (clear_exl_reg) begin
+                if (clear_exl) begin
                     cp0_reg_Status[1] <= 1'b0;
                 end
             end
