@@ -24,14 +24,14 @@ module AT(
                   sllv||srlv||srav||my_And||my_Or||my_Xor||my_Nor||ori||Andi||Xori||slt||sltu||slti||sltiu||
                   (beq||beql)||(bne||bnel)||(blez||blezl)||(bgtz||bgtzl)||(bltz||bltzl)||(bgez||bgezl)||(bltzal||bltzall)||(bgezal||bgezall)||mul||
                   teq||teqi||tge||tgei||tgeiu||tgeu||tlt||tlti||tltiu||tltu||tne||tnei||
-                  clo||clz||madd||maddu||msub||msubu||movn||movz);
+                  clo||clz||madd||maddu||msub||msubu||movn||movz||CACHE);
     wire NeedRt =(add||addu||sub||subu||(SC|sw)||swl||swr||sb||sh||mult||multu||div||divu||sll||srl||sra||sllv||srlv||srav||
                   my_And||my_Or||my_Xor||my_Nor||slt||sltu||(beq||beql)||(bne||bnel)||mtc0||mul||
                   teq||tge||tgeu||tlt||tltu||tne||
                   madd||maddu||msub||msubu||movn||movz);
 
     wire [3:0] T_Rs =
-         (addi||addiu||add||addu||sub||subu||(LL|lw)||lwl||lwr||(SC|sw)||swl||swr||lb||lbu||lh||lhu||sb||sh||mult||multu||div||mthi||mtlo||
+         (addi||addiu||add||CACHE||addu||sub||subu||(LL|lw)||lwl||lwr||(SC|sw)||swl||swr||lb||lbu||lh||lhu||sb||sh||mult||multu||div||mthi||mtlo||
           divu||sllv||srlv||srav||my_And||my_Or||my_Xor||my_Nor||ori||Andi||Xori||slt||sltu||slti||sltiu||mul
           ||clo||clz||madd||maddu||msub||msubu) ? 1:0;
 

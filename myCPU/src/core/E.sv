@@ -34,6 +34,8 @@ module E(
         output reg [31:0] E_SC_data,
         input D_clear_exl,
         output reg E_clear_exl,
+        output reg [31:0] E_origin,
+        input [31:0] D_origin,
 
         output salu_busy_real,
 
@@ -183,6 +185,7 @@ module E(
     reg [`INSTRBUS_WIDTH-1:0] salu_InstrBus;
 
     reg mul_clear_exl,salu_clear_exl;
+    reg [31:0] mul_origin,salu_origin;
 
     assign E_XALU_Busy_real = E_XALU_Busy | mul_in_xalu;
 
@@ -230,6 +233,7 @@ module E(
             E_OverFlow           <= 0;
             E_DataUnaligned      <= 0;
             E_clear_exl          <= 0;
+            E_origin             <= 0;
         end
         else if(clo||clz && !count_in_salu)begin
             count_in_salu           <= 1;
@@ -255,6 +259,7 @@ module E(
             salu_inst_invalid       <= D_InvalidInstruction;
             salu_trap               <= D_trap;
             salu_clear_exl          <= D_clear_exl;
+            salu_origin             <= D_origin;
             E_PC                 <= 0;
             E_EPC                <= reset? 0 : D_EPC;
             E_WriteMemData       <= 0;
@@ -277,6 +282,7 @@ module E(
             E_OverFlow           <= 0;
             E_DataUnaligned      <= 0;
             E_clear_exl          <= 0;
+            E_origin             <= 0;
         end
         else if (mul && !mul_in_xalu) begin
             mul_in_xalu            <= 1;
@@ -302,6 +308,7 @@ module E(
             mul_inst_invalid       <= D_InvalidInstruction;
             mul_trap               <= D_trap;
             mul_clear_exl          <= D_clear_exl;
+            mul_origin             <= D_origin;
             E_PC                 <= 0;
             E_EPC                <= reset? 0 : D_EPC;
             E_WriteMemData       <= 0;
@@ -324,6 +331,7 @@ module E(
             E_OverFlow           <= 0;
             E_DataUnaligned      <= 0;
             E_clear_exl          <= 0;
+            E_origin             <= 0;
         end
         else if (!dm_stall) begin
             if(count_in_salu && !salu_busy)begin
@@ -349,6 +357,7 @@ module E(
                 E_DataUnaligned      <= salu_data_alignment_err;
                 E_in_delayslot       <= salu_in_delayslot;
                 E_clear_exl          <= salu_clear_exl;
+                E_origin             <= salu_origin;
             end
             else if(mul_in_xalu && !E_XALU_Busy)begin
                 mul_in_xalu          <= 1'b0;
@@ -373,6 +382,7 @@ module E(
                 E_DataUnaligned      <= mul_data_alignment_err;
                 E_in_delayslot       <= mul_in_delayslot;
                 E_clear_exl          <= mul_clear_exl;
+                E_origin             <= mul_origin;
             end
             else begin
                 E_PC                 <= D_PC;
@@ -399,6 +409,7 @@ module E(
                 E_llbit <= llbit;
                 E_SC_data            <= SC?{31'd0,llbit}:(({32{clo|clz}}&salur)|({32{!(clo|clz)}}&Data_Inter));
                 E_clear_exl          <= D_clear_exl;
+                E_origin             <= D_origin;
             end
         end
     end

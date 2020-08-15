@@ -54,6 +54,9 @@ module mycpu_top(
         output [31:0] debug_wb_rf_wdata
     );
     wire [31:0] tlb_reg_daddr,tlb_reg_iaddr_is_dm_stall,tlb_reg_iaddr_not_dm_stall;
+    
+
+    wire [31:0] D_origin,E_origin;
 
     wire D_trap,E_trap;
     wire salu_busy_real;
@@ -284,6 +287,7 @@ module mycpu_top(
           .ExceptionFlush(ExceptionFlush),
           .inst_sram_data_ok(inst_sram_data_ok),
           .W_T(M_T),
+          .D_origin(D_origin),
           .W_WriteRegEnable(M_WriteRegEnableExted),
           .W_RegWriteId(M_RegId),
           .W_RegWriteData(M_Data),
@@ -358,6 +362,8 @@ module mycpu_top(
           .D_RtData(D_RtData),
           .D_Shamt(D_Shamt),
           .D_Imm16(D_Imm16),
+          .D_origin(D_origin),
+          .E_origin(E_origin),
           .D_Sel(D_Sel),
           .D_InstrBus(D_InstrBus),
           .D_T(D_T),
@@ -621,6 +627,16 @@ module mycpu_top(
     logic [`DCACHE_TAG_WIDTH - 1 : 0] w_dcache_instr_tag;
     logic [1:0]  w_icache_instr, w_dcache_instr;
 
+    wire `INSTR_SET;
+    assign {`INSTR_SET} = E_InstrBus;
+
+    wire index_invalidate,store_tag,hit_writeback;
+    assign index_invalidate = (CACHE && E_origin[20:18] == 3'b000);
+    assign store_tag = (CACHE && E_origin[20:18] == 3'b010);
+    assign hit_writeback = (CACHE && E_origin[20:18] == 3'b110);
+    wire [1:0] cache_type;
+    assign cache_type = ({2{index_invalidate}}&2'b01) | ({2{store_tag}}&2'b10) | ({2{hit_writeback}}&2'b11);
+
 
      cache_soc 
    #(
@@ -669,11 +685,11 @@ module mycpu_top(
                   .o_dsram_valid(data_sram_data_ok),
 
                   .i_dcache_instr_tag('0),
-	              .i_dcache_instr('0), //m级传�?
-                  .i_dcache_instr_addr('0), 
+	              .i_dcache_instr(cache_type), //m级传�?
+                  .i_dcache_instr_addr(E_Data), 
                 
-                  .i_icache_instr('0), //m级传�?
-	              .i_icache_instr_addr('0),   //m级传�?
+                  .i_icache_instr(cache_type), //m级传�?
+	              .i_icache_instr_addr(E_Data),   //m级传�?
 	              .i_icache_instr_tag('0),
 
                   .arid,

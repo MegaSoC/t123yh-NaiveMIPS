@@ -29,6 +29,7 @@ module D(
         output reg [15:0] D_Imm16,
         output reg [2:0] D_Sel,
         output reg [`INSTRBUS_WIDTH-1:0] D_InstrBus,
+        output reg [31:0] D_origin,
         output reg D_clear_exl,
 
         input [3:0] E_T,
@@ -173,6 +174,7 @@ module D(
 
         if(reset || ExceptionFlush )begin
             D_PC                 <= 0;
+            D_origin             <= 0;
             RsNumber_D           <= 0;
             RtNumber_D           <= 0;
             D_RsData             <= 0;
@@ -198,6 +200,7 @@ module D(
         else if(!dm_stall)begin
             if(D_stall_Pass || I_nextNotReady || last_likely_failed)begin
                 D_PC                 <= 0;
+                D_origin             <= 0;
                 RsNumber_D           <= 0;
                 RtNumber_D           <= 0;
                 D_RsData             <= 0;
@@ -219,6 +222,7 @@ module D(
             end
             else begin
                 D_PC                 <= I_PC;
+                D_origin             <= I_MipsInstr;
                 RsNumber_D           <= Rs_Inter;
                 RtNumber_D           <= Rt_Inter;
                 D_RdID               <= Rd_Inter;
