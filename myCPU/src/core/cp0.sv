@@ -216,6 +216,9 @@ module cp0(
                     `CP0_Conf0: begin
                         cp0_reg_Conf0[2:0]               <= data_i[2:0];
                     end
+                    `CP0_TagLo0:begin
+                        cp0_reg_TagLo0                   <= data_i;
+                    end
                     22 : begin
                         dcache_close <= 1;
                     end
