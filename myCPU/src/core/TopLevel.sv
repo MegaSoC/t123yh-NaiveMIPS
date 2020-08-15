@@ -633,7 +633,7 @@ module mycpu_top(
     wire index_invalidate,store_tag,hit_writeback;
     assign index_invalidate = (CACHE && E_origin[20:18] == 3'b000);
     assign store_tag = (CACHE && E_origin[20:18] == 3'b010);
-    assign hit_writeback = (CACHE && E_origin[20:18] == 3'b110);
+    assign hit_writeback = (CACHE && E_origin[20:18] != 3'b000 && E_origin[20:18] != 3'b010);
     wire [1:0] cache_type;
     assign cache_type = ({2{index_invalidate}}&2'b01) | ({2{store_tag}}&2'b10) | ({2{hit_writeback}}&2'b11);
 
