@@ -44,7 +44,7 @@ module M(
     wire [31:0] regRT = (E_RtID!=0 && M_WriteRegEnable && M_RegId==E_RtID) ? M_Data : E_MemWriteData;
     wire [1:0] AddrOffset = E_Data[1:0];
 
-    assign read = (lb|lbu|lh|lhu|(LL|lw));
+    assign read = (lb|lbu|lh|lhu|(LL|lw)|CACHE);
     assign write = (sb|sh|(SC|sw));
     assign dm_stall = ((read|write)& uncached & !data_sram_data_ok ) | ( (!uncached) & (!hit));
     assign data2cp0 = regRT;
