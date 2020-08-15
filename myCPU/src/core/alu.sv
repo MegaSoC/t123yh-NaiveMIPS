@@ -98,7 +98,7 @@ module ALU(
 
     assign cache_r = srca + Imm32;
 
-    assign Data_Inter_onlyaddr = add_r;
+    assign Data_Inter_onlyaddr = ({32{CACHE}}&cache_r) | ({32{!CACHE}}&add_r);
 
     assign aluresult = ({32{normal}}&normal_r) | ({32{i}}&i_r) | ({32{s}}&s_r) | ({32{cmp}}&cmp_r) | ({32{type_pc}}&(PC+8) | ({32{mov}}&movr));
 
