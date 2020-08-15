@@ -637,6 +637,10 @@ module mycpu_top(
     wire [1:0] cache_type;
     assign cache_type = ({2{index_invalidate}}&2'b01) | ({2{store_tag}}&2'b10) | ({2{hit_writeback}}&2'b11);
 
+    wire [1:0] DI;
+    assign DI[0] = E_origin[17:16] == 2'b00;
+    assign DI[1] = E_origin[17:16] == 2'b01;
+
 
      cache_soc 
    #(
@@ -685,10 +689,10 @@ module mycpu_top(
                   .o_dsram_valid(data_sram_data_ok),
 
                   .i_dcache_instr_tag(cp0.cp0_reg_TagLo0),
-	              .i_dcache_instr(cache_type), //m级传�?
+	              .i_dcache_instr({2{DI[1]}} & cache_type), //m级传�?
                   .i_dcache_instr_addr(E_Data), 
                 
-                  .i_icache_instr(cache_type), //m级传�?
+                  .i_icache_instr({2{DI[0]}} & cache_type), //m级传�?
 	              .i_icache_instr_addr(E_Data),   //m级传�?
 	              .i_icache_instr_tag(cp0.cp0_reg_TagLo0),
 
