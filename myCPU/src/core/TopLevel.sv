@@ -684,13 +684,13 @@ module mycpu_top(
                   .o_dsram_outdata(data_sram_rdata),
                   .o_dsram_valid(data_sram_data_ok),
 
-                  .i_dcache_instr_tag('0),
+                  .i_dcache_instr_tag(cp0.cp0_reg_TagLo0),
 	              .i_dcache_instr(cache_type), //m级传�?
                   .i_dcache_instr_addr(E_Data), 
                 
                   .i_icache_instr(cache_type), //m级传�?
 	              .i_icache_instr_addr(E_Data),   //m级传�?
-	              .i_icache_instr_tag('0),
+	              .i_icache_instr_tag(cp0.cp0_reg_TagLo0),
 
                   .arid,
                   .araddr,
