@@ -29,6 +29,7 @@ LEAF(e6_mapped_instr)
     li t5, 0xFFFFE000
     li s5, 0x6000
     and t0, t0, t5
+    srl t0, t0, 6
     move t1, t0
     la t6, instr_tlb
     andi t6, t6, 0xFFF
