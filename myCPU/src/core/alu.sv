@@ -96,6 +96,7 @@ module ALU(
     logic type_pc;
     assign type_pc = (jal|jalr|(bltzal||bltzall)|(bgezal||bgezall));
 
+    wire [31:0] cache_r;
     assign cache_r = srca + Imm32;
 
     assign Data_Inter_onlyaddr = ({32{CACHE}}&cache_r) | ({32{!CACHE}}&add_r);
