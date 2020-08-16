@@ -6,7 +6,7 @@
 
 `define INIT_Random 	31
 `define INIT_PAGEMASKK  32'b0
-`define INIT_PRID       32'H00004220
+`define INIT_PRID       32'H00018003
 `define INIT_EBASE 		32'H80000000
 `define INIT_STATUS     32'H00400000
 `define INIT_CONF0 		{1'b1,3'b0,3'b0,9'b0,1'b0,2'b0,3'b0,3'b1,3'b0,1'b0,3'd3}

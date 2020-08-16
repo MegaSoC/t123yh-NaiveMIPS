@@ -77,7 +77,6 @@ module cp0(
     reg [31:0] cp0_reg_Status   ;   // 12
     reg [31:0] cp0_reg_Cause    ;   // 13
     reg [31:0] cp0_reg_EPC      ;   // 14
-    reg [31:0] cp0_reg_PRId     ;   // 15.0
     reg [31:0] cp0_reg_EBase    ;   // 15.1
     reg [31:0] cp0_reg_Conf0    ;   // 16.0
     reg [31:0] cp0_reg_Conf1    ;   // 16.1
@@ -123,7 +122,7 @@ module cp0(
                     ({32{raddr == `CP0_Status   }} & cp0_reg_Status   ) |
                     ({32{raddr == `CP0_Cause    }} & cp0_reg_CauseR   ) |
                     ({32{raddr == `CP0_EPC      }} & cp0_reg_EPC      ) |
-                    ({32{raddr == `CP0_PRId     }} & cp0_reg_PRId     ) |
+                    ({32{raddr == `CP0_PRId     }} & `INIT_PRID       ) |
                     ({32{raddr == `CP0_EBase    }} & cp0_reg_EBase    ) |
                     ({32{raddr == `CP0_Conf0    }} & cp0_reg_Conf0    ) | 
                     ({32{raddr == `CP0_Conf1    }} & cp0_reg_Conf1    ) |  
@@ -147,7 +146,6 @@ module cp0(
             cp0_reg_Status   <= `INIT_STATUS;
             cp0_reg_Cause    <= 32'b0;
             cp0_reg_EPC      <= 32'b0;
-            cp0_reg_PRId     <= `INIT_PRID;
             cp0_reg_EBase    <= `INIT_EBASE;
             cp0_reg_Conf0    <= `INIT_CONF0;
             cp0_reg_Conf1    <= `INIT_CONF1;
