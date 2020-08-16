@@ -2,7 +2,7 @@
 #include <regdef.h>
 #include <cpu_cde.h>
 
-#define TEST_NUM 12
+#define TEST_NUM 16
 
 
 ##s0, number
@@ -426,6 +426,8 @@ inst_test:
     nop
     jal e3_madd_msub_test    #lui
     nop
+    jal e8_lwl_lwr   #addu
+    nop
     jal e4_ll_sc    #lui
     nop
     jal e5_movz_movn    #lui
@@ -447,6 +449,8 @@ kseg0_kseg1:
     jal e2_clo_clz_test    #lui
     nop
     jal e3_madd_msub_test    #lui
+    nop
+    jal e8_lwl_lwr   #addu
     nop
     jal e4_ll_sc    #lui
     nop
