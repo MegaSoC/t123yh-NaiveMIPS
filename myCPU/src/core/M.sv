@@ -66,23 +66,21 @@ module M(
     wire [31:0] E_Datarrr;
     wire [3:0] RegWriteEnable_EExtedrrr;
 
-    logic [31:0] lwld,alwld;
-    assign lwld = ( Ans<<({Offset_Inter,3'b0}));
-    assign alwld = ( Ans>>({Offset_Inter,3'b0}));
-    logic normal;
-    assign normal = !(lb|lbu|lh|lhu|lwl|(!E_MemFamily));
-    assign E_Datarrr = ({32{!E_MemFamily}} & Ans) |
-           ({32{lhu}} & {16'b0,alwld[15:0]})|
-           ({32{lh}} & {{16{alwld[15]}},alwld[15:0]})|
-           ({32{lbu}} & {24'b0,alwld[7:0]})|
-           ({32{lb}} & {{24{alwld[7]}},alwld[7:0]})|
-           ({32{lwl}} & lwld)|
-           ({32{normal}} & alwld);
+    logic [31:0] lwld, lwrd, normd;
+    assign lwld = (Ans<<({~Offset_Inter,3'b0})) | (regRT & ~(32'hFFFFFFFF << {~Offset_Inter, 3'b0}));
+    assign lwrd = (Ans>>({Offset_Inter,3'b0})) | (regRT & ~(32'hFFFFFFFF >> {Offset_Inter, 3'b0}));
+
+    assign normd = (Ans>>({Offset_Inter,3'b0}));
+    wire normal = !(lb|lbu|lh|lhu|lwl|lwr);
+    assign E_Datarrr = ({32{normal}} & Ans) |
+           ({32{lhu}} & {16'b0,normd[15:0]})|
+           ({32{lh}} & {{16{normd[15]}},normd[15:0]})|
+           ({32{lbu}} & {24'b0,normd[7:0]})|
+           ({32{lb}} & {{24{normd[7]}},normd[7:0]})|
+           ({32{lwl}} & lwld) |
+           ({32{lwr}} & lwrd);
 
     wire [3:0] WritePreExted = {4{E_RegWriteEnable}};
-    logic pnormal;
-    assign pnormal = !(lwl|lwr);
-    assign RegWriteEnable_EExtedrrr = ({32{lwr}}&(WritePreExted>>Offset_Inter)) | ({32{lwl}}&( WritePreExted<<(~Offset_Inter))) | ({32{pnormal}}&(WritePreExted));
 
     always_ff @ (posedge Clk) begin
         if(reset | (ExceptionFlush) ) begin
@@ -107,7 +105,7 @@ module M(
             M_PC <= E_PC;
             M_T <= E_T==0?0:E_T-1;
             M_Data <= SC ? E_SC_data : E_Datarrr;
-            M_WriteRegEnableExted <= RegWriteEnable_EExtedrrr;
+            M_WriteRegEnableExted <= WritePreExted;
         end
     end
 

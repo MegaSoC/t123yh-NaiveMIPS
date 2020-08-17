@@ -160,7 +160,7 @@ module D(
         if (reset) begin
             D_EPC <= 0;
         end
-        else begin
+        else if(!dm_stall)begin
             D_EPC <= D_is_branch? I_PC - 4 : I_PC;
         end
     end

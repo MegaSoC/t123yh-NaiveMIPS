@@ -108,8 +108,8 @@ module E(
     assign E_XALU_Busy = XALU_Busy_Inter;
     wire `INSTR_SET;
     assign {`INSTR_SET} = D_InstrBus;
-    assign D_read =  (lb|lbu|lh|lhu|(LL|lw));
-    assign D_write = (sb|sh|(SC|sw));
+    assign D_read =  (lb|lbu|lh|lhu|(LL|lw)|lwl|lwr);
+    assign D_write = (sb|sh|(SC|sw)|swl|swr);
 
     wire [8:0] ExtType_Inter;
     wire [3:0] MemWriteEnable_Inter;
@@ -120,7 +120,7 @@ module E(
     assign Offset = Data_Inter[1:0];
 
     assign ExtType_Inter         = {lb,lbu,lh,lhu,(LL|lw),lwl,lwr,swl,swr};
-    assign MemFamily_Inter       = lb|lbu|lh|lhu|(LL|lw)|sb|sh|(SC|sw);
+    assign MemFamily_Inter       = lb|lbu|lh|lhu|LL|lw|sb|sh|SC|sw|swl|swr|lwl|lwr;
     assign D_load_alignment_err  = ((LL|lw) & Offset[1:0]!=0) | (lh & Offset[0] !=0) | (lhu & Offset[0] !=0) ;
     assign D_store_alignment_err = ((SC|sw) & Offset[1:0]!=0) | (sh & Offset[0] !=0) ;
 
