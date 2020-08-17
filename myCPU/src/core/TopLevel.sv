@@ -100,7 +100,7 @@ module mycpu_top(
     wire[3:0] data_sram_wen;
 
     wire[2:0] data_size;
-    assign data_size = ((SC|sw) | (LL|lw)) ? 3'b010 :
+    assign data_size = ((SC|sw) | (LL|lw|lwl|lwr)) ? 3'b010 :
            (sh | lh | lhu) ? 3'b001 :
            3'b000 ;
 
