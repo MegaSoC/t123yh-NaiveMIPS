@@ -772,7 +772,7 @@ bfc008a8:	0ff00434 	jal	bfc010d0 <n92_tlbwi_test>
 /home/lxb/project-for-linux/loooongson/soft/func_extended/start.S:438
 bfc008ac:	00000000 	nop
 /home/lxb/project-for-linux/loooongson/soft/func_extended/start.S:439
-bfc008b0:	0ff00554 	jal	bfc01550 <n93_tlbwr_test>
+bfc008b0:	0ff00550 	jal	bfc01540 <n93_tlbwr_test>
 /home/lxb/project-for-linux/loooongson/soft/func_extended/start.S:440
 bfc008b4:	00000000 	nop
 /home/lxb/project-for-linux/loooongson/soft/func_extended/start.S:442
@@ -962,119 +962,122 @@ bfc00a1c:	3c08800d 	lui	t0,0x800d
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/e8_lwl_lwr.S:12
 bfc00a20:	ad120000 	sw	s2,0(t0)
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/e8_lwl_lwr.S:18
-bfc00a24:	3c088000 	lui	t0,0x8000
-bfc00a28:	3508d000 	ori	t0,t0,0xd000
+bfc00a24:	3c08e000 	lui	t0,0xe000
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/e8_lwl_lwr.S:19
-bfc00a2c:	3c091234 	lui	t1,0x1234
-bfc00a30:	35295678 	ori	t1,t1,0x5678
+bfc00a28:	03e84024 	and	t0,ra,t0
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/e8_lwl_lwr.S:20
-bfc00a34:	ad090004 	sw	t1,4(t0)
+bfc00a2c:	3508d000 	ori	t0,t0,0xd000
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/e8_lwl_lwr.S:21
-bfc00a38:	3c0a90ab 	lui	t2,0x90ab
-bfc00a3c:	354acdef 	ori	t2,t2,0xcdef
+bfc00a30:	3c091234 	lui	t1,0x1234
+bfc00a34:	35295678 	ori	t1,t1,0x5678
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/e8_lwl_lwr.S:22
-bfc00a40:	ad0a0008 	sw	t2,8(t0)
+bfc00a38:	ad090004 	sw	t1,4(t0)
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/e8_lwl_lwr.S:23
-bfc00a44:	3c0b2233 	lui	t3,0x2233
-bfc00a48:	356b4455 	ori	t3,t3,0x4455
+bfc00a3c:	3c0a90ab 	lui	t2,0x90ab
+bfc00a40:	354acdef 	ori	t2,t2,0xcdef
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/e8_lwl_lwr.S:24
-bfc00a4c:	890b0008 	lwl	t3,8(t0)
+bfc00a44:	ad0a0008 	sw	t2,8(t0)
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/e8_lwl_lwr.S:25
-bfc00a50:	3c0eef33 	lui	t6,0xef33
-bfc00a54:	35ce4455 	ori	t6,t6,0x4455
+bfc00a48:	3c0b2233 	lui	t3,0x2233
+bfc00a4c:	356b4455 	ori	t3,t3,0x4455
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/e8_lwl_lwr.S:26
-bfc00a58:	156e002d 	bne	t3,t6,bfc00b10 <inst_error>
+bfc00a50:	890b0008 	lwl	t3,8(t0)
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/e8_lwl_lwr.S:27
-bfc00a5c:	00000000 	nop
+bfc00a54:	3c0eef33 	lui	t6,0xef33
+bfc00a58:	35ce4455 	ori	t6,t6,0x4455
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/e8_lwl_lwr.S:28
-bfc00a60:	990b0005 	lwr	t3,5(t0)
+bfc00a5c:	156e002d 	bne	t3,t6,bfc00b14 <inst_error>
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/e8_lwl_lwr.S:29
-bfc00a64:	3c0eef12 	lui	t6,0xef12
-bfc00a68:	35ce3456 	ori	t6,t6,0x3456
+bfc00a60:	00000000 	nop
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/e8_lwl_lwr.S:30
-bfc00a6c:	156e0028 	bne	t3,t6,bfc00b10 <inst_error>
+bfc00a64:	990b0005 	lwr	t3,5(t0)
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/e8_lwl_lwr.S:31
-bfc00a70:	00000000 	nop
+bfc00a68:	3c0eef12 	lui	t6,0xef12
+bfc00a6c:	35ce3456 	ori	t6,t6,0x3456
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/e8_lwl_lwr.S:32
-bfc00a74:	3c0b2233 	lui	t3,0x2233
-bfc00a78:	356b4455 	ori	t3,t3,0x4455
+bfc00a70:	156e0028 	bne	t3,t6,bfc00b14 <inst_error>
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/e8_lwl_lwr.S:33
-bfc00a7c:	890b0009 	lwl	t3,9(t0)
+bfc00a74:	00000000 	nop
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/e8_lwl_lwr.S:34
-bfc00a80:	3c0ecdef 	lui	t6,0xcdef
-bfc00a84:	35ce4455 	ori	t6,t6,0x4455
+bfc00a78:	3c0b2233 	lui	t3,0x2233
+bfc00a7c:	356b4455 	ori	t3,t3,0x4455
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/e8_lwl_lwr.S:35
-bfc00a88:	156e0021 	bne	t3,t6,bfc00b10 <inst_error>
+bfc00a80:	890b0009 	lwl	t3,9(t0)
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/e8_lwl_lwr.S:36
-bfc00a8c:	00000000 	nop
+bfc00a84:	3c0ecdef 	lui	t6,0xcdef
+bfc00a88:	35ce4455 	ori	t6,t6,0x4455
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/e8_lwl_lwr.S:37
-bfc00a90:	990b0006 	lwr	t3,6(t0)
+bfc00a8c:	156e0021 	bne	t3,t6,bfc00b14 <inst_error>
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/e8_lwl_lwr.S:38
-bfc00a94:	3c0ecdef 	lui	t6,0xcdef
-bfc00a98:	35ce1234 	ori	t6,t6,0x1234
+bfc00a90:	00000000 	nop
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/e8_lwl_lwr.S:39
-bfc00a9c:	156e001c 	bne	t3,t6,bfc00b10 <inst_error>
+bfc00a94:	990b0006 	lwr	t3,6(t0)
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/e8_lwl_lwr.S:40
-bfc00aa0:	00000000 	nop
+bfc00a98:	3c0ecdef 	lui	t6,0xcdef
+bfc00a9c:	35ce1234 	ori	t6,t6,0x1234
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/e8_lwl_lwr.S:41
-bfc00aa4:	3c0b2233 	lui	t3,0x2233
-bfc00aa8:	356b4455 	ori	t3,t3,0x4455
+bfc00aa0:	156e001c 	bne	t3,t6,bfc00b14 <inst_error>
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/e8_lwl_lwr.S:42
-bfc00aac:	890b000a 	lwl	t3,10(t0)
+bfc00aa4:	00000000 	nop
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/e8_lwl_lwr.S:43
-bfc00ab0:	3c0eabcd 	lui	t6,0xabcd
-bfc00ab4:	35ceef55 	ori	t6,t6,0xef55
+bfc00aa8:	3c0b2233 	lui	t3,0x2233
+bfc00aac:	356b4455 	ori	t3,t3,0x4455
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/e8_lwl_lwr.S:44
-bfc00ab8:	156e0015 	bne	t3,t6,bfc00b10 <inst_error>
+bfc00ab0:	890b000a 	lwl	t3,10(t0)
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/e8_lwl_lwr.S:45
-bfc00abc:	00000000 	nop
+bfc00ab4:	3c0eabcd 	lui	t6,0xabcd
+bfc00ab8:	35ceef55 	ori	t6,t6,0xef55
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/e8_lwl_lwr.S:46
-bfc00ac0:	990b0007 	lwr	t3,7(t0)
+bfc00abc:	156e0015 	bne	t3,t6,bfc00b14 <inst_error>
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/e8_lwl_lwr.S:47
-bfc00ac4:	3c0eabcd 	lui	t6,0xabcd
-bfc00ac8:	35ceef12 	ori	t6,t6,0xef12
+bfc00ac0:	00000000 	nop
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/e8_lwl_lwr.S:48
-bfc00acc:	156e0010 	bne	t3,t6,bfc00b10 <inst_error>
+bfc00ac4:	990b0007 	lwr	t3,7(t0)
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/e8_lwl_lwr.S:49
-bfc00ad0:	00000000 	nop
+bfc00ac8:	3c0eabcd 	lui	t6,0xabcd
+bfc00acc:	35ceef12 	ori	t6,t6,0xef12
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/e8_lwl_lwr.S:50
-bfc00ad4:	3c0b2233 	lui	t3,0x2233
-bfc00ad8:	356b4455 	ori	t3,t3,0x4455
+bfc00ad0:	156e0010 	bne	t3,t6,bfc00b14 <inst_error>
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/e8_lwl_lwr.S:51
-bfc00adc:	890b000b 	lwl	t3,11(t0)
+bfc00ad4:	00000000 	nop
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/e8_lwl_lwr.S:52
-bfc00ae0:	3c0e90ab 	lui	t6,0x90ab
-bfc00ae4:	35cecdef 	ori	t6,t6,0xcdef
+bfc00ad8:	3c0b2233 	lui	t3,0x2233
+bfc00adc:	356b4455 	ori	t3,t3,0x4455
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/e8_lwl_lwr.S:53
-bfc00ae8:	156e0009 	bne	t3,t6,bfc00b10 <inst_error>
+bfc00ae0:	890b000b 	lwl	t3,11(t0)
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/e8_lwl_lwr.S:54
-bfc00aec:	00000000 	nop
+bfc00ae4:	3c0e90ab 	lui	t6,0x90ab
+bfc00ae8:	35cecdef 	ori	t6,t6,0xcdef
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/e8_lwl_lwr.S:55
-bfc00af0:	3c0b2233 	lui	t3,0x2233
-bfc00af4:	356b4455 	ori	t3,t3,0x4455
+bfc00aec:	156e0009 	bne	t3,t6,bfc00b14 <inst_error>
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/e8_lwl_lwr.S:56
-bfc00af8:	990b0004 	lwr	t3,4(t0)
+bfc00af0:	00000000 	nop
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/e8_lwl_lwr.S:57
-bfc00afc:	3c0e1234 	lui	t6,0x1234
-bfc00b00:	35ce5678 	ori	t6,t6,0x5678
+bfc00af4:	3c0b2233 	lui	t3,0x2233
+bfc00af8:	356b4455 	ori	t3,t3,0x4455
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/e8_lwl_lwr.S:58
-bfc00b04:	156e0002 	bne	t3,t6,bfc00b10 <inst_error>
+bfc00afc:	990b0004 	lwr	t3,4(t0)
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/e8_lwl_lwr.S:59
-bfc00b08:	00000000 	nop
-/home/lxb/project-for-linux/loooongson/soft/func_extended/inst/e8_lwl_lwr.S:64
-bfc00b0c:	26730001 	addiu	s3,s3,1
+bfc00b00:	3c0e1234 	lui	t6,0x1234
+bfc00b04:	35ce5678 	ori	t6,t6,0x5678
+/home/lxb/project-for-linux/loooongson/soft/func_extended/inst/e8_lwl_lwr.S:60
+bfc00b08:	156e0002 	bne	t3,t6,bfc00b14 <inst_error>
+/home/lxb/project-for-linux/loooongson/soft/func_extended/inst/e8_lwl_lwr.S:61
+bfc00b0c:	00000000 	nop
+/home/lxb/project-for-linux/loooongson/soft/func_extended/inst/e8_lwl_lwr.S:66
+bfc00b10:	26730001 	addiu	s3,s3,1
 
-bfc00b10 <inst_error>:
-/home/lxb/project-for-linux/loooongson/soft/func_extended/inst/e8_lwl_lwr.S:67
-bfc00b10:	00104e00 	sll	t1,s0,0x18
-/home/lxb/project-for-linux/loooongson/soft/func_extended/inst/e8_lwl_lwr.S:68
-bfc00b14:	01334025 	or	t0,t1,s3
+bfc00b14 <inst_error>:
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/e8_lwl_lwr.S:69
-bfc00b18:	ae280000 	sw	t0,0(s1)
+bfc00b14:	00104e00 	sll	t1,s0,0x18
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/e8_lwl_lwr.S:70
-bfc00b1c:	03e00008 	jr	ra
+bfc00b18:	01334025 	or	t0,t1,s3
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/e8_lwl_lwr.S:71
-bfc00b20:	00000000 	nop
+bfc00b1c:	ae280000 	sw	t0,0(s1)
+/home/lxb/project-for-linux/loooongson/soft/func_extended/inst/e8_lwl_lwr.S:72
+bfc00b20:	03e00008 	jr	ra
+/home/lxb/project-for-linux/loooongson/soft/func_extended/inst/e8_lwl_lwr.S:73
+bfc00b24:	00000000 	nop
 	...
 
 bfc00b30 <instr_tlb>:
@@ -1928,452 +1931,451 @@ bfc0136c:	3c08800d 	lui	t0,0x800d
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/e9_swl_swr.S:12
 bfc01370:	ad120000 	sw	s2,0(t0)
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/e9_swl_swr.S:18
-bfc01374:	3c088000 	lui	t0,0x8000
-bfc01378:	3508d000 	ori	t0,t0,0xd000
+bfc01374:	3c08e000 	lui	t0,0xe000
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/e9_swl_swr.S:19
-bfc0137c:	3c088000 	lui	t0,0x8000
-bfc01380:	3508d000 	ori	t0,t0,0xd000
+bfc01378:	03e84024 	and	t0,ra,t0
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/e9_swl_swr.S:20
-bfc01384:	3c091234 	lui	t1,0x1234
-bfc01388:	35295678 	ori	t1,t1,0x5678
+bfc0137c:	3508d000 	ori	t0,t0,0xd000
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/e9_swl_swr.S:21
-bfc0138c:	ad090004 	sw	t1,4(t0)
+bfc01380:	3c091234 	lui	t1,0x1234
+bfc01384:	35295678 	ori	t1,t1,0x5678
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/e9_swl_swr.S:22
-bfc01390:	3c0a90ab 	lui	t2,0x90ab
-bfc01394:	354acdef 	ori	t2,t2,0xcdef
+bfc01388:	ad090004 	sw	t1,4(t0)
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/e9_swl_swr.S:23
-bfc01398:	ad0a0008 	sw	t2,8(t0)
+bfc0138c:	3c0a90ab 	lui	t2,0x90ab
+bfc01390:	354acdef 	ori	t2,t2,0xcdef
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/e9_swl_swr.S:24
-bfc0139c:	3c0b1926 	lui	t3,0x1926
-bfc013a0:	356b0817 	ori	t3,t3,0x817
+bfc01394:	ad0a0008 	sw	t2,8(t0)
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/e9_swl_swr.S:25
-bfc013a4:	a90b0008 	swl	t3,8(t0)
+bfc01398:	3c0b1926 	lui	t3,0x1926
+bfc0139c:	356b0817 	ori	t3,t3,0x817
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/e9_swl_swr.S:26
-bfc013a8:	8d0c0008 	lw	t4,8(t0)
+bfc013a0:	a90b0008 	swl	t3,8(t0)
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/e9_swl_swr.S:27
-bfc013ac:	3c0d90ab 	lui	t5,0x90ab
-bfc013b0:	35adcd19 	ori	t5,t5,0xcd19
+bfc013a4:	8d0c0008 	lw	t4,8(t0)
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/e9_swl_swr.S:28
-bfc013b4:	158d005e 	bne	t4,t5,bfc01530 <inst_error>
+bfc013a8:	3c0d90ab 	lui	t5,0x90ab
+bfc013ac:	35adcd19 	ori	t5,t5,0xcd19
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/e9_swl_swr.S:29
-bfc013b8:	00000000 	nop
+bfc013b0:	158d005e 	bne	t4,t5,bfc0152c <inst_error>
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/e9_swl_swr.S:30
-bfc013bc:	3c091234 	lui	t1,0x1234
-bfc013c0:	35295678 	ori	t1,t1,0x5678
+bfc013b4:	00000000 	nop
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/e9_swl_swr.S:31
-bfc013c4:	ad090004 	sw	t1,4(t0)
+bfc013b8:	3c091234 	lui	t1,0x1234
+bfc013bc:	35295678 	ori	t1,t1,0x5678
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/e9_swl_swr.S:32
-bfc013c8:	3c0a90ab 	lui	t2,0x90ab
-bfc013cc:	354acdef 	ori	t2,t2,0xcdef
+bfc013c0:	ad090004 	sw	t1,4(t0)
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/e9_swl_swr.S:33
-bfc013d0:	ad0a0008 	sw	t2,8(t0)
+bfc013c4:	3c0a90ab 	lui	t2,0x90ab
+bfc013c8:	354acdef 	ori	t2,t2,0xcdef
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/e9_swl_swr.S:34
-bfc013d4:	a90b0005 	swl	t3,5(t0)
+bfc013cc:	ad0a0008 	sw	t2,8(t0)
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/e9_swl_swr.S:35
-bfc013d8:	8d0c0004 	lw	t4,4(t0)
+bfc013d0:	a90b0005 	swl	t3,5(t0)
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/e9_swl_swr.S:36
-bfc013dc:	3c0d1234 	lui	t5,0x1234
-bfc013e0:	35ad1926 	ori	t5,t5,0x1926
+bfc013d4:	8d0c0004 	lw	t4,4(t0)
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/e9_swl_swr.S:37
-bfc013e4:	158d0052 	bne	t4,t5,bfc01530 <inst_error>
+bfc013d8:	3c0d1234 	lui	t5,0x1234
+bfc013dc:	35ad1926 	ori	t5,t5,0x1926
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/e9_swl_swr.S:38
-bfc013e8:	00000000 	nop
+bfc013e0:	158d0052 	bne	t4,t5,bfc0152c <inst_error>
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/e9_swl_swr.S:39
-bfc013ec:	3c091234 	lui	t1,0x1234
-bfc013f0:	35295678 	ori	t1,t1,0x5678
+bfc013e4:	00000000 	nop
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/e9_swl_swr.S:40
-bfc013f4:	ad090004 	sw	t1,4(t0)
+bfc013e8:	3c091234 	lui	t1,0x1234
+bfc013ec:	35295678 	ori	t1,t1,0x5678
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/e9_swl_swr.S:41
-bfc013f8:	3c0a90ab 	lui	t2,0x90ab
-bfc013fc:	354acdef 	ori	t2,t2,0xcdef
+bfc013f0:	ad090004 	sw	t1,4(t0)
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/e9_swl_swr.S:42
-bfc01400:	ad0a0008 	sw	t2,8(t0)
+bfc013f4:	3c0a90ab 	lui	t2,0x90ab
+bfc013f8:	354acdef 	ori	t2,t2,0xcdef
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/e9_swl_swr.S:43
-bfc01404:	a90b0006 	swl	t3,6(t0)
+bfc013fc:	ad0a0008 	sw	t2,8(t0)
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/e9_swl_swr.S:44
-bfc01408:	8d0c0004 	lw	t4,4(t0)
+bfc01400:	a90b0006 	swl	t3,6(t0)
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/e9_swl_swr.S:45
-bfc0140c:	3c0d1219 	lui	t5,0x1219
-bfc01410:	35ad2608 	ori	t5,t5,0x2608
+bfc01404:	8d0c0004 	lw	t4,4(t0)
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/e9_swl_swr.S:46
-bfc01414:	158d0046 	bne	t4,t5,bfc01530 <inst_error>
+bfc01408:	3c0d1219 	lui	t5,0x1219
+bfc0140c:	35ad2608 	ori	t5,t5,0x2608
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/e9_swl_swr.S:47
-bfc01418:	00000000 	nop
+bfc01410:	158d0046 	bne	t4,t5,bfc0152c <inst_error>
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/e9_swl_swr.S:48
-bfc0141c:	3c091234 	lui	t1,0x1234
-bfc01420:	35295678 	ori	t1,t1,0x5678
+bfc01414:	00000000 	nop
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/e9_swl_swr.S:49
-bfc01424:	ad090004 	sw	t1,4(t0)
+bfc01418:	3c091234 	lui	t1,0x1234
+bfc0141c:	35295678 	ori	t1,t1,0x5678
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/e9_swl_swr.S:50
-bfc01428:	3c0a90ab 	lui	t2,0x90ab
-bfc0142c:	354acdef 	ori	t2,t2,0xcdef
+bfc01420:	ad090004 	sw	t1,4(t0)
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/e9_swl_swr.S:51
-bfc01430:	ad0a0008 	sw	t2,8(t0)
+bfc01424:	3c0a90ab 	lui	t2,0x90ab
+bfc01428:	354acdef 	ori	t2,t2,0xcdef
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/e9_swl_swr.S:52
-bfc01434:	a90b0007 	swl	t3,7(t0)
+bfc0142c:	ad0a0008 	sw	t2,8(t0)
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/e9_swl_swr.S:53
-bfc01438:	8d0c0004 	lw	t4,4(t0)
+bfc01430:	a90b0007 	swl	t3,7(t0)
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/e9_swl_swr.S:54
-bfc0143c:	8d0e0008 	lw	t6,8(t0)
+bfc01434:	8d0c0004 	lw	t4,4(t0)
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/e9_swl_swr.S:55
-bfc01440:	3c0d90ab 	lui	t5,0x90ab
-bfc01444:	35adcdef 	ori	t5,t5,0xcdef
+bfc01438:	8d0e0008 	lw	t6,8(t0)
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/e9_swl_swr.S:56
-bfc01448:	15cd0039 	bne	t6,t5,bfc01530 <inst_error>
+bfc0143c:	3c0d90ab 	lui	t5,0x90ab
+bfc01440:	35adcdef 	ori	t5,t5,0xcdef
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/e9_swl_swr.S:57
-bfc0144c:	00000000 	nop
+bfc01444:	15cd0039 	bne	t6,t5,bfc0152c <inst_error>
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/e9_swl_swr.S:58
-bfc01450:	158b0037 	bne	t4,t3,bfc01530 <inst_error>
+bfc01448:	00000000 	nop
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/e9_swl_swr.S:59
-bfc01454:	00000000 	nop
-/home/lxb/project-for-linux/loooongson/soft/func_extended/inst/e9_swl_swr.S:62
-bfc01458:	3c091234 	lui	t1,0x1234
-bfc0145c:	35295678 	ori	t1,t1,0x5678
+bfc0144c:	158b0037 	bne	t4,t3,bfc0152c <inst_error>
+/home/lxb/project-for-linux/loooongson/soft/func_extended/inst/e9_swl_swr.S:60
+bfc01450:	00000000 	nop
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/e9_swl_swr.S:63
-bfc01460:	ad090004 	sw	t1,4(t0)
+bfc01454:	3c091234 	lui	t1,0x1234
+bfc01458:	35295678 	ori	t1,t1,0x5678
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/e9_swl_swr.S:64
-bfc01464:	3c0a90ab 	lui	t2,0x90ab
-bfc01468:	354acdef 	ori	t2,t2,0xcdef
+bfc0145c:	ad090004 	sw	t1,4(t0)
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/e9_swl_swr.S:65
-bfc0146c:	ad0a0008 	sw	t2,8(t0)
+bfc01460:	3c0a90ab 	lui	t2,0x90ab
+bfc01464:	354acdef 	ori	t2,t2,0xcdef
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/e9_swl_swr.S:66
-bfc01470:	3c0b1926 	lui	t3,0x1926
-bfc01474:	356b0817 	ori	t3,t3,0x817
+bfc01468:	ad0a0008 	sw	t2,8(t0)
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/e9_swl_swr.S:67
-bfc01478:	b90b0005 	swr	t3,5(t0)
+bfc0146c:	3c0b1926 	lui	t3,0x1926
+bfc01470:	356b0817 	ori	t3,t3,0x817
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/e9_swl_swr.S:68
-bfc0147c:	8d0c0004 	lw	t4,4(t0)
+bfc01474:	b90b0005 	swr	t3,5(t0)
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/e9_swl_swr.S:69
-bfc01480:	3c0d2608 	lui	t5,0x2608
-bfc01484:	35ad1778 	ori	t5,t5,0x1778
+bfc01478:	8d0c0004 	lw	t4,4(t0)
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/e9_swl_swr.S:70
-bfc01488:	158d0029 	bne	t4,t5,bfc01530 <inst_error>
+bfc0147c:	3c0d2608 	lui	t5,0x2608
+bfc01480:	35ad1778 	ori	t5,t5,0x1778
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/e9_swl_swr.S:71
-bfc0148c:	00000000 	nop
+bfc01484:	158d0029 	bne	t4,t5,bfc0152c <inst_error>
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/e9_swl_swr.S:72
-bfc01490:	3c091234 	lui	t1,0x1234
-bfc01494:	35295678 	ori	t1,t1,0x5678
+bfc01488:	00000000 	nop
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/e9_swl_swr.S:73
-bfc01498:	ad090004 	sw	t1,4(t0)
+bfc0148c:	3c091234 	lui	t1,0x1234
+bfc01490:	35295678 	ori	t1,t1,0x5678
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/e9_swl_swr.S:74
-bfc0149c:	3c0a90ab 	lui	t2,0x90ab
-bfc014a0:	354acdef 	ori	t2,t2,0xcdef
+bfc01494:	ad090004 	sw	t1,4(t0)
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/e9_swl_swr.S:75
-bfc014a4:	ad0a0008 	sw	t2,8(t0)
+bfc01498:	3c0a90ab 	lui	t2,0x90ab
+bfc0149c:	354acdef 	ori	t2,t2,0xcdef
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/e9_swl_swr.S:76
-bfc014a8:	b90b0006 	swr	t3,6(t0)
+bfc014a0:	ad0a0008 	sw	t2,8(t0)
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/e9_swl_swr.S:77
-bfc014ac:	8d0c0004 	lw	t4,4(t0)
+bfc014a4:	b90b0006 	swr	t3,6(t0)
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/e9_swl_swr.S:78
-bfc014b0:	3c0d0817 	lui	t5,0x817
-bfc014b4:	35ad5678 	ori	t5,t5,0x5678
+bfc014a8:	8d0c0004 	lw	t4,4(t0)
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/e9_swl_swr.S:79
-bfc014b8:	158d001d 	bne	t4,t5,bfc01530 <inst_error>
+bfc014ac:	3c0d0817 	lui	t5,0x817
+bfc014b0:	35ad5678 	ori	t5,t5,0x5678
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/e9_swl_swr.S:80
-bfc014bc:	00000000 	nop
+bfc014b4:	158d001d 	bne	t4,t5,bfc0152c <inst_error>
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/e9_swl_swr.S:81
-bfc014c0:	3c091234 	lui	t1,0x1234
-bfc014c4:	35295678 	ori	t1,t1,0x5678
+bfc014b8:	00000000 	nop
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/e9_swl_swr.S:82
-bfc014c8:	ad090004 	sw	t1,4(t0)
+bfc014bc:	3c091234 	lui	t1,0x1234
+bfc014c0:	35295678 	ori	t1,t1,0x5678
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/e9_swl_swr.S:83
-bfc014cc:	3c0a90ab 	lui	t2,0x90ab
-bfc014d0:	354acdef 	ori	t2,t2,0xcdef
+bfc014c4:	ad090004 	sw	t1,4(t0)
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/e9_swl_swr.S:84
-bfc014d4:	ad0a0008 	sw	t2,8(t0)
+bfc014c8:	3c0a90ab 	lui	t2,0x90ab
+bfc014cc:	354acdef 	ori	t2,t2,0xcdef
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/e9_swl_swr.S:85
-bfc014d8:	b90b0007 	swr	t3,7(t0)
+bfc014d0:	ad0a0008 	sw	t2,8(t0)
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/e9_swl_swr.S:86
-bfc014dc:	8d0c0004 	lw	t4,4(t0)
+bfc014d4:	b90b0007 	swr	t3,7(t0)
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/e9_swl_swr.S:87
-bfc014e0:	3c0d1734 	lui	t5,0x1734
-bfc014e4:	35ad5678 	ori	t5,t5,0x5678
+bfc014d8:	8d0c0004 	lw	t4,4(t0)
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/e9_swl_swr.S:88
-bfc014e8:	158d0011 	bne	t4,t5,bfc01530 <inst_error>
+bfc014dc:	3c0d1734 	lui	t5,0x1734
+bfc014e0:	35ad5678 	ori	t5,t5,0x5678
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/e9_swl_swr.S:89
-bfc014ec:	00000000 	nop
+bfc014e4:	158d0011 	bne	t4,t5,bfc0152c <inst_error>
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/e9_swl_swr.S:90
-bfc014f0:	3c091234 	lui	t1,0x1234
-bfc014f4:	35295678 	ori	t1,t1,0x5678
+bfc014e8:	00000000 	nop
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/e9_swl_swr.S:91
-bfc014f8:	ad090004 	sw	t1,4(t0)
+bfc014ec:	3c091234 	lui	t1,0x1234
+bfc014f0:	35295678 	ori	t1,t1,0x5678
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/e9_swl_swr.S:92
-bfc014fc:	3c0a90ab 	lui	t2,0x90ab
-bfc01500:	354acdef 	ori	t2,t2,0xcdef
+bfc014f4:	ad090004 	sw	t1,4(t0)
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/e9_swl_swr.S:93
-bfc01504:	ad0a0008 	sw	t2,8(t0)
+bfc014f8:	3c0a90ab 	lui	t2,0x90ab
+bfc014fc:	354acdef 	ori	t2,t2,0xcdef
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/e9_swl_swr.S:94
-bfc01508:	b90b0008 	swr	t3,8(t0)
+bfc01500:	ad0a0008 	sw	t2,8(t0)
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/e9_swl_swr.S:95
-bfc0150c:	8d0c0004 	lw	t4,4(t0)
+bfc01504:	b90b0008 	swr	t3,8(t0)
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/e9_swl_swr.S:96
-bfc01510:	8d0e0008 	lw	t6,8(t0)
+bfc01508:	8d0c0004 	lw	t4,4(t0)
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/e9_swl_swr.S:97
-bfc01514:	3c0d1234 	lui	t5,0x1234
-bfc01518:	35ad5678 	ori	t5,t5,0x5678
+bfc0150c:	8d0e0008 	lw	t6,8(t0)
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/e9_swl_swr.S:98
-bfc0151c:	15cb0004 	bne	t6,t3,bfc01530 <inst_error>
+bfc01510:	3c0d1234 	lui	t5,0x1234
+bfc01514:	35ad5678 	ori	t5,t5,0x5678
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/e9_swl_swr.S:99
-bfc01520:	00000000 	nop
+bfc01518:	15cb0004 	bne	t6,t3,bfc0152c <inst_error>
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/e9_swl_swr.S:100
-bfc01524:	158d0002 	bne	t4,t5,bfc01530 <inst_error>
+bfc0151c:	00000000 	nop
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/e9_swl_swr.S:101
-bfc01528:	00000000 	nop
-/home/lxb/project-for-linux/loooongson/soft/func_extended/inst/e9_swl_swr.S:107
-bfc0152c:	26730001 	addiu	s3,s3,1
+bfc01520:	158d0002 	bne	t4,t5,bfc0152c <inst_error>
+/home/lxb/project-for-linux/loooongson/soft/func_extended/inst/e9_swl_swr.S:102
+bfc01524:	00000000 	nop
+/home/lxb/project-for-linux/loooongson/soft/func_extended/inst/e9_swl_swr.S:108
+bfc01528:	26730001 	addiu	s3,s3,1
 
-bfc01530 <inst_error>:
-/home/lxb/project-for-linux/loooongson/soft/func_extended/inst/e9_swl_swr.S:110
-bfc01530:	00104e00 	sll	t1,s0,0x18
+bfc0152c <inst_error>:
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/e9_swl_swr.S:111
-bfc01534:	01334025 	or	t0,t1,s3
+bfc0152c:	00104e00 	sll	t1,s0,0x18
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/e9_swl_swr.S:112
-bfc01538:	ae280000 	sw	t0,0(s1)
+bfc01530:	01334025 	or	t0,t1,s3
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/e9_swl_swr.S:113
-bfc0153c:	03e00008 	jr	ra
+bfc01534:	ae280000 	sw	t0,0(s1)
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/e9_swl_swr.S:114
-bfc01540:	00000000 	nop
-	...
+bfc01538:	03e00008 	jr	ra
+/home/lxb/project-for-linux/loooongson/soft/func_extended/inst/e9_swl_swr.S:115
+bfc0153c:	00000000 	nop
 
-bfc01550 <n93_tlbwr_test>:
+bfc01540 <n93_tlbwr_test>:
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/n93_tlbwr.S:9
-bfc01550:	26100001 	addiu	s0,s0,1
+bfc01540:	26100001 	addiu	s0,s0,1
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/n93_tlbwr.S:10
-bfc01554:	2404005d 	li	a0,93
+bfc01544:	2404005d 	li	a0,93
 
-bfc01558 <test_gbit_start>:
+bfc01548 <test_gbit_start>:
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/n93_tlbwr.S:13
-bfc01558:	3c02ffe8 	lui	v0,0xffe8
+bfc01548:	3c02ffe8 	lui	v0,0xffe8
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/n93_tlbwr.S:14
-bfc0155c:	3442dc03 	ori	v0,v0,0xdc03
+bfc0154c:	3442dc03 	ori	v0,v0,0xdc03
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/n93_tlbwr.S:15
-bfc01560:	3c120011 	lui	s2,0x11
+bfc01550:	3c120011 	lui	s2,0x11
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/n93_tlbwr.S:16
-bfc01564:	3652e124 	ori	s2,s2,0xe124
+bfc01554:	3652e124 	ori	s2,s2,0xe124
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/n93_tlbwr.S:17
-bfc01568:	3c150011 	lui	s5,0x11
+bfc01558:	3c150011 	lui	s5,0x11
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/n93_tlbwr.S:18
-bfc0156c:	36b5e000 	ori	s5,s5,0xe000
+bfc0155c:	36b5e000 	ori	s5,s5,0xe000
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/n93_tlbwr.S:19
-bfc01570:	3c071234 	lui	a3,0x1234
+bfc01560:	3c071234 	lui	a3,0x1234
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/n93_tlbwr.S:20
-bfc01574:	34e75867 	ori	a3,a3,0x5867
+bfc01564:	34e75867 	ori	a3,a3,0x5867
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/n93_tlbwr.S:21
-bfc01578:	241a0001 	li	k0,1
+bfc01568:	241a0001 	li	k0,1
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/n93_tlbwr.S:22
-bfc0157c:	24084000 	li	t0,16384
+bfc0156c:	24084000 	li	t0,16384
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/n93_tlbwr.S:23
-bfc01580:	24094000 	li	t1,16384
+bfc01570:	24094000 	li	t1,16384
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/n93_tlbwr.S:24
-bfc01584:	ae470000 	sw	a3,0(s2)
+bfc01574:	ae470000 	sw	a3,0(s2)
 	...
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/n93_tlbwr.S:30
-bfc0159c:	3c08ed08 	lui	t0,0xed08
+bfc0158c:	3c08ed08 	lui	t0,0xed08
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/n93_tlbwr.S:31
-bfc015a0:	3508dc16 	ori	t0,t0,0xdc16
+bfc01590:	3508dc16 	ori	t0,t0,0xdc16
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/n93_tlbwr.S:32
-bfc015a4:	14680064 	bne	v1,t0,bfc01738 <inst_error>
+bfc01594:	14680064 	bne	v1,t0,bfc01728 <inst_error>
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/n93_tlbwr.S:33
-bfc015a8:	00000000 	nop
+bfc01598:	00000000 	nop
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/n93_tlbwr.S:34
-bfc015ac:	3c120011 	lui	s2,0x11
+bfc0159c:	3c120011 	lui	s2,0x11
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/n93_tlbwr.S:35
-bfc015b0:	3652f124 	ori	s2,s2,0xf124
+bfc015a0:	3652f124 	ori	s2,s2,0xf124
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/n93_tlbwr.S:36
-bfc015b4:	8e480000 	lw	t0,0(s2)
+bfc015a4:	8e480000 	lw	t0,0(s2)
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/n93_tlbwr.S:37
-bfc015b8:	3c071234 	lui	a3,0x1234
+bfc015a8:	3c071234 	lui	a3,0x1234
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/n93_tlbwr.S:38
-bfc015bc:	34e75867 	ori	a3,a3,0x5867
+bfc015ac:	34e75867 	ori	a3,a3,0x5867
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/n93_tlbwr.S:39
-bfc015c0:	14e8005d 	bne	a3,t0,bfc01738 <inst_error>
+bfc015b0:	14e8005d 	bne	a3,t0,bfc01728 <inst_error>
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/n93_tlbwr.S:40
-bfc015c4:	00000000 	nop
+bfc015b4:	00000000 	nop
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/n93_tlbwr.S:41
-bfc015c8:	3c128010 	lui	s2,0x8010
-bfc015cc:	36520124 	ori	s2,s2,0x124
+bfc015b8:	3c128010 	lui	s2,0x8010
+bfc015bc:	36520124 	ori	s2,s2,0x124
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/n93_tlbwr.S:42
-bfc015d0:	8e480000 	lw	t0,0(s2)
+bfc015c0:	8e480000 	lw	t0,0(s2)
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/n93_tlbwr.S:43
-bfc015d4:	14e80058 	bne	a3,t0,bfc01738 <inst_error>
+bfc015c4:	14e80058 	bne	a3,t0,bfc01728 <inst_error>
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/n93_tlbwr.S:44
-bfc015d8:	00000000 	nop
+bfc015c8:	00000000 	nop
 
-bfc015dc <test_asid_match>:
+bfc015cc <test_asid_match>:
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/n93_tlbwr.S:46
-bfc015dc:	3c02ffe8 	lui	v0,0xffe8
+bfc015cc:	3c02ffe8 	lui	v0,0xffe8
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/n93_tlbwr.S:47
-bfc015e0:	3442dc03 	ori	v0,v0,0xdc03
+bfc015d0:	3442dc03 	ori	v0,v0,0xdc03
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/n93_tlbwr.S:48
-bfc015e4:	3c120012 	lui	s2,0x12
+bfc015d4:	3c120012 	lui	s2,0x12
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/n93_tlbwr.S:49
-bfc015e8:	3652e124 	ori	s2,s2,0xe124
+bfc015d8:	3652e124 	ori	s2,s2,0xe124
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/n93_tlbwr.S:50
-bfc015ec:	241a0003 	li	k0,3
+bfc015dc:	241a0003 	li	k0,3
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/n93_tlbwr.S:51
-bfc015f0:	3c150012 	lui	s5,0x12
+bfc015e0:	3c150012 	lui	s5,0x12
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/n93_tlbwr.S:52
-bfc015f4:	36b5e0dc 	ori	s5,s5,0xe0dc
+bfc015e4:	36b5e0dc 	ori	s5,s5,0xe0dc
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/n93_tlbwr.S:53
-bfc015f8:	3c07e235 	lui	a3,0xe235
+bfc015e8:	3c07e235 	lui	a3,0xe235
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/n93_tlbwr.S:54
-bfc015fc:	34e7e8f7 	ori	a3,a3,0xe8f7
+bfc015ec:	34e7e8f7 	ori	a3,a3,0xe8f7
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/n93_tlbwr.S:55
-bfc01600:	24084006 	li	t0,16390
+bfc015f0:	24084006 	li	t0,16390
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/n93_tlbwr.S:56
-bfc01604:	24094006 	li	t1,16390
+bfc015f4:	24094006 	li	t1,16390
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/n93_tlbwr.S:57
-bfc01608:	ae470000 	sw	a3,0(s2)
+bfc015f8:	ae470000 	sw	a3,0(s2)
 	...
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/n93_tlbwr.S:63
-bfc01620:	3c08ed08 	lui	t0,0xed08
+bfc01610:	3c08ed08 	lui	t0,0xed08
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/n93_tlbwr.S:64
-bfc01624:	3508dc18 	ori	t0,t0,0xdc18
+bfc01614:	3508dc18 	ori	t0,t0,0xdc18
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/n93_tlbwr.S:65
-bfc01628:	14680043 	bne	v1,t0,bfc01738 <inst_error>
+bfc01618:	14680043 	bne	v1,t0,bfc01728 <inst_error>
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/n93_tlbwr.S:66
-bfc0162c:	00000000 	nop
+bfc0161c:	00000000 	nop
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/n93_tlbwr.S:67
-bfc01630:	3c150013 	lui	s5,0x13
+bfc01620:	3c150013 	lui	s5,0x13
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/n93_tlbwr.S:68
-bfc01634:	36b5e0dc 	ori	s5,s5,0xe0dc
+bfc01624:	36b5e0dc 	ori	s5,s5,0xe0dc
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/n93_tlbwr.S:69
-bfc01638:	40955000 	mtc0	s5,$10
+bfc01628:	40955000 	mtc0	s5,$10
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/n93_tlbwr.S:70
-bfc0163c:	3c120013 	lui	s2,0x13
+bfc0162c:	3c120013 	lui	s2,0x13
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/n93_tlbwr.S:71
-bfc01640:	3652f124 	ori	s2,s2,0xf124
+bfc01630:	3652f124 	ori	s2,s2,0xf124
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/n93_tlbwr.S:72
-bfc01644:	24084006 	li	t0,16390
+bfc01634:	24084006 	li	t0,16390
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/n93_tlbwr.S:73
-bfc01648:	24094006 	li	t1,16390
+bfc01638:	24094006 	li	t1,16390
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/n93_tlbwr.S:74
-bfc0164c:	8e480000 	lw	t0,0(s2)
+bfc0163c:	8e480000 	lw	t0,0(s2)
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/n93_tlbwr.S:75
-bfc01650:	3c07e235 	lui	a3,0xe235
+bfc01640:	3c07e235 	lui	a3,0xe235
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/n93_tlbwr.S:76
-bfc01654:	34e7e8f7 	ori	a3,a3,0xe8f7
+bfc01644:	34e7e8f7 	ori	a3,a3,0xe8f7
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/n93_tlbwr.S:77
-bfc01658:	14e80037 	bne	a3,t0,bfc01738 <inst_error>
+bfc01648:	14e80037 	bne	a3,t0,bfc01728 <inst_error>
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/n93_tlbwr.S:78
-bfc0165c:	00000000 	nop
+bfc0164c:	00000000 	nop
 
-bfc01660 <test_asid_2>:
+bfc01650 <test_asid_2>:
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/n93_tlbwr.S:80
-bfc01660:	3c02ffe8 	lui	v0,0xffe8
+bfc01650:	3c02ffe8 	lui	v0,0xffe8
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/n93_tlbwr.S:81
-bfc01664:	3442dc03 	ori	v0,v0,0xdc03
+bfc01654:	3442dc03 	ori	v0,v0,0xdc03
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/n93_tlbwr.S:82
-bfc01668:	3c120014 	lui	s2,0x14
+bfc01658:	3c120014 	lui	s2,0x14
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/n93_tlbwr.S:83
-bfc0166c:	3652e124 	ori	s2,s2,0xe124
+bfc0165c:	3652e124 	ori	s2,s2,0xe124
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/n93_tlbwr.S:84
-bfc01670:	241a0003 	li	k0,3
+bfc01660:	241a0003 	li	k0,3
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/n93_tlbwr.S:85
-bfc01674:	3c150014 	lui	s5,0x14
+bfc01664:	3c150014 	lui	s5,0x14
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/n93_tlbwr.S:86
-bfc01678:	36b5e0dc 	ori	s5,s5,0xe0dc
+bfc01668:	36b5e0dc 	ori	s5,s5,0xe0dc
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/n93_tlbwr.S:87
-bfc0167c:	3c07bd86 	lui	a3,0xbd86
+bfc0166c:	3c07bd86 	lui	a3,0xbd86
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/n93_tlbwr.S:88
-bfc01680:	34e713ac 	ori	a3,a3,0x13ac
+bfc01670:	34e713ac 	ori	a3,a3,0x13ac
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/n93_tlbwr.S:89
-bfc01684:	24084006 	li	t0,16390
+bfc01674:	24084006 	li	t0,16390
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/n93_tlbwr.S:90
-bfc01688:	24094000 	li	t1,16384
+bfc01678:	24094000 	li	t1,16384
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/n93_tlbwr.S:91
-bfc0168c:	ae470000 	sw	a3,0(s2)
+bfc0167c:	ae470000 	sw	a3,0(s2)
 	...
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/n93_tlbwr.S:97
-bfc016a4:	3c08ed08 	lui	t0,0xed08
+bfc01694:	3c08ed08 	lui	t0,0xed08
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/n93_tlbwr.S:98
-bfc016a8:	3508dc18 	ori	t0,t0,0xdc18
+bfc01698:	3508dc18 	ori	t0,t0,0xdc18
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/n93_tlbwr.S:99
-bfc016ac:	14680022 	bne	v1,t0,bfc01738 <inst_error>
+bfc0169c:	14680022 	bne	v1,t0,bfc01728 <inst_error>
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/n93_tlbwr.S:100
-bfc016b0:	00000000 	nop
+bfc016a0:	00000000 	nop
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/n93_tlbwr.S:101
-bfc016b4:	3c120015 	lui	s2,0x15
+bfc016a4:	3c120015 	lui	s2,0x15
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/n93_tlbwr.S:102
-bfc016b8:	3652f124 	ori	s2,s2,0xf124
+bfc016a8:	3652f124 	ori	s2,s2,0xf124
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/n93_tlbwr.S:103
-bfc016bc:	3c150015 	lui	s5,0x15
+bfc016ac:	3c150015 	lui	s5,0x15
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/n93_tlbwr.S:104
-bfc016c0:	36b5e0dc 	ori	s5,s5,0xe0dc
+bfc016b0:	36b5e0dc 	ori	s5,s5,0xe0dc
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/n93_tlbwr.S:105
-bfc016c4:	24084000 	li	t0,16384
+bfc016b4:	24084000 	li	t0,16384
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/n93_tlbwr.S:106
-bfc016c8:	24094002 	li	t1,16386
+bfc016b8:	24094002 	li	t1,16386
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/n93_tlbwr.S:107
-bfc016cc:	241a0003 	li	k0,3
+bfc016bc:	241a0003 	li	k0,3
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/n93_tlbwr.S:108
-bfc016d0:	8e470000 	lw	a3,0(s2)
+bfc016c0:	8e470000 	lw	a3,0(s2)
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/n93_tlbwr.S:109
-bfc016d4:	3c07ed08 	lui	a3,0xed08
+bfc016c4:	3c07ed08 	lui	a3,0xed08
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/n93_tlbwr.S:110
-bfc016d8:	34e7dc18 	ori	a3,a3,0xdc18
+bfc016c8:	34e7dc18 	ori	a3,a3,0xdc18
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/n93_tlbwr.S:111
-bfc016dc:	14e30016 	bne	a3,v1,bfc01738 <inst_error>
+bfc016cc:	14e30016 	bne	a3,v1,bfc01728 <inst_error>
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/n93_tlbwr.S:112
-bfc016e0:	00000000 	nop
+bfc016d0:	00000000 	nop
 
-bfc016e4 <test_tlbp>:
+bfc016d4 <test_tlbp>:
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/n93_tlbwr.S:114
-bfc016e4:	3c150011 	lui	s5,0x11
+bfc016d4:	3c150011 	lui	s5,0x11
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/n93_tlbwr.S:115
-bfc016e8:	36b5e000 	ori	s5,s5,0xe000
+bfc016d8:	36b5e000 	ori	s5,s5,0xe000
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/n93_tlbwr.S:116
-bfc016ec:	40955000 	mtc0	s5,$10
+bfc016dc:	40955000 	mtc0	s5,$10
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/n93_tlbwr.S:117
-bfc016f0:	40801000 	mtc0	zero,$2
+bfc016e0:	40801000 	mtc0	zero,$2
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/n93_tlbwr.S:118
-bfc016f4:	40801800 	mtc0	zero,$3
+bfc016e4:	40801800 	mtc0	zero,$3
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/n93_tlbwr.S:119
-bfc016f8:	42000008 	tlbp
+bfc016e8:	42000008 	tlbp
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/n93_tlbwr.S:120
-bfc016fc:	42000001 	tlbr
+bfc016ec:	42000001 	tlbr
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/n93_tlbwr.S:121
-bfc01700:	40805000 	mtc0	zero,$10
+bfc016f0:	40805000 	mtc0	zero,$10
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/n93_tlbwr.S:122
-bfc01704:	400b1000 	mfc0	t3,$2
+bfc016f4:	400b1000 	mfc0	t3,$2
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/n93_tlbwr.S:123
-bfc01708:	240c4007 	li	t4,16391
+bfc016f8:	240c4007 	li	t4,16391
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/n93_tlbwr.S:124
-bfc0170c:	156c000a 	bne	t3,t4,bfc01738 <inst_error>
+bfc016fc:	156c000a 	bne	t3,t4,bfc01728 <inst_error>
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/n93_tlbwr.S:125
-bfc01710:	00000000 	nop
+bfc01700:	00000000 	nop
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/n93_tlbwr.S:126
-bfc01714:	400b1800 	mfc0	t3,$3
+bfc01704:	400b1800 	mfc0	t3,$3
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/n93_tlbwr.S:127
-bfc01718:	240c4007 	li	t4,16391
+bfc01708:	240c4007 	li	t4,16391
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/n93_tlbwr.S:128
-bfc0171c:	156c0006 	bne	t3,t4,bfc01738 <inst_error>
+bfc0170c:	156c0006 	bne	t3,t4,bfc01728 <inst_error>
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/n93_tlbwr.S:129
-bfc01720:	00000000 	nop
+bfc01710:	00000000 	nop
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/n93_tlbwr.S:130
-bfc01724:	40801000 	mtc0	zero,$2
+bfc01714:	40801000 	mtc0	zero,$2
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/n93_tlbwr.S:131
-bfc01728:	40801800 	mtc0	zero,$3
+bfc01718:	40801800 	mtc0	zero,$3
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/n93_tlbwr.S:132
-bfc0172c:	42000002 	tlbwi
+bfc0171c:	42000002 	tlbwi
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/n93_tlbwr.S:133
-bfc01730:	00000000 	nop
+bfc01720:	00000000 	nop
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/n93_tlbwr.S:135
-bfc01734:	26730001 	addiu	s3,s3,1
+bfc01724:	26730001 	addiu	s3,s3,1
 
-bfc01738 <inst_error>:
+bfc01728 <inst_error>:
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/n93_tlbwr.S:138
-bfc01738:	00104e00 	sll	t1,s0,0x18
+bfc01728:	00104e00 	sll	t1,s0,0x18
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/n93_tlbwr.S:139
-bfc0173c:	01334025 	or	t0,t1,s3
+bfc0172c:	01334025 	or	t0,t1,s3
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/n93_tlbwr.S:140
-bfc01740:	ae280000 	sw	t0,0(s1)
+bfc01730:	ae280000 	sw	t0,0(s1)
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/n93_tlbwr.S:141
-bfc01744:	03e00008 	jr	ra
+bfc01734:	03e00008 	jr	ra
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/n93_tlbwr.S:142
-bfc01748:	00000000 	nop
-bfc0174c:	00000000 	nop
-bfc01750:	9f3f7f7c 	0x9f3f7f7c
+bfc01738:	00000000 	nop
+bfc0173c:	00000000 	nop
+bfc01740:	9f3f7f7c 	0x9f3f7f7c
 	...
 
 Disassembly of section .data:
@@ -2399,7 +2401,7 @@ Disassembly of section .debug_aranges:
   28:	00040000 	sll	zero,a0,0x0
   2c:	00000000 	nop
   30:	bfc00a10 	0xbfc00a10
-  34:	00000114 	0x114
+  34:	00000118 	0x118
 	...
   40:	0000001c 	0x1c
   44:	00e00002 	0xe00002
@@ -2462,13 +2464,13 @@ Disassembly of section .debug_aranges:
  148:	00040000 	sll	zero,a0,0x0
  14c:	00000000 	nop
  150:	bfc01360 	0xbfc01360
- 154:	000001e4 	0x1e4
+ 154:	000001e0 	0x1e0
 	...
  160:	0000001c 	0x1c
  164:	050d0002 	0x50d0002
  168:	00040000 	sll	zero,a0,0x0
  16c:	00000000 	nop
- 170:	bfc01550 	0xbfc01550
+ 170:	bfc01540 	0xbfc01540
  174:	000001fc 	0x1fc
 	...
 
@@ -2515,7 +2517,7 @@ Disassembly of section .pdr:
 	...
  138:	0000001d 	0x1d
  13c:	0000001f 	0x1f
- 140:	bfc01550 	0xbfc01550
+ 140:	bfc01540 	0xbfc01540
 	...
  158:	0000001d 	0x1d
  15c:	0000001f 	0x1f
@@ -2645,7 +2647,7 @@ Disassembly of section .debug_line:
  1dc:	4b4b4b4b 	c2	0x14b4b4b
  1e0:	4b4b4b4c 	c2	0x14b4b4c
  1e4:	01000402 	0x1000402
- 1e8:	00006a01 	0x6a01
+ 1e8:	00006c01 	0x6c01
  1ec:	23000200 	addi	zero,t8,512
  1f0:	01000000 	0x1000000
  1f4:	0d0efb01 	jal	43bec04 <data_size+0x43bebf4>
@@ -2659,167 +2661,167 @@ Disassembly of section .debug_line:
  214:	05000000 	bltz	t0,218 <data_size+0x208>
  218:	c00a1002 	ll	t2,4098(zero)
  21c:	4b4b19bf 	c2	0x14b19bf
- 220:	83504b4b 	lb	s0,19275(k0)
- 224:	4b834b83 	c2	0x1834b83
+ 220:	4b504b4b 	c2	0x1504b4b
+ 224:	4b834b4b 	c2	0x1834b4b
  228:	4b834b83 	c2	0x1834b83
- 22c:	4b834b4b 	c2	0x1834b4b
- 230:	834b834b 	lb	t3,-31925(k0)
- 234:	834b4b4b 	lb	t3,19275(k0)
- 238:	4b834b4b 	c2	0x1834b4b
- 23c:	4b4b4b83 	c2	0x14b4b83
- 240:	834b4b83 	lb	t3,19331(k0)
- 244:	4b4b834b 	c2	0x14b834b
- 248:	4b834b83 	c2	0x1834b83
- 24c:	4b4b4d4f 	c2	0x14b4d4f
- 250:	04024b4b 	bltzl	zero,12f80 <data_size+0x12f70>
- 254:	5d010100 	0x5d010100
- 258:	02000000 	0x2000000
- 25c:	00002800 	sll	a1,zero,0x0
- 260:	fb010100 	sdc2	$1,256(t8)
- 264:	01000d0e 	0x1000d0e
- 268:	00010101 	0x10101
- 26c:	00010000 	sll	zero,at,0x0
- 270:	65000100 	0x65000100
- 274:	616d5f36 	0x616d5f36
- 278:	64657070 	0x64657070
- 27c:	736e695f 	0x736e695f
- 280:	532e7274 	beql	t9,t6,1cc54 <data_size+0x1cc44>
- 284:	00000000 	nop
- 288:	02050000 	0x2050000
- 28c:	bfc00b30 	0xbfc00b30
- 290:	4c4b4b19 	0x4c4b4b19
- 294:	4b4b4b4b 	c2	0x14b4b4b
- 298:	4b4b864b 	c2	0x14b864b
- 29c:	4b4b4b4c 	c2	0x14b4b4c
- 2a0:	4b4b4b83 	c2	0x14b4b83
- 2a4:	4b834b4b 	c2	0x1834b4b
- 2a8:	834b4b4b 	lb	t3,19275(k0)
- 2ac:	4b4b4d4d 	c2	0x14b4d4d
- 2b0:	024b4b4b 	0x24b4b4b
- 2b4:	01010004 	sllv	zero,at,t0
- 2b8:	00000055 	0x55
- 2bc:	002b0002 	0x2b0002
- 2c0:	01010000 	0x1010000
- 2c4:	000d0efb 	0xd0efb
- 2c8:	01010101 	0x1010101
- 2cc:	01000000 	0x1000000
- 2d0:	00010000 	sll	zero,at,0x0
- 2d4:	745f3765 	jalx	17cdd94 <data_size+0x17cdd84>
- 2d8:	645f626c 	0x645f626c
- 2dc:	6c62756f 	0x6c62756f
- 2e0:	696d5f65 	0x696d5f65
- 2e4:	532e7373 	beql	t9,t6,1d0b4 <data_size+0x1d0a4>
- 2e8:	00000000 	nop
- 2ec:	02050000 	0x2050000
- 2f0:	bfc00bd0 	0xbfc00bd0
- 2f4:	4b4c4b18 	c2	0x14c4b18
- 2f8:	4b4b4b4b 	c2	0x14b4b4b
+ 22c:	4b4b4b83 	c2	0x14b4b83
+ 230:	834b4b83 	lb	t3,19331(k0)
+ 234:	4b4b834b 	c2	0x14b834b
+ 238:	4b4b834b 	c2	0x14b834b
+ 23c:	4b834b83 	c2	0x1834b83
+ 240:	4b834b4b 	c2	0x1834b4b
+ 244:	834b834b 	lb	t3,-31925(k0)
+ 248:	4b834b4b 	c2	0x1834b4b
+ 24c:	4d4f4b83 	0x4d4f4b83
+ 250:	4b4b4b4b 	c2	0x14b4b4b
+ 254:	01000402 	0x1000402
+ 258:	00005d01 	0x5d01
+ 25c:	28000200 	slti	zero,zero,512
+ 260:	01000000 	0x1000000
+ 264:	0d0efb01 	jal	43bec04 <data_size+0x43bebf4>
+ 268:	01010100 	0x1010100
+ 26c:	00000001 	0x1
+ 270:	01000001 	0x1000001
+ 274:	5f366500 	0x5f366500
+ 278:	7070616d 	0x7070616d
+ 27c:	695f6465 	0x695f6465
+ 280:	7274736e 	0x7274736e
+ 284:	0000532e 	0x532e
+ 288:	00000000 	nop
+ 28c:	0b300205 	j	cc00814 <data_size+0xcc00804>
+ 290:	4b19bfc0 	c2	0x119bfc0
+ 294:	4b4b4c4b 	c2	0x14b4c4b
+ 298:	864b4b4b 	lh	t3,19275(s2)
+ 29c:	4b4c4b4b 	c2	0x14c4b4b
+ 2a0:	4b834b4b 	c2	0x1834b4b
+ 2a4:	4b4b4b4b 	c2	0x14b4b4b
+ 2a8:	4b4b4b83 	c2	0x14b4b83
+ 2ac:	4d4d834b 	0x4d4d834b
+ 2b0:	4b4b4b4b 	c2	0x14b4b4b
+ 2b4:	0004024b 	0x4024b
+ 2b8:	00550101 	0x550101
+ 2bc:	00020000 	sll	zero,v0,0x0
+ 2c0:	0000002b 	sltu	zero,zero,zero
+ 2c4:	0efb0101 	jal	bec0404 <data_size+0xbec03f4>
+ 2c8:	0101000d 	break	0x101
+ 2cc:	00000101 	0x101
+ 2d0:	00000100 	sll	zero,zero,0x4
+ 2d4:	37650001 	ori	a1,k1,0x1
+ 2d8:	626c745f 	0x626c745f
+ 2dc:	756f645f 	jalx	5bd917c <data_size+0x5bd916c>
+ 2e0:	5f656c62 	0x5f656c62
+ 2e4:	7373696d 	0x7373696d
+ 2e8:	0000532e 	0x532e
+ 2ec:	00000000 	nop
+ 2f0:	0bd00205 	j	f400814 <data_size+0xf400804>
+ 2f4:	4b18bfc0 	c2	0x118bfc0
+ 2f8:	4b4b4b4c 	c2	0x14b4b4c
  2fc:	4b4b4b4b 	c2	0x14b4b4b
  300:	4b4b4b4b 	c2	0x14b4b4b
- 304:	4d4c4b4b 	0x4d4c4b4b
- 308:	4b4b4b4b 	c2	0x14b4b4b
- 30c:	01000402 	0x1000402
- 310:	00004e01 	0x4e01
- 314:	25000200 	addiu	zero,t0,512
- 318:	01000000 	0x1000000
- 31c:	0d0efb01 	jal	43bec04 <data_size+0x43bebf4>
- 320:	01010100 	0x1010100
- 324:	00000001 	0x1
- 328:	01000001 	0x1000001
- 32c:	5f356500 	0x5f356500
- 330:	7a766f6d 	0x7a766f6d
- 334:	766f6d5f 	jalx	9bdb57c <data_size+0x9bdb56c>
- 338:	00532e6e 	0x532e6e
- 33c:	00000000 	nop
- 340:	30020500 	andi	v0,zero,0x500
- 344:	19bfc00c 	0x19bfc00c
- 348:	4b4b4b4b 	c2	0x14b4b4b
- 34c:	4b4b4b50 	c2	0x14b4b50
+ 304:	4b4b4b4b 	c2	0x14b4b4b
+ 308:	4b4b4d4c 	c2	0x14b4d4c
+ 30c:	04024b4b 	bltzl	zero,1303c <data_size+0x1302c>
+ 310:	4e010100 	c3	0x10100
+ 314:	02000000 	0x2000000
+ 318:	00002500 	sll	a0,zero,0x14
+ 31c:	fb010100 	sdc2	$1,256(t8)
+ 320:	01000d0e 	0x1000d0e
+ 324:	00010101 	0x10101
+ 328:	00010000 	sll	zero,at,0x0
+ 32c:	65000100 	0x65000100
+ 330:	6f6d5f35 	0x6f6d5f35
+ 334:	6d5f7a76 	0x6d5f7a76
+ 338:	2e6e766f 	sltiu	t6,s3,30319
+ 33c:	00000053 	0x53
+ 340:	05000000 	bltz	t0,344 <data_size+0x334>
+ 344:	c00c3002 	ll	t4,12290(zero)
+ 348:	4b4b19bf 	c2	0x14b19bf
+ 34c:	4b504b4b 	c2	0x1504b4b
  350:	4b4b4b4b 	c2	0x14b4b4b
- 354:	4b834b4b 	c2	0x1834b4b
- 358:	4b4b4d4f 	c2	0x14b4d4f
- 35c:	04024b4b 	bltzl	zero,1308c <data_size+0x1307c>
- 360:	90010100 	lbu	at,256(zero)
- 364:	02000000 	0x2000000
- 368:	00002500 	sll	a0,zero,0x14
- 36c:	fb010100 	sdc2	$1,256(t8)
- 370:	01000d0e 	0x1000d0e
- 374:	00010101 	0x10101
- 378:	00010000 	sll	zero,at,0x0
- 37c:	65000100 	0x65000100
- 380:	72745f31 	0x72745f31
- 384:	745f7061 	jalx	17dc184 <data_size+0x17dc174>
- 388:	2e747365 	sltiu	s4,s3,29541
- 38c:	00000053 	0x53
- 390:	05000000 	bltz	t0,394 <data_size+0x384>
- 394:	c00c9002 	ll	t4,-28670(zero)
- 398:	4b4b19bf 	c2	0x14b19bf
- 39c:	084d4b4b 	j	1352d2c <data_size+0x1352d1c>
- 3a0:	f33d083d 	0xf33d083d
- 3a4:	083d08f3 	j	f423cc <data_size+0xf423bc>
- 3a8:	08f4f33d 	j	3d3ccf4 <data_size+0x3d3cce4>
- 3ac:	f33d083d 	0xf33d083d
- 3b0:	083d08f3 	j	f423cc <data_size+0xf423bc>
- 3b4:	08f3f33d 	j	3cfccf4 <data_size+0x3cfcce4>
- 3b8:	f33d083d 	0xf33d083d
- 3bc:	083d08f3 	j	f423cc <data_size+0xf423bc>
- 3c0:	08f4f33d 	j	3d3ccf4 <data_size+0x3d3cce4>
- 3c4:	08e508e5 	j	3942394 <data_size+0x3942384>
+ 354:	4b4b4b4b 	c2	0x14b4b4b
+ 358:	4d4f4b83 	0x4d4f4b83
+ 35c:	4b4b4b4b 	c2	0x14b4b4b
+ 360:	01000402 	0x1000402
+ 364:	00009001 	0x9001
+ 368:	25000200 	addiu	zero,t0,512
+ 36c:	01000000 	0x1000000
+ 370:	0d0efb01 	jal	43bec04 <data_size+0x43bebf4>
+ 374:	01010100 	0x1010100
+ 378:	00000001 	0x1
+ 37c:	01000001 	0x1000001
+ 380:	5f316500 	0x5f316500
+ 384:	70617274 	0x70617274
+ 388:	7365745f 	0x7365745f
+ 38c:	00532e74 	teq	v0,s3,0xb9
+ 390:	00000000 	nop
+ 394:	90020500 	lbu	v0,1280(zero)
+ 398:	19bfc00c 	0x19bfc00c
+ 39c:	4b4b4b4b 	c2	0x14b4b4b
+ 3a0:	083d084d 	j	f42134 <data_size+0xf42124>
+ 3a4:	08f3f33d 	j	3cfccf4 <data_size+0x3cfcce4>
+ 3a8:	f33d083d 	0xf33d083d
+ 3ac:	083d08f4 	j	f423d0 <data_size+0xf423c0>
+ 3b0:	08f3f33d 	j	3cfccf4 <data_size+0x3cfcce4>
+ 3b4:	f33d083d 	0xf33d083d
+ 3b8:	083d08f3 	j	f423cc <data_size+0xf423bc>
+ 3bc:	08f3f33d 	j	3cfccf4 <data_size+0x3cfcce4>
+ 3c0:	f33d083d 	0xf33d083d
+ 3c4:	08e508f4 	j	39423d0 <data_size+0x39423c0>
  3c8:	08e508e5 	j	3942394 <data_size+0x3942384>
  3cc:	08e508e5 	j	3942394 <data_size+0x3942384>
- 3d0:	08ad08ad 	j	2b422b4 <data_size+0x2b422a4>
+ 3d0:	08ad08e5 	j	2b42394 <data_size+0x2b42384>
  3d4:	08ad08ad 	j	2b422b4 <data_size+0x2b422a4>
  3d8:	08ad08ad 	j	2b422b4 <data_size+0x2b422a4>
  3dc:	08ad08ad 	j	2b422b4 <data_size+0x2b422a4>
  3e0:	08ad08ad 	j	2b422b4 <data_size+0x2b422a4>
  3e4:	08ad08ad 	j	2b422b4 <data_size+0x2b422a4>
  3e8:	08ad08ad 	j	2b422b4 <data_size+0x2b422a4>
- 3ec:	4b4b4db0 	c2	0x14b4db0
- 3f0:	04024b4b 	bltzl	zero,13120 <data_size+0x13110>
- 3f4:	6b010100 	0x6b010100
- 3f8:	02000000 	0x2000000
- 3fc:	00002200 	sll	a0,zero,0x8
- 400:	fb010100 	sdc2	$1,256(t8)
- 404:	01000d0e 	0x1000d0e
- 408:	00010101 	0x10101
- 40c:	00010000 	sll	zero,at,0x0
- 410:	6e000100 	0x6e000100
- 414:	745f3239 	jalx	17cc8e4 <data_size+0x17cc8d4>
- 418:	6977626c 	0x6977626c
- 41c:	0000532e 	0x532e
+ 3ec:	4db008ad 	0x4db008ad
+ 3f0:	4b4b4b4b 	c2	0x14b4b4b
+ 3f4:	01000402 	0x1000402
+ 3f8:	00006b01 	0x6b01
+ 3fc:	22000200 	addi	zero,s0,512
+ 400:	01000000 	0x1000000
+ 404:	0d0efb01 	jal	43bec04 <data_size+0x43bebf4>
+ 408:	01010100 	0x1010100
+ 40c:	00000001 	0x1
+ 410:	01000001 	0x1000001
+ 414:	32396e00 	andi	t9,s1,0x6e00
+ 418:	626c745f 	0x626c745f
+ 41c:	532e6977 	beql	t9,t6,1a9fc <data_size+0x1a9ec>
  420:	00000000 	nop
- 424:	10d00205 	beq	a2,s0,c3c <data_size+0xc2c>
- 428:	4b1abfc0 	c2	0x11abfc0
- 42c:	4b4c4b4c 	c2	0x14c4b4c
- 430:	4b4b4b4b 	c2	0x14b4b4b
+ 424:	02050000 	0x2050000
+ 428:	bfc010d0 	0xbfc010d0
+ 42c:	4b4c4b1a 	c2	0x14c4b1a
+ 430:	4b4b4b4c 	c2	0x14b4b4c
  434:	4b4b4b4b 	c2	0x14b4b4b
  438:	4b4b4b4b 	c2	0x14b4b4b
  43c:	4b4b4b4b 	c2	0x14b4b4b
  440:	4b4b4b4b 	c2	0x14b4b4b
  444:	4b4b4b4b 	c2	0x14b4b4b
  448:	4b4b4b4b 	c2	0x14b4b4b
- 44c:	4b4b4c4b 	c2	0x14b4c4b
+ 44c:	4c4b4b4b 	0x4c4b4b4b
  450:	4b4b4b4b 	c2	0x14b4b4b
  454:	4b4b4b4b 	c2	0x14b4b4b
- 458:	4c4b4b4b 	0x4c4b4b4b
- 45c:	4b4b4b4d 	c2	0x14b4b4d
- 460:	0004024b 	0x4024b
- 464:	00690101 	0x690101
- 468:	00020000 	sll	zero,v0,0x0
- 46c:	00000025 	move	zero,zero
- 470:	0efb0101 	jal	bec0404 <data_size+0xbec03f4>
- 474:	0101000d 	break	0x101
- 478:	00000101 	0x101
- 47c:	00000100 	sll	zero,zero,0x4
- 480:	33650001 	andi	a1,k1,0x1
- 484:	64616d5f 	0x64616d5f
- 488:	736d5f64 	0x736d5f64
- 48c:	532e6275 	beql	t9,t6,18e64 <data_size+0x18e54>
- 490:	00000000 	nop
- 494:	02050000 	0x2050000
- 498:	bfc011b0 	0xbfc011b0
- 49c:	4b4b4b19 	c2	0x14b4b19
- 4a0:	4b4b4d4b 	c2	0x14b4d4b
+ 458:	4b4b4b4b 	c2	0x14b4b4b
+ 45c:	4b4d4c4b 	c2	0x14d4c4b
+ 460:	024b4b4b 	0x24b4b4b
+ 464:	01010004 	sllv	zero,at,t0
+ 468:	00000069 	0x69
+ 46c:	00250002 	0x250002
+ 470:	01010000 	0x1010000
+ 474:	000d0efb 	0xd0efb
+ 478:	01010101 	0x1010101
+ 47c:	01000000 	0x1000000
+ 480:	00010000 	sll	zero,at,0x0
+ 484:	6d5f3365 	0x6d5f3365
+ 488:	5f646461 	0x5f646461
+ 48c:	6275736d 	0x6275736d
+ 490:	0000532e 	0x532e
+ 494:	00000000 	nop
+ 498:	11b00205 	beq	t5,s0,cb0 <data_size+0xca0>
+ 49c:	4b19bfc0 	c2	0x119bfc0
+ 4a0:	4d4b4b4b 	0x4d4b4b4b
  4a4:	4b4b4b4b 	c2	0x14b4b4b
  4a8:	4b4b4b4b 	c2	0x14b4b4b
  4ac:	4b4b4b4b 	c2	0x14b4b4b
@@ -2829,117 +2831,117 @@ Disassembly of section .debug_line:
  4bc:	4b4b4b4b 	c2	0x14b4b4b
  4c0:	4b4b4b4b 	c2	0x14b4b4b
  4c4:	4b4b4b4b 	c2	0x14b4b4b
- 4c8:	4b4b4d4e 	c2	0x14b4d4e
- 4cc:	04024b4b 	bltzl	zero,131fc <data_size+0x131ec>
- 4d0:	4c010100 	0x4c010100
- 4d4:	02000000 	0x2000000
- 4d8:	00002100 	sll	a0,zero,0x4
- 4dc:	fb010100 	sdc2	$1,256(t8)
- 4e0:	01000d0e 	0x1000d0e
- 4e4:	00010101 	0x10101
- 4e8:	00010000 	sll	zero,at,0x0
- 4ec:	65000100 	0x65000100
- 4f0:	6c6c5f34 	0x6c6c5f34
- 4f4:	2e63735f 	sltiu	v1,s3,29535
- 4f8:	00000053 	0x53
- 4fc:	05000000 	bltz	t0,500 <data_size+0x4f0>
- 500:	c0128002 	ll	s2,-32766(zero)
- 504:	4b4b19bf 	c2	0x14b19bf
- 508:	83504b4b 	lb	s0,19275(k0)
- 50c:	4b4b4b4b 	c2	0x14b4b4b
- 510:	4b4b4b4c 	c2	0x14b4b4c
- 514:	4b4b4b4c 	c2	0x14b4b4c
- 518:	4b4b4d4f 	c2	0x14b4d4f
- 51c:	04024b4b 	bltzl	zero,1324c <data_size+0x1323c>
- 520:	4c010100 	0x4c010100
- 524:	02000000 	0x2000000
- 528:	00002300 	sll	a0,zero,0xc
- 52c:	fb010100 	sdc2	$1,256(t8)
- 530:	01000d0e 	0x1000d0e
- 534:	00010101 	0x10101
- 538:	00010000 	sll	zero,at,0x0
- 53c:	65000100 	0x65000100
- 540:	6c635f32 	0x6c635f32
- 544:	6c635f6f 	0x6c635f6f
- 548:	00532e7a 	0x532e7a
- 54c:	00000000 	nop
- 550:	f0020500 	0xf0020500
- 554:	19bfc012 	0x19bfc012
- 558:	4b4b4b4b 	c2	0x14b4b4b
- 55c:	4b4b834d 	c2	0x14b834d
- 560:	834b4b4b 	lb	t3,19275(k0)
- 564:	4b4b4b4b 	c2	0x14b4b4b
- 568:	4b4b4d4e 	c2	0x14b4d4e
- 56c:	04024b4b 	bltzl	zero,1329c <data_size+0x1328c>
- 570:	92010100 	lbu	at,256(s0)
- 574:	02000000 	0x2000000
- 578:	00002300 	sll	a0,zero,0xc
- 57c:	fb010100 	sdc2	$1,256(t8)
- 580:	01000d0e 	0x1000d0e
- 584:	00010101 	0x10101
- 588:	00010000 	sll	zero,at,0x0
- 58c:	65000100 	0x65000100
- 590:	77735f39 	jalx	dcd7ce4 <data_size+0xdcd7cd4>
- 594:	77735f6c 	jalx	dcd7db0 <data_size+0xdcd7da0>
- 598:	00532e72 	tlt	v0,s3,0xb9
- 59c:	00000000 	nop
- 5a0:	60020500 	0x60020500
- 5a4:	19bfc013 	0x19bfc013
- 5a8:	4b4b4b4b 	c2	0x14b4b4b
- 5ac:	83838350 	lb	v1,-31920(gp)
- 5b0:	834b834b 	lb	t3,-31925(k0)
- 5b4:	4b834b4b 	c2	0x1834b4b
- 5b8:	834b834b 	lb	t3,-31925(k0)
- 5bc:	834b4b4b 	lb	t3,19275(k0)
+ 4c8:	4d4e4b4b 	0x4d4e4b4b
+ 4cc:	4b4b4b4b 	c2	0x14b4b4b
+ 4d0:	01000402 	0x1000402
+ 4d4:	00004c01 	0x4c01
+ 4d8:	21000200 	addi	zero,t0,512
+ 4dc:	01000000 	0x1000000
+ 4e0:	0d0efb01 	jal	43bec04 <data_size+0x43bebf4>
+ 4e4:	01010100 	0x1010100
+ 4e8:	00000001 	0x1
+ 4ec:	01000001 	0x1000001
+ 4f0:	5f346500 	0x5f346500
+ 4f4:	735f6c6c 	0x735f6c6c
+ 4f8:	00532e63 	0x532e63
+ 4fc:	00000000 	nop
+ 500:	80020500 	lb	v0,1280(zero)
+ 504:	19bfc012 	0x19bfc012
+ 508:	4b4b4b4b 	c2	0x14b4b4b
+ 50c:	4b4b8350 	c2	0x14b8350
+ 510:	4b4c4b4b 	c2	0x14c4b4b
+ 514:	4b4c4b4b 	c2	0x14c4b4b
+ 518:	4d4f4b4b 	0x4d4f4b4b
+ 51c:	4b4b4b4b 	c2	0x14b4b4b
+ 520:	01000402 	0x1000402
+ 524:	00004c01 	0x4c01
+ 528:	23000200 	addi	zero,t8,512
+ 52c:	01000000 	0x1000000
+ 530:	0d0efb01 	jal	43bec04 <data_size+0x43bebf4>
+ 534:	01010100 	0x1010100
+ 538:	00000001 	0x1
+ 53c:	01000001 	0x1000001
+ 540:	5f326500 	0x5f326500
+ 544:	5f6f6c63 	0x5f6f6c63
+ 548:	2e7a6c63 	sltiu	k0,s3,27747
+ 54c:	00000053 	0x53
+ 550:	05000000 	bltz	t0,554 <data_size+0x544>
+ 554:	c012f002 	ll	s2,-4094(zero)
+ 558:	4b4b19bf 	c2	0x14b19bf
+ 55c:	834d4b4b 	lb	t5,19275(k0)
+ 560:	4b4b4b4b 	c2	0x14b4b4b
+ 564:	4b4b834b 	c2	0x14b834b
+ 568:	4d4e4b4b 	0x4d4e4b4b
+ 56c:	4b4b4b4b 	c2	0x14b4b4b
+ 570:	01000402 	0x1000402
+ 574:	00009301 	0x9301
+ 578:	23000200 	addi	zero,t8,512
+ 57c:	01000000 	0x1000000
+ 580:	0d0efb01 	jal	43bec04 <data_size+0x43bebf4>
+ 584:	01010100 	0x1010100
+ 588:	00000001 	0x1
+ 58c:	01000001 	0x1000001
+ 590:	5f396500 	0x5f396500
+ 594:	5f6c7773 	0x5f6c7773
+ 598:	2e727773 	sltiu	s2,s3,30579
+ 59c:	00000053 	0x53
+ 5a0:	05000000 	bltz	t0,5a4 <data_size+0x594>
+ 5a4:	c0136002 	ll	s3,24578(zero)
+ 5a8:	4b4b19bf 	c2	0x14b19bf
+ 5ac:	4b504b4b 	c2	0x1504b4b
+ 5b0:	4b834b4b 	c2	0x1834b4b
+ 5b4:	4b834b83 	c2	0x1834b83
+ 5b8:	4b4b834b 	c2	0x14b834b
+ 5bc:	4b834b83 	c2	0x1834b83
  5c0:	4b834b4b 	c2	0x1834b4b
- 5c4:	4b4b4b83 	c2	0x14b4b83
- 5c8:	834b4b83 	lb	t3,19331(k0)
- 5cc:	4b4b834b 	c2	0x14b834b
- 5d0:	4b834b4b 	c2	0x1834b4b
- 5d4:	834d4b4b 	lb	t5,19275(k0)
- 5d8:	834b834b 	lb	t3,-31925(k0)
- 5dc:	4b834b4b 	c2	0x1834b4b
- 5e0:	834b834b 	lb	t3,-31925(k0)
- 5e4:	834b4b4b 	lb	t3,19275(k0)
+ 5c4:	834b834b 	lb	t3,-31925(k0)
+ 5c8:	834b4b4b 	lb	t3,19275(k0)
+ 5cc:	4b834b4b 	c2	0x1834b4b
+ 5d0:	4b4b4b83 	c2	0x14b4b83
+ 5d4:	4b4b834b 	c2	0x14b834b
+ 5d8:	4b834d4b 	c2	0x1834d4b
+ 5dc:	4b834b83 	c2	0x1834b83
+ 5e0:	4b4b834b 	c2	0x14b834b
+ 5e4:	4b834b83 	c2	0x1834b83
  5e8:	4b834b4b 	c2	0x1834b4b
- 5ec:	4b4b4b83 	c2	0x14b4b83
- 5f0:	834b4b83 	lb	t3,19331(k0)
- 5f4:	4b4b834b 	c2	0x14b834b
- 5f8:	4b834b4b 	c2	0x1834b4b
- 5fc:	4d504b4b 	0x4d504b4b
- 600:	4b4b4b4b 	c2	0x14b4b4b
- 604:	01000402 	0x1000402
- 608:	0000b201 	0xb201
- 60c:	22000200 	addi	zero,s0,512
- 610:	01000000 	0x1000000
- 614:	0d0efb01 	jal	43bec04 <data_size+0x43bebf4>
- 618:	01010100 	0x1010100
- 61c:	00000001 	0x1
- 620:	01000001 	0x1000001
- 624:	33396e00 	andi	t9,t9,0x6e00
- 628:	626c745f 	0x626c745f
- 62c:	532e7277 	beql	t9,t6,1d00c <data_size+0x1cffc>
- 630:	00000000 	nop
- 634:	02050000 	0x2050000
- 638:	bfc01550 	0xbfc01550
- 63c:	4b4d4b1a 	c2	0x14d4b1a
- 640:	4b4b4b4b 	c2	0x14b4b4b
+ 5ec:	834b834b 	lb	t3,-31925(k0)
+ 5f0:	834b4b4b 	lb	t3,19275(k0)
+ 5f4:	4b834b4b 	c2	0x1834b4b
+ 5f8:	4b4b4b83 	c2	0x14b4b83
+ 5fc:	4b4b834b 	c2	0x14b834b
+ 600:	4b4d504b 	c2	0x14d504b
+ 604:	024b4b4b 	0x24b4b4b
+ 608:	01010004 	sllv	zero,at,t0
+ 60c:	000000b2 	tlt	zero,zero,0x2
+ 610:	00220002 	0x220002
+ 614:	01010000 	0x1010000
+ 618:	000d0efb 	0xd0efb
+ 61c:	01010101 	0x1010101
+ 620:	01000000 	0x1000000
+ 624:	00010000 	sll	zero,at,0x0
+ 628:	5f33396e 	0x5f33396e
+ 62c:	77626c74 	jalx	d89b1d0 <data_size+0xd89b1c0>
+ 630:	00532e72 	tlt	v0,s3,0xb9
+ 634:	00000000 	nop
+ 638:	40020500 	0x40020500
+ 63c:	1abfc015 	0x1abfc015
+ 640:	4b4b4d4b 	c2	0x14b4d4b
  644:	4b4b4b4b 	c2	0x14b4b4b
  648:	4b4b4b4b 	c2	0x14b4b4b
  64c:	4b4b4b4b 	c2	0x14b4b4b
  650:	4b4b4b4b 	c2	0x14b4b4b
  654:	4b4b4b4b 	c2	0x14b4b4b
- 658:	834b4b4b 	lb	t3,19275(k0)
- 65c:	4b4c4b4b 	c2	0x14c4b4b
- 660:	4b4b4b4b 	c2	0x14b4b4b
+ 658:	4b4b4b4b 	c2	0x14b4b4b
+ 65c:	4b834b4b 	c2	0x1834b4b
+ 660:	4b4b4c4b 	c2	0x14b4c4b
  664:	4b4b4b4b 	c2	0x14b4b4b
  668:	4b4b4b4b 	c2	0x14b4b4b
  66c:	4b4b4b4b 	c2	0x14b4b4b
  670:	4b4b4b4b 	c2	0x14b4b4b
  674:	4b4b4b4b 	c2	0x14b4b4b
  678:	4b4b4b4b 	c2	0x14b4b4b
- 67c:	4c4b4b4b 	0x4c4b4b4b
- 680:	4b4b4b4b 	c2	0x14b4b4b
+ 67c:	4b4b4b4b 	c2	0x14b4b4b
+ 680:	4b4c4b4b 	c2	0x14c4b4b
  684:	4b4b4b4b 	c2	0x14b4b4b
  688:	4b4b4b4b 	c2	0x14b4b4b
  68c:	4b4b4b4b 	c2	0x14b4b4b
@@ -2947,14 +2949,15 @@ Disassembly of section .debug_line:
  694:	4b4b4b4b 	c2	0x14b4b4b
  698:	4b4b4b4b 	c2	0x14b4b4b
  69c:	4b4b4b4b 	c2	0x14b4b4b
- 6a0:	4b4b4b4c 	c2	0x14b4b4c
+ 6a0:	4c4b4b4b 	0x4c4b4b4b
  6a4:	4b4b4b4b 	c2	0x14b4b4b
  6a8:	4b4b4b4b 	c2	0x14b4b4b
  6ac:	4b4b4b4b 	c2	0x14b4b4b
  6b0:	4b4b4b4b 	c2	0x14b4b4b
- 6b4:	4b4b4d4c 	c2	0x14b4d4c
- 6b8:	04024b4b 	bltzl	zero,133e8 <data_size+0x133d8>
- 6bc:	Address 0x00000000000006bc is out of bounds.
+ 6b4:	4c4b4b4b 	0x4c4b4b4b
+ 6b8:	4b4b4b4d 	c2	0x14b4b4d
+ 6bc:	0004024b 	0x4024b
+ 6c0:	Address 0x00000000000006c0 is out of bounds.
 
 
 Disassembly of section .debug_info:
@@ -2991,7 +2994,7 @@ Disassembly of section .debug_info:
   70:	00001400 	sll	v0,zero,0x10
   74:	e9010400 	swc2	$1,1024(t0)
   78:	10000001 	b	80 <data_size+0x70>
-  7c:	24bfc00a 	addiu	ra,a1,-16374
+  7c:	28bfc00a 	slti	ra,a1,-16374
   80:	65bfc00b 	0x65bfc00b
   84:	776c5f38 	jalx	db17ce0 <data_size+0xdb17cd0>
   88:	776c5f6c 	jalx	db17db0 <data_size+0xdb17da0>
@@ -3019,7 +3022,7 @@ Disassembly of section .debug_info:
   e0:	00000076 	tne	zero,zero,0x1
   e4:	00280002 	0x280002
   e8:	01040000 	0x1040000
-  ec:	00000257 	0x257
+  ec:	00000259 	0x259
   f0:	bfc00b30 	0xbfc00b30
   f4:	bfc00bcc 	0xbfc00bcc
   f8:	6d5f3665 	0x6d5f3665
@@ -3049,7 +3052,7 @@ Disassembly of section .debug_info:
  158:	00798001 	0x798001
  15c:	00020000 	sll	zero,v0,0x0
  160:	0000003c 	0x3c
- 164:	02b80104 	0x2b80104
+ 164:	02ba0104 	0x2ba0104
  168:	0bd00000 	j	f400000 <data_size+0xf3ffff0>
  16c:	0c30bfc0 	jal	c2ff00 <data_size+0xc2fef0>
  170:	3765bfc0 	ori	a1,k1,0xbfc0
@@ -3080,7 +3083,7 @@ Disassembly of section .debug_info:
  1d4:	73800100 	0x73800100
  1d8:	02000000 	0x2000000
  1dc:	00005000 	sll	t2,zero,0x0
- 1e0:	11010400 	beq	t0,at,11e4 <data_size+0x11d4>
+ 1e0:	13010400 	beq	t8,at,11e4 <data_size+0x11d4>
  1e4:	30000003 	andi	zero,zero,0x3
  1e8:	90bfc00c 	lbu	ra,-16372(a1)
  1ec:	65bfc00c 	0x65bfc00c
@@ -3110,9 +3113,9 @@ Disassembly of section .debug_info:
  24c:	00738001 	0x738001
  250:	00020000 	sll	zero,v0,0x0
  254:	00000064 	0x64
- 258:	03630104 	0x3630104
+ 258:	03650104 	0x3650104
  25c:	0c900000 	jal	2400000 <data_size+0x23ffff0>
- 260:	10d0bfc0 	beq	a2,s0,ffff0164 <_etext+0x403ee9fc>
+ 260:	10d0bfc0 	beq	a2,s0,ffff0164 <_etext+0x403eea0c>
  264:	3165bfc0 	andi	a1,t3,0xbfc0
  268:	6172745f 	0x6172745f
  26c:	65745f70 	0x65745f70
@@ -3140,7 +3143,7 @@ Disassembly of section .debug_info:
  2c4:	00007080 	sll	t6,zero,0x2
  2c8:	78000200 	0x78000200
  2cc:	04000000 	bltz	zero,2d0 <data_size+0x2c0>
- 2d0:	0003f701 	0x3f701
+ 2d0:	0003f901 	0x3f901
  2d4:	c010d000 	ll	s0,-12288(zero)
  2d8:	c011acbf 	ll	s1,-21313(zero)
  2dc:	32396ebf 	andi	t9,s1,0x6ebf
@@ -3169,7 +3172,7 @@ Disassembly of section .debug_info:
  338:	00007380 	sll	t6,zero,0xe
  33c:	8c000200 	lw	zero,512(zero)
  340:	04000000 	bltz	zero,344 <data_size+0x334>
- 344:	00046601 	0x46601
+ 344:	00046801 	0x46801
  348:	c011b000 	ll	s1,-20480(zero)
  34c:	c01278bf 	ll	s2,30911(zero)
  350:	5f3365bf 	0x5f3365bf
@@ -3199,7 +3202,7 @@ Disassembly of section .debug_info:
  3b0:	0000006f 	0x6f
  3b4:	00a00002 	0xa00002
  3b8:	01040000 	0x1040000
- 3bc:	000004d3 	0x4d3
+ 3bc:	000004d5 	0x4d5
  3c0:	bfc01280 	0xbfc01280
  3c4:	bfc012e8 	0xbfc012e8
  3c8:	6c5f3465 	0x6c5f3465
@@ -3227,9 +3230,9 @@ Disassembly of section .debug_info:
  420:	71800100 	0x71800100
  424:	02000000 	0x2000000
  428:	0000b400 	sll	s6,zero,0x10
- 42c:	23010400 	addi	at,t8,1024
+ 42c:	25010400 	addiu	at,t0,1024
  430:	f0000005 	0xf0000005
- 434:	54bfc012 	bnel	a1,ra,ffff0480 <_etext+0x403eed18>
+ 434:	54bfc012 	bnel	a1,ra,ffff0480 <_etext+0x403eed28>
  438:	65bfc013 	0x65bfc013
  43c:	6c635f32 	0x6c635f32
  440:	6c635f6f 	0x6c635f6f
@@ -3257,9 +3260,9 @@ Disassembly of section .debug_info:
  498:	00000071 	tgeu	zero,zero,0x1
  49c:	00c80002 	0xc80002
  4a0:	01040000 	0x1040000
- 4a4:	00000573 	tltu	zero,zero,0x15
+ 4a4:	00000575 	0x575
  4a8:	bfc01360 	0xbfc01360
- 4ac:	bfc01544 	0xbfc01544
+ 4ac:	bfc01540 	0xbfc01540
  4b0:	735f3965 	0x735f3965
  4b4:	735f6c77 	0x735f6c77
  4b8:	532e7277 	beql	t9,t6,1ce98 <data_size+0x1ce88>
@@ -3286,9 +3289,9 @@ Disassembly of section .debug_info:
  50c:	00007080 	sll	t6,zero,0x2
  510:	dc000200 	ldc3	$0,512(zero)
  514:	04000000 	bltz	zero,518 <data_size+0x508>
- 518:	00060901 	0x60901
- 51c:	c0155000 	ll	s5,20480(zero)
- 520:	c0174cbf 	ll	s7,19647(zero)
+ 518:	00060c01 	0x60c01
+ 51c:	c0154000 	ll	s5,16384(zero)
+ 520:	c0173cbf 	ll	s7,15551(zero)
  524:	33396ebf 	andi	t9,t9,0x6ebf
  528:	626c745f 	0x626c745f
  52c:	532e7277 	beql	t9,t6,1cf0c <data_size+0x1cefc>

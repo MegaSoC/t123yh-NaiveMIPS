@@ -15,8 +15,9 @@ LEAF(e9_swl_swr)
         
 
 ###test inst
-    li t0, 0x8000d000
-     li t0, 0x8000d000
+    li t0, 0xE0000000
+    and t0, ra, t0
+    ori t0, t0, 0xd000
     li t1, 0x12345678
     sw t1, 4(t0)
     li t2, 0x90ABCDEF
