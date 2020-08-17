@@ -47,7 +47,16 @@ LEAF(e8_lwl_lwr)
     li t6, 0xABCDEF12
     bne t3, t6, inst_error
     nop
-    
+    li t3, 0x22334455
+    lwl t3, 11(t0)
+    li t6, 0x90ABCDEF
+    bne t3, t6, inst_error
+    nop
+    li t3, 0x22334455
+    lwr t3, 4(t0)
+    li t6, 0x12345678
+    bne t3, t6, inst_error
+    nop
     
     .set mips2
 ###detect exception

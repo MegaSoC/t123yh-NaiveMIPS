@@ -426,6 +426,8 @@ inst_test:
     nop
     jal e3_madd_msub_test    #lui
     nop
+    jal e9_swl_swr   #addu
+    nop
     jal e8_lwl_lwr   #addu
     nop
     jal e4_ll_sc    #lui
@@ -449,6 +451,8 @@ kseg0_kseg1:
     jal e2_clo_clz_test    #lui
     nop
     jal e3_madd_msub_test    #lui
+    nop
+    jal e9_swl_swr   #addu
     nop
     jal e8_lwl_lwr   #addu
     nop
