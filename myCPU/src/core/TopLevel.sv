@@ -48,16 +48,17 @@ module mycpu_top(
         input bvalid ,
         output bready ,
 
-        output [31:0] debug_wb_pc,
-        output [3:0] debug_wb_rf_wen,
-        output [4:0] debug_wb_rf_wnum,
-        output [31:0] debug_wb_rf_wdata
+        (* mark_debug = "true" *) output wire [31:0] debug_wb_pc,
+        (* mark_debug = "true" *) output wire [3:0] debug_wb_rf_wen,
+        (* mark_debug = "true" *) output wire [4:0] debug_wb_rf_wnum,
+        (* mark_debug = "true" *) output wire [31:0] debug_wb_rf_wdata,
+        (* mark_debug = "true" *) output [31:0] debug_i_pc,
+        (* mark_debug = "true" *) output [31:0] debug_i_instr
     );
     wire [31:0] tlb_reg_daddr,tlb_reg_iaddr_is_dm_stall,tlb_reg_iaddr_not_dm_stall;
-    
-
+    assign debug_i_pc = I_PC;
+    assign debug_i_instr = I_Instr;
     wire [31:0] D_origin,E_origin;
-
     wire D_trap,E_trap;
     wire salu_busy_real;
 
@@ -90,6 +91,7 @@ module mycpu_top(
     assign inst_sram_wen = 4'b0;
     assign inst_sram_wdata = 32'b0;
     assign inst_sram_en = aresetn & ( !D_stall_Pass & !dm_stall );
+
 
     wire[31:0] data_sram_rdata;
     wire[31:0] data_sram_wdata;
@@ -276,7 +278,8 @@ module mycpu_top(
 
     wire E_XALU_Busy;
     wire D_InDelaySlot;
-    wire D_clear_exl,E_clear_exl;
+    (* mark_debug = "true" *) wire D_clear_exl;
+    (* mark_debug = "true" *) wire E_clear_exl;
 
     wire [3:0] M_WriteRegEnableExted;
     D my_d(
@@ -689,11 +692,11 @@ module mycpu_top(
                   .o_dsram_valid(data_sram_data_ok),
 
                   .i_dcache_instr_tag(cp0.cp0_reg_TagLo0[31:12]),
-	              .i_dcache_instr({2{DI[1]}} & cache_type), //m级传�?
+	              .i_dcache_instr({2{DI[1]}} & cache_type),
                   .i_dcache_instr_addr(E_Data), 
                 
-                  .i_icache_instr({2{DI[0]}} & cache_type), //m级传�?
-	              .i_icache_instr_addr(E_Data),   //m级传�?
+                  .i_icache_instr({2{DI[0]}} & cache_type),
+	              .i_icache_instr_addr(E_Data),
 	              .i_icache_instr_tag(cp0.cp0_reg_TagLo0[31:12]),
 
                   .arid,
