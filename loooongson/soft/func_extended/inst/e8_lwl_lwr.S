@@ -60,6 +60,20 @@ LEAF(e8_lwl_lwr)
     bne t3, t6, inst_error
     nop
     
+    li t3, 0x22334455
+    lwl t3, 9(t0)
+    nop
+    lwr t3, 6(t0)
+    li t6, 0xCDEF1234
+    bne t3, t6, inst_error
+    nop
+    li t3, 0x22334455
+    lwl t3, 9(t0)
+    lwr t3, 6(t0)
+    li t6, 0xCDEF1234
+    bne t3, t6, inst_error
+    nop
+    
     .set mips2
 ###detect exception
 ###score ++
