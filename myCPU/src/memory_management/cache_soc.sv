@@ -44,10 +44,10 @@ module cache_soc #(
     output logic o_dsram_valid,
 
 	input [DCACHE_TAG_WIDTH - 1 : 0] i_dcache_instr_tag,
-	input logic [1:0] i_dcache_instr, //m级传入
+	input cache_op i_dcache_instr, //m级传入
     input word i_dcache_instr_addr, 
     
-    input logic [1:0] i_icache_instr, //m级传入
+    input cache_op i_icache_instr, //m级传入
 	input word i_icache_instr_addr,   //m级传入
 	input [ICACHE_TAG_WIDTH - 1 : 0] i_icache_instr_tag,
 

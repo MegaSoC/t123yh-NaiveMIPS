@@ -14,7 +14,7 @@ module new_dcache#(
 	input logic i_valid, //�?????????????�?????????????16�????????????? 可�?�项�?????????????16 8 4 2 1 0
 	//input logic i_uncached,   //当前地址是否经过icache
 	input logic [31:0] i_phy_addr, //假设查tlb要花费一个周�?????????????
-	input logic [1:0] i_cache_instr, //m级传入
+	input cache_op i_cache_instr, //m级传入
 	input word i_cache_instr_addr,   //m级传入
 	input [TAG_WIDTH - 1 : 0] i_cache_instr_tag,
 	input logic [31:0] i_va, //提前�?????????????个周期进入cache
@@ -216,7 +216,7 @@ logic [SET_ASSOC - 1 : 0][GROUP_NUM - 1 : 0] r_dirty;
 logic [LINE_WORD_OFFSET - 1 : 0] w_start_offseta, w_start_offsetb, w_end_offseta;
 tag [SET_ASSOC-1 : 0] w_tag_res;
 tag w_cache_inst_tag;
-logic w_cache_inst_hit, w_cache_inst_tag_wen, r_cache_hit_flag;
+logic w_cache_inst_hit, w_cache_inst_tag_wen, r_cache_wb_flag, w_cache_inst_wb;
 word w_va_end;
 logic w_tag_wea;
 tag w_tag_din;
@@ -323,11 +323,11 @@ end
 always_comb begin
 
 	w_idle_hita = w_pipe_hit || w_rbuffer_hita || w_wbuffer_hit;
-	w_idle_miss = (r_state == IDLE || r_state == IDLE_RECEIVING) && w_tag_num && ~w_idle_hita && ~w_waita && i_cache_instr != 2'b11;
+	w_idle_miss = (r_state == IDLE || r_state == IDLE_RECEIVING) && w_tag_num && ~w_idle_hita && ~w_waita && i_cache_instr == CACHE_NOP;
 	w_state = r_state;
 	case (r_state)
 		IDLE:begin
-			if(w_idle_miss||w_cache_inst_hit) begin
+			if(w_idle_miss||w_cache_inst_wb) begin
 				w_state = RECEIVING;
 			end
 		end
@@ -358,7 +358,7 @@ always_comb begin
 			// 	w_state = REFILL;
 			else if(!(w_resp.last && w_resp.valid2) && w_waita)
 				w_state = READ_WAITING;
-			else if(!(w_resp.last && w_resp.valid2) && (w_idle_miss||w_cache_inst_hit) )
+			else if(!(w_resp.last && w_resp.valid2) && (w_idle_miss||w_cache_inst_wb) )
 				w_state = RECEIVING2;
 		end
 		REFILL: begin
@@ -399,9 +399,10 @@ assign w_tag_wea = w_memread_end ;
 assign w_cache_inst_index = get_index(i_cache_instr_addr);
 assign w_cache_inst_way = get_cache_inst_way(i_cache_instr_addr);
 assign w_cache_inst_tag.tag = i_cache_instr_tag;
-assign w_cache_inst_tag.valid = i_cache_instr != 2'b01;
-assign w_cache_inst_tag_wen = i_cache_instr == 2'b01 || i_cache_instr == 2'b10;
-assign w_cache_inst_hit = (w_pipe_hit || w_rbuffer_hita || w_waita) && i_cache_instr == 2'b11;
+assign w_cache_inst_tag.valid = i_cache_instr != CACHE_HIT_INVALIDATE;
+assign w_cache_inst_tag_wen = i_cache_instr == CACHE_INDEX_STORE_TAG || (w_cache_inst_hit && i_cache_instr == CACHE_HIT_INVALIDATE);
+assign w_cache_inst_hit = (w_pipe_hit || w_rbuffer_hita || w_waita) && (i_cache_instr == CACHE_HIT_WRITEBACK_INVALIDATE || i_cache_instr == CACHE_HIT_INVALIDATE);
+assign w_cache_inst_wb = (w_cache_inst_hit && i_cache_instr == CACHE_HIT_WRITEBACK_INVALIDATE) || i_cache_instr == CACHE_INDEX_WRITEBACK_INVALIDATE;
 assign w_cache_inst_hitway = (w_hit_way & {2{w_pipe_hit}}) | (r_rbuffer_way & ({2{w_waita}} | {2{w_rbuffer_hita}}));
 assign w_reset_tag.tag = '0;
 assign w_reset_tag.valid = 0;
@@ -528,21 +529,21 @@ always_ff @(posedge i_clk) begin
 		r_save_tag <= '0;
 		r_save_index <= '0;
 		r_save_new_tag <= '0;
-		r_cache_hit_flag <= 0;
+		r_cache_wb_flag <= 0;
 	end
-	else if(w_idle_miss || w_waita || w_cache_inst_hit)begin
+	else if(w_idle_miss || w_waita || w_cache_inst_wb)begin
 		r_save_start_va <= r_pipe1_va;
 		r_save_addr <= w_phy_addr;
 		r_save_offset <= r_start_offseta;
-		r_reqstart_offset <= ({LINE_WORD_OFFSET{w_cache_inst_hit}})|(w_memread_req.startaddr[LINE_WORD_OFFSET + 1 : 2]);
-		r_save_wen <= {4{~w_cache_inst_hit}} & i_wen;
+		r_reqstart_offset <= ({LINE_WORD_OFFSET{w_cache_inst_wb}})|(w_memread_req.startaddr[LINE_WORD_OFFSET + 1 : 2]);
+		r_save_wen <= {4{~w_cache_inst_wb}} & i_wen;
 		r_save_indata <= i_in_data;
 		// r_save_dirty <= r_dirty[w_lru_select][w_indexa];
-		r_save_index <= get_index(r_pipe1_va);
+		r_save_index <= i_cache_instr == CACHE_INDEX_WRITEBACK_INVALIDATE ? w_cache_inst_index : get_index(w_phy_addr);
 		r_save_tag <= w_tag_res[w_lru_select]; //old tag
 		r_save_new_tag.tag <= w_phy_tag;
 		r_save_new_tag.valid <= 1;
-		r_cache_hit_flag <= w_cache_inst_hit;
+		r_cache_wb_flag <= w_cache_inst_wb;
 	end
 end
 
@@ -559,7 +560,7 @@ end
 
 
 //内存通信模块
-assign w_mem_read_we = (w_idle_miss ) || w_cache_inst_hit;
+assign w_mem_read_we = (w_idle_miss ) || w_cache_inst_wb;
 assign w_memread_req.len = WORD_PER_LINE - 1;
 assign w_memread_req.size = 3'b010;
 assign w_memread_req.status = 2'b10;
@@ -597,10 +598,10 @@ always_ff @(posedge i_clk) begin
 		if(w_memread_start) begin
 			r_old_tag <= r_save_tag;
 			r_rbuffer_valid1 <=1;
-			r_rbuffer_index1 <= get_index(r_save_addr);
+			r_rbuffer_index1 <= r_save_index;
 			r_rbuffer_tag.tag <= r_save_new_tag.tag;
-			r_rbuffer_tag.valid <= ~r_cache_hit_flag;
-			cnt_rbuffer <= {LINE_WORD_OFFSET{~r_cache_hit_flag}}&r_reqstart_offset;
+			r_rbuffer_tag.valid <= ~r_cache_wb_flag;
+			cnt_rbuffer <= {LINE_WORD_OFFSET{~r_cache_wb_flag}}&r_reqstart_offset;
 			r_rbuffer_way <= r_save_select_way;
 			r_rbuffer_onehot_way <= r_save_onehot_way;
 			r_writeback_addr <= {r_save_tag.tag,get_index(r_save_addr),{LINE_BYTE_OFFSET{1'b0}}};
@@ -735,9 +736,15 @@ always_ff @(posedge i_clk) begin
 		r_save_onehot_way <= '0;
 	end
 	else begin
-		if(w_cache_inst_hit)begin
-			r_save_select_way <= w_cache_inst_hitway;
-			r_save_onehot_way <= SET_ASSOC == 2?onehot1to2(w_cache_inst_hitway):onehot2to4(w_cache_inst_hitway);
+		if(w_cache_inst_wb)begin
+			if( i_cache_instr == CACHE_HIT_WRITEBACK_INVALIDATE) begin
+				r_save_select_way <= w_cache_inst_hitway;
+				r_save_onehot_way <= SET_ASSOC == 2?onehot1to2(w_cache_inst_hitway):onehot2to4(w_cache_inst_hitway);
+			end
+			else if(i_cache_instr == CACHE_INDEX_WRITEBACK_INVALIDATE) begin
+				r_save_select_way = SET_ASSOC == 2?i_cache_instr_addr[LINE_BYTE_OFFSET + INDEX_WIDTH] : i_cache_instr_addr[LINE_BYTE_OFFSET + INDEX_WIDTH + 1 : LINE_BYTE_OFFSET + INDEX_WIDTH];
+				r_save_onehot_way <= w_cache_inst_way;
+			end
 		end
 		else if(w_rbuffer_hita || w_waita)begin
 			r_lru_ram[r_indexa] <= gen_new_lru(r_lru_ram[r_indexa], r_rbuffer_way);

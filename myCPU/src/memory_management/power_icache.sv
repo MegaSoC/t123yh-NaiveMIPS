@@ -14,7 +14,7 @@ module new_icache#(
     input logic i_valid2,
 	//input logic i_uncached,   //当前地址是否经过icache
 	input logic [31:0] i_phy_addr, //假设查tlb要花费一个周�?????????????
-	input logic [1:0] i_cache_instr, //m级传入
+	input cache_op i_cache_instr, //m级传入
 	input word i_cache_instr_addr,   //m级传入
 	input [TAG_WIDTH - 1 : 0] i_cache_instr_tag,
 	input logic [31:0] i_va, //提前�?????????????个周期进入cache
@@ -253,7 +253,7 @@ always_comb begin
 	end
 
 	w_idle_hita = w_pipe_hit || w_rbuffer_hita;
-	w_idle_miss = (r_state == IDLE || r_state == IDLE_RECEIVING) && w_tag_num && ~w_idle_hita && ~w_waita && i_cache_instr != 2'b11;
+	w_idle_miss = (r_state == IDLE || r_state == IDLE_RECEIVING) && w_tag_num && ~w_idle_hita && ~w_waita && i_cache_instr == CACHE_NOP;
 	w_state = r_state;
 	case (r_state)
 		IDLE:begin
@@ -310,8 +310,9 @@ assign w_tag_wea = w_memread_end ;
 assign w_cache_inst_index = get_index(i_cache_instr_addr);
 assign w_cache_inst_way = get_cache_inst_way(i_cache_instr_addr);
 assign w_cache_inst_tag.tag = i_cache_instr_tag;
-assign w_cache_inst_tag.valid = i_cache_instr != 2'b01;
-assign w_cache_inst_tag_wen = i_cache_instr == 2'b01 || i_cache_instr == 2'b10;
+assign w_cache_inst_tag.valid = i_cache_instr != CACHE_HIT_INVALIDATE && i_cache_instr != CACHE_INDEX_WRITEBACK_INVALIDATE;
+assign w_cache_inst_hit = (w_pipe_hit || w_rbuffer_hita || w_waita) && i_cache_instr == CACHE_HIT_INVALIDATE;
+assign w_cache_inst_tag_wen = i_cache_instr == CACHE_INDEX_STORE_TAG || w_cache_inst_hit;
 assign w_reset_tag.tag = '0;
 assign w_reset_tag.valid = 0;
 

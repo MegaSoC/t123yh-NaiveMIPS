@@ -639,7 +639,7 @@ module mycpu_top(
         icache_op = CACHE_NOP;
         dcache_op = CACHE_NOP;
         if(CACHE && E_origin[17:16] == 2'b00)begin
-            case(E_origin[20:18]):
+            case(E_origin[20:18])
                 3'b000:begin
                     icache_op = CACHE_INDEX_WRITEBACK_INVALIDATE;
                 end
@@ -652,7 +652,7 @@ module mycpu_top(
             endcase
         end
         if(CACHE && E_origin[17:16] == 2'b01)begin
-            case(E_origin[20:18]):
+            case(E_origin[20:18])
                 3'b000:begin
                     dcache_op = CACHE_INDEX_WRITEBACK_INVALIDATE;
                 end
