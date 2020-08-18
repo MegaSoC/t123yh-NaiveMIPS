@@ -59,6 +59,14 @@
 `define CP0_TagHi0     8'b11101000
 `define CP0_ErrorEPC   8'b11110000
 
+typedef enum logic [2:0]{
+	CACHE_NOP,
+	CACHE_INDEX_WRITEBACK_INVALIDATE,
+	CACHE_INDEX_STORE_TAG,
+	CACHE_HIT_WRITEBACK_INVALIDATE,
+	CACHE_HIT_INVALIDATE
+} cache_op;
+
 `define INSTRBUS_WIDTH  104
 `define InstrWireSetWithOutNop    lb,lbu,lh,lhu,lw,sb,sh,sw,\
 						          addi,addiu,add,addu,sub,subu,\

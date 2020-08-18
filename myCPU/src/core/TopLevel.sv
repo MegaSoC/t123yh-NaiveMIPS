@@ -633,16 +633,41 @@ module mycpu_top(
     wire `INSTR_SET;
     assign {`INSTR_SET} = E_InstrBus;
 
-    wire index_invalidate,store_tag,hit_writeback;
-    assign index_invalidate = (CACHE && E_origin[20:18] == 3'b000);
-    assign store_tag = (CACHE && E_origin[20:18] == 3'b010);
-    assign hit_writeback = (CACHE && E_origin[20:18] != 3'b000 && E_origin[20:18] != 3'b010);
-    wire [1:0] cache_type;
-    assign cache_type = ({2{index_invalidate}}&2'b01) | ({2{store_tag}}&2'b10) | ({2{hit_writeback}}&2'b11);
+    cache_op icache_op, dcache_op;
 
-    wire [1:0] DI;
-    assign DI[0] = E_origin[17:16] == 2'b00;
-    assign DI[1] = E_origin[17:16] == 2'b01;
+    always_comb begin
+        icache_op = CACHE_NOP;
+        dcache_op = CACHE_NOP;
+        if(CACHE && E_origin[17:16] == 2'b00)begin
+            case(E_origin[20:18]):
+                3'b000:begin
+                    icache_op = CACHE_INDEX_WRITEBACK_INVALIDATE;
+                end
+                3'b010:begin
+                    icache_op = CACHE_INDEX_STORE_TAG;
+                end
+                3'b100:begin
+                    icache_op = CACHE_HIT_INVALIDATE;
+                end
+            endcase
+        end
+        if(CACHE && E_origin[17:16] == 2'b01)begin
+            case(E_origin[20:18]):
+                3'b000:begin
+                    dcache_op = CACHE_INDEX_WRITEBACK_INVALIDATE;
+                end
+                3'b010:begin
+                    dcache_op = CACHE_INDEX_STORE_TAG;
+                end
+                3'b100:begin
+                    dcache_op = CACHE_HIT_INVALIDATE;
+                end
+                3'b101:begin
+                    dcache_op = CACHE_HIT_WRITEBACK_INVALIDATE;
+                end
+            endcase
+        end
+    end
 
 
      cache_soc 
@@ -691,13 +716,13 @@ module mycpu_top(
                   .o_dsram_outdata(data_sram_rdata),
                   .o_dsram_valid(data_sram_data_ok),
 
-                  .i_dcache_instr_tag(cp0.cp0_reg_TagLo0[31:12]),
-	              .i_dcache_instr({2{DI[1]}} & cache_type),
+                  .i_dcache_instr_tag(cp0.cp0_reg_TagLo0[31:(32 - `DCACHE_TAG_WIDTH)]),
+	              .i_dcache_instr(icache_op),
                   .i_dcache_instr_addr(E_Data), 
                 
-                  .i_icache_instr({2{DI[0]}} & cache_type),
+                  .i_icache_instr(dcache_op),
 	              .i_icache_instr_addr(E_Data),
-	              .i_icache_instr_tag(cp0.cp0_reg_TagLo0[31:12]),
+                  .i_icache_instr_tag(cp0.cp0_reg_TagLo0[31:(32 - `ICACHE_TAG_WIDTH)]),
 
                   .arid,
                   .araddr,
