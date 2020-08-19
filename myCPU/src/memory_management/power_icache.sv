@@ -308,11 +308,10 @@ assign o_inn_stall = w_inn_stall;
 //pipeline1 process 
 assign w_tag_wea = w_memread_end ;
 assign w_cache_inst_index = get_index(i_cache_instr_addr);
-assign w_cache_inst_way = get_cache_inst_way(i_cache_instr_addr);
+assign w_cache_inst_way = i_cache_instr == CACHE_HIT_INVALIDATE ? {SET_ASSOC{1'b1}} : get_cache_inst_way(i_cache_instr_addr);
 assign w_cache_inst_tag.tag = i_cache_instr_tag;
-assign w_cache_inst_tag.valid = i_cache_instr != CACHE_HIT_INVALIDATE && i_cache_instr != CACHE_INDEX_WRITEBACK_INVALIDATE;
-assign w_cache_inst_hit = (w_pipe_hit || w_rbuffer_hita || w_waita) && i_cache_instr == CACHE_HIT_INVALIDATE;
-assign w_cache_inst_tag_wen = i_cache_instr == CACHE_INDEX_STORE_TAG || w_cache_inst_hit;
+assign w_cache_inst_tag.valid = i_cache_instr == CACHE_INDEX_STORE_TAG;
+assign w_cache_inst_tag_wen = i_cache_instr == CACHE_INDEX_STORE_TAG || i_cache_instr == CACHE_INDEX_WRITEBACK_INVALIDATE || i_cache_instr == CACHE_HIT_INVALIDATE;
 assign w_reset_tag.tag = '0;
 assign w_reset_tag.valid = 0;
 

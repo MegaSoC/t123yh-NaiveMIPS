@@ -717,10 +717,10 @@ module mycpu_top(
                   .o_dsram_valid(data_sram_data_ok),
 
                   .i_dcache_instr_tag(cp0.cp0_reg_TagLo0[31:(32 - `DCACHE_TAG_WIDTH)]),
-	              .i_dcache_instr(icache_op),
+	              .i_dcache_instr(dcache_op),
                   .i_dcache_instr_addr(E_Data), 
                 
-                  .i_icache_instr(dcache_op),
+                  .i_icache_instr(icache_op),
 	              .i_icache_instr_addr(E_Data),
                   .i_icache_instr_tag(cp0.cp0_reg_TagLo0[31:(32 - `ICACHE_TAG_WIDTH)]),
 
