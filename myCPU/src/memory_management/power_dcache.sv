@@ -210,7 +210,7 @@ tag w_reset_tag;
 //pipe1 signal
 index w_indexa, w_cache_inst_index;
 logic [SET_ASSOC - 1 : 0] w_cache_inst_way;
-logic [$clog2(SET_ASSOC) - 1 : 0] r_save_select_way,w_cache_inst_hitway;
+logic [$clog2(SET_ASSOC) - 1 : 0] r_save_select_way,w_cache_inst_hitway, w_cache_inst_waay;
 logic [SET_ASSOC - 1 : 0] r_save_onehot_way;
 logic [SET_ASSOC - 1 : 0][GROUP_NUM - 1 : 0] r_dirty;
 logic [LINE_WORD_OFFSET - 1 : 0] w_start_offseta, w_start_offsetb, w_end_offseta;
@@ -404,6 +404,7 @@ assign w_cache_inst_tag_wen = i_cache_instr == CACHE_INDEX_STORE_TAG || (w_cache
 assign w_cache_inst_hit = (w_pipe_hit || w_rbuffer_hita || w_waita) && (i_cache_instr == CACHE_HIT_WRITEBACK_INVALIDATE || i_cache_instr == CACHE_HIT_INVALIDATE);
 assign w_cache_inst_wb = (w_cache_inst_hit && i_cache_instr == CACHE_HIT_WRITEBACK_INVALIDATE) || i_cache_instr == CACHE_INDEX_WRITEBACK_INVALIDATE;
 assign w_cache_inst_hitway = (w_hit_way & {2{w_pipe_hit}}) | (r_rbuffer_way & ({2{w_waita}} | {2{w_rbuffer_hita}}));
+assign w_cache_inst_waay = SET_ASSOC == 2?i_cache_instr_addr[LINE_BYTE_OFFSET + INDEX_WIDTH] : i_cache_instr_addr[LINE_BYTE_OFFSET + INDEX_WIDTH + 1 : LINE_BYTE_OFFSET + INDEX_WIDTH];
 assign w_reset_tag.tag = '0;
 assign w_reset_tag.valid = 0;
 
@@ -540,7 +541,15 @@ always_ff @(posedge i_clk) begin
 		r_save_indata <= i_in_data;
 		// r_save_dirty <= r_dirty[w_lru_select][w_indexa];
 		r_save_index <= i_cache_instr == CACHE_INDEX_WRITEBACK_INVALIDATE ? w_cache_inst_index : get_index(w_phy_addr);
-		r_save_tag <= w_tag_res[w_lru_select]; //old tag
+		if(i_cache_instr == CACHE_INDEX_WRITEBACK_INVALIDATE) begin
+			r_save_tag <= w_tag_res[w_cache_inst_waay];
+		end
+		else if(i_cache_instr == CACHE_HIT_WRITEBACK_INVALIDATE) begin
+			r_save_tag <= w_tag_res[w_cache_inst_hitway];
+		end
+		else begin
+			r_save_tag <= w_tag_res[w_lru_select];
+		end
 		r_save_new_tag.tag <= w_phy_tag;
 		r_save_new_tag.valid <= 1;
 		r_cache_wb_flag <= w_cache_inst_wb;
@@ -742,7 +751,7 @@ always_ff @(posedge i_clk) begin
 				r_save_onehot_way <= SET_ASSOC == 2?onehot1to2(w_cache_inst_hitway):onehot2to4(w_cache_inst_hitway);
 			end
 			else if(i_cache_instr == CACHE_INDEX_WRITEBACK_INVALIDATE) begin
-				r_save_select_way = SET_ASSOC == 2?i_cache_instr_addr[LINE_BYTE_OFFSET + INDEX_WIDTH] : i_cache_instr_addr[LINE_BYTE_OFFSET + INDEX_WIDTH + 1 : LINE_BYTE_OFFSET + INDEX_WIDTH];
+				r_save_select_way = w_cache_inst_waay;
 				r_save_onehot_way <= w_cache_inst_way;
 			end
 		end
