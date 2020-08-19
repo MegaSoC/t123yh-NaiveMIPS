@@ -104,12 +104,7 @@ module mycpu_top(
     wire[2:0] data_size;
     assign data_size = ((SC|sw) | (LL|lw|lwl|lwr)) ? 3'b010 :
            (sh | lh | lhu) ? 3'b001 :
-           3'b000 ;
-
-    assign wid = awid;
-
-
-
+           3'b000;
 
     wire [3 :0] arid_d ;
     wire [31:0] araddr_d ;
