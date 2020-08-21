@@ -535,8 +535,8 @@ always_ff @(posedge i_clk) begin
 	else if(w_idle_miss || w_waita || w_cache_inst_wb)begin
 		r_save_start_va <= r_pipe1_va;
 		r_save_addr <= w_phy_addr;
-		r_save_offset <= r_start_offseta;
-		r_reqstart_offset <= ({LINE_WORD_OFFSET{w_cache_inst_wb}})|(w_memread_req.startaddr[LINE_WORD_OFFSET + 1 : 2]);
+		r_save_offset <= r_start_offseta | {LINE_WORD_OFFSET{w_cache_inst_wb}};
+		r_reqstart_offset <= w_memread_req.startaddr[LINE_BYTE_OFFSET - 1 : 2];
 		r_save_wen <= {4{~w_cache_inst_wb}} & i_wen;
 		r_save_indata <= i_in_data;
 		// r_save_dirty <= r_dirty[w_lru_select][w_indexa];
@@ -569,11 +569,11 @@ end
 
 
 //内存通信模块
-assign w_mem_read_we = (w_idle_miss ) || w_cache_inst_wb;
+assign w_mem_read_we = (w_idle_miss  || w_cache_inst_wb) && (r_state == IDLE || r_state == IDLE_RECEIVING);
 assign w_memread_req.len = WORD_PER_LINE - 1;
 assign w_memread_req.size = 3'b010;
 assign w_memread_req.status = 2'b10;
-assign w_memread_req.startaddr = {w_phy_addr[31:2], 2'b0};
+assign w_memread_req.startaddr = {w_phy_addr[31:2], 2'b0} & {{TAG_WIDTH{1'b1}},{INDEX_WIDTH{1'b1}},{LINE_WORD_OFFSET{~w_cache_inst_wb}},2'b11};
 assign w_memread_req.va = {r_pipe1_va[31:LINE_BYTE_OFFSET],{LINE_BYTE_OFFSET{1'b0}}};
 
 assign w_resp = i_resp;
@@ -610,7 +610,7 @@ always_ff @(posedge i_clk) begin
 			r_rbuffer_index1 <= r_save_index;
 			r_rbuffer_tag.tag <= r_save_new_tag.tag;
 			r_rbuffer_tag.valid <= ~r_cache_wb_flag;
-			cnt_rbuffer <= {LINE_WORD_OFFSET{~r_cache_wb_flag}}&r_reqstart_offset;
+			cnt_rbuffer <= r_reqstart_offset;
 			r_rbuffer_way <= r_save_select_way;
 			r_rbuffer_onehot_way <= r_save_onehot_way;
 			r_writeback_addr <= {r_save_tag.tag,get_index(r_save_addr),{LINE_BYTE_OFFSET{1'b0}}};
