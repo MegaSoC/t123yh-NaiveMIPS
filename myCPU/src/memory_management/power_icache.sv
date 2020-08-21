@@ -253,7 +253,7 @@ always_comb begin
 	end
 
 	w_idle_hita = w_pipe_hit || w_rbuffer_hita;
-	w_idle_miss = (r_state == IDLE || r_state == IDLE_RECEIVING) && w_tag_num && ~w_idle_hita && ~w_waita && i_cache_instr == CACHE_NOP;
+	w_idle_miss = (r_state == IDLE || r_state == IDLE_RECEIVING) && w_tag_num && ~w_idle_hita && ~w_waita;
 	w_state = r_state;
 	case (r_state)
 		IDLE:begin
