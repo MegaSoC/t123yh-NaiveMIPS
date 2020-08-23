@@ -547,6 +547,9 @@ always_ff @(posedge i_clk) begin
 		else if(i_cache_instr == CACHE_HIT_WRITEBACK_INVALIDATE) begin
 			r_save_tag <= w_tag_res[w_cache_inst_hitway];
 		end
+		else if(r_state == IDLE_RECEIVING && w_lru_select == r_rbuffer_way && r_rbuffer_index1 == get_index(w_phy_addr)) begin
+			r_save_tag <= r_rbuffer_tag;
+		end
 		else begin
 			r_save_tag <= w_tag_res[w_lru_select];
 		end
