@@ -493,22 +493,31 @@ module mycpu_top(
     wire SR_BEV, SR_EXL, CAUSE_IV;
     wire [31:0] ebase;
 
+    reg last_cannot_int;
+    always_ff @(posedge Clk)begin       
+    if (reset) begin
+                      last_cannot_int <= 0;
+        end else begin                                                                                                                                                           
+        last_cannot_int <= dm_stall || my_e.count_in_salu ||my_e.E_XALU_Busy;
+        end
+    end                                           
+                                        
     exception exception(
-                  .flush(ExceptionFlush),
-                  .CP0_WrExp(cp0_CP0_WrExp),
+                  .flush(ExceptionFlush),                                                                                                                                                                                                                                                                                                  
+                  .CP0_WrExp(cp0_CP0_WrExp),                
                   .clear_exl(clear_exl),
                   .ExcCode(ExcCode),
-                  .epc(exp_epc),
+                  .epc(exp_epc),         
                   .badvaddr(exp_badvaddr),
                   .badvaddr_we(exp_badvaddr_we),
-                  .NewExceptionPC(NewExceptionPC),
-
-                  .clk(Clk),
+                  .NewExceptionPC(NewExceptionPC),              
+                                         
+                  .clk(Clk),                                                                                                         
                   .reset(reset),
-                  .E_EPC(E_EPC),
+                  .E_EPC(E_EPC),            
                   .pc(E_PC),
                   .mm_pc(M_PC_post),
-                  .data_vaddr(E_Data),
+                  .data_vaddr(E_Data),                               
                   .data_we(sb | sh | (SC|sw)),
                   .DataMiss(data_exp_miss),
                   .InstMiss(E_InstMiss),
@@ -525,7 +534,7 @@ module mycpu_top(
                   .in_delayslot(E_in_delayslot),
                   .overflow(E_OverFlow),
                   .epc_in(cp0_epc),
-                  .allow_int(cp0_allow_int),
+                  .allow_int(cp0_allow_int && !last_cannot_int),
                   .interrupt_flag(interrupt_flag),
                   .inst_sram_data_ok(inst_sram_data_ok),
                   .icache_stall(icache_stall),
