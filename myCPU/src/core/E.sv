@@ -235,7 +235,7 @@ module E(
             E_clear_exl          <= 0;
             E_origin             <= 0;
         end
-        else if(clo||clz && !count_in_salu)begin
+        else if(clo||clz && !count_in_salu &&!dm_stall)begin
             count_in_salu           <= 1;
             salu_PC                 <= D_PC;
             salu_EPC                <= D_EPC;
@@ -284,7 +284,7 @@ module E(
             E_clear_exl          <= 0;
             E_origin             <= 0;
         end
-        else if (mul && !mul_in_xalu) begin
+        else if (mul && !mul_in_xalu &&!dm_stall) begin
             mul_in_xalu            <= 1;
             mul_PC                 <= D_PC;
             mul_EPC                <= D_EPC;

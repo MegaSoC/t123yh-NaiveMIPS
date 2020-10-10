@@ -50,8 +50,8 @@ module exception(
 
     wire [31:0] base = SR_BEV ? 32'hbfc00200 : ebase;
 
-    assign E_CurrentException = (allow_int & interrupt_flag != 8'b0) |
-                                (DirtyData & data_we) |
+    assign E_CurrentException = (allow_int && interrupt_flag != 8'b0) |
+                                (DirtyData && data_we) |
                                 InstMiss | DataMiss |
                                 inst_invalid | data_invalid |
                                 IllegalInst | IllegalData |
@@ -70,7 +70,7 @@ module exception(
             CP0_WrExp      <= 1'b0;
             clear_exl      <= 1'b0;
         end else begin
-            if (allow_int & interrupt_flag != 8'b0) begin
+            if (allow_int && interrupt_flag != 8'b0) begin
                 ExcCode        <= `EX_INTERRUPT;
                 badvaddr_we    <= 1'b0;
                 badvaddr       <= 32'b0;
@@ -226,7 +226,7 @@ module exception(
                 CP0_WrExp      <= 1'b1;
                 clear_exl      <= 1'b0;
             end
-            else if (DirtyData & data_we) begin
+            else if (DirtyData && data_we) begin
                 ExcCode        <= `EX_MOD;
                 badvaddr_we    <= 1'b1;
                 badvaddr       <= data_vaddr;
