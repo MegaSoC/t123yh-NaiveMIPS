@@ -2,6 +2,7 @@
 
 module M(
         input Clk,
+        input E_rw,
         input reset,
         output dm_stall,
         input ExceptionFlush,
@@ -46,7 +47,10 @@ module M(
 
     assign read = (lwl|lwr|lb|lbu|lh|lhu|(LL|lw)|CACHE);
     assign write = (swl|swr|sb|sh|(SC|sw));
-    assign dm_stall = (read|write)&(( uncached & !data_sram_data_ok ) | ( (!uncached) & (!hit)));
+    assign dm_stall = ((read|write)&(( uncached & !data_sram_data_ok ) | ( (!uncached) & (!hit)))) | (E_rw&!hit);
+    wire old_dm_stall;
+    assign old_dm_stall = ((read|write)&( uncached & !data_sram_data_ok ) | ( (!uncached) & (!hit)));
+
     assign data2cp0 = regRT;
     assign data_sram_wdata = swl?(regRT>>({(~AddrOffset),3'b0})):
            (regRT<<({AddrOffset,3'b0}));

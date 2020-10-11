@@ -77,6 +77,7 @@ module E(
         output wire [31:0] E_calLSaddr_is_dm_stall,
         input wire E_EstallClear,
         output wire E_MemReadEnable_Inter,
+        output wire MemFamily_Inter,
         output wire E_MemSaveType_Inter
     );
     wire E_XALU_Busy;
@@ -120,7 +121,7 @@ module E(
     assign Offset = Data_Inter[1:0];
 
     assign ExtType_Inter         = {lb,lbu,lh,lhu,(LL|lw),lwl,lwr,swl,swr};
-    assign MemFamily_Inter       = lb|lbu|lh|lhu|LL|lw|sb|sh|SC|sw|swl|swr|lwl|lwr;
+    assign MemFamily_Inter       = lb|lbu|lh|lhu|LL|lw|sb|sh|SC|sw|swl|swr|lwl|lwr|CACHE;
     assign D_load_alignment_err  = ((LL|lw) & Offset[1:0]!=0) | (lh & Offset[0] !=0) | (lhu & Offset[0] !=0) ;
     assign D_store_alignment_err = ((SC|sw) & Offset[1:0]!=0) | (sh & Offset[0] !=0) ;
 

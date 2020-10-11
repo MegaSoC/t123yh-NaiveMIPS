@@ -346,6 +346,7 @@ module mycpu_top(
     wire E_MemLStype_Inter = E_MemReadEnable_Inter | E_MemSaveType_Inter ;
 
     wire D_dcache_read,D_dcache_write;
+    wire E_rw;
     E my_e(
           .Clk(Clk),
           .reset(Myreset),
@@ -407,6 +408,7 @@ module mycpu_top(
           .D_trap(D_trap),
           .E_trap(E_trap),
           .E_clear_exl(E_clear_exl),
+          .MemFamily_Inter(E_rw),
 
           .E_CurrentException(E_CurrentException),
           .E_calLSaddr_is_dm_stall(E_calLSaddr_is_dm_stall),
@@ -432,6 +434,7 @@ module mycpu_top(
 
     M my_m(
           .Clk(Clk),
+          .E_rw(E_rw),
           .reset(Myreset),
           .dm_stall(dm_stall),
           .ExceptionFlush(ExceptionFlush),
@@ -771,4 +774,48 @@ module mycpu_top(
 
     );
 
+    integer fp_w;
+    initial begin
+        fp_w = $fopen("D:/debug.txt","w");
+    end
+    
+    always_ff @(posedge Clk) begin
+        if(|debug_wb_rf_wen)begin
+            if(debug_wb_rf_wnum != 0)begin
+                $fwrite(fp_w,"pc:%8h, num = %d, wdata = %8h\n",debug_wb_pc,debug_wb_rf_wnum,debug_wb_rf_wdata);
+                $fflush(fp_w);
+            end
+        end
+    end
+
+    integer fp_b;
+    initial begin
+        fp_b = $fopen("D:/store.txt","w");
+    end
+    
+    always_ff @(posedge Clk) begin
+        if((!data_uncached) &write & !E_CurrentException && last_pc != E_PC)begin
+                $fwrite(fp_b,"EPC:%8h, addr = %8h, wdata = %8h\n",E_PC,data_sram_addr,data_sram_wdata);
+                $fflush(fp_b);
+        end
+    end
+
+    reg [31:0] last_pc;
+      wire [31:0] cnm;
+      assign cnm = E_PC;
+
+
+    integer fp_t;
+    initial begin
+        fp_t = $fopen("D:/pc_t.txt","w");
+        last_pc = 0;
+    end
+    
+    always @(posedge Clk) begin
+        if((!data_uncached) &write & !E_CurrentException && last_pc != E_PC)begin
+                $fwrite(fp_t,"EPC:%8h, time: %dns\n",E_PC,$time);
+                $fflush(fp_t);
+                last_pc = cnm;
+        end
+    end
 endmodule
