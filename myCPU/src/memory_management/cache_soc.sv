@@ -13,35 +13,46 @@ module cache_soc #(
     input logic i_clk,
     input logic i_rst,
 
-    input word   i_icache_npc,//icache的pc，由npc模块产生，比物理地址（i_icache_phyaddr）前一个周期到达
-    input word   i_icache_phyaddr,//icache的物理地址，时机与I级相同
-    input logic  i_icache_valid1,//i_icache_npc的valid信号
-    input logic  i_icache_valid2,//i_icache_phyaddr的valid信号
-    output word  o_icache_inst,//icache的查询结果，I级出（i_icache_npc的下个周期）
-    output logic o_i_stall,//icache产生的暂停信号
+    input word   i_i_npc,//指令的pc，由npc模块产生，比物理地址（i_icache_phyaddr）前一个周期到达
+    input word   i_i_phyaddr,//icache的物理地址，时机与I级相同
+    input logic  i_i_valid1,//i_icache_npc的valid信号
+    input logic  i_i_valid2,//i_icache_phyaddr的valid信号
+    input logic  i_i_cached, //指明指令是否经过icache，1：经过，0：不经过
+    output word  o_i_inst,//指令的查询结果，I级出（i_i_npc的下个周期）
+    output logic o_i_valid, //指令的valid信号
 
-    input word   i_isram_addr,//不通过icache的指令物理地址（与i_icache_phyaddr时机相同）
-    input logic  i_isram_valid,//i_isram_adddr的valid信号
-    output logic o_isram_valid,//o_isram_inst的valid信号
-    output word  o_isram_inst,//不通过icache的查询结果
+    // output word  o_icache_inst,//icache的查询结果，I级出（i_icache_npc的下个周期）@@
+    // output logic o_i_stall,//icache产生的暂停信号 @@
+    // input word   i_isram_addr,//不通过icache的指令物理地址（与i_icache_phyaddr时机相同）@@
+    // input logic  i_isram_valid,//i_isram_adddr的valid信号@@
+    // output logic o_isram_valid,//o_isram_inst的valid信号@@
+    // output word  o_isram_inst,//不通过icache的查询结果@@
 
-    input word   i_dcache_va,//dcache的虚拟地址，由alu产生，比物理地址(i_dcache_phyaddr)前一个周期到达
-    input word   i_dcache_phyaddr,//dcache的物理地址，时机与M级相同
-    input logic  [3:0] i_dcache_byteen,//i_dcache_write拉高时表明哪些字节是有效的
-    input logic  i_dcache_read,//与i_dcache_phyaddr时机相同，通过dcache的读信号
-    input logic  i_dcache_write,//与i_dcache_phyaddr时机相同，通过dcache的写信号
-    input word   i_dcache_indata,//与i_dcache_phyaddr时机相同，写的内容
-    output word  i_dcache_outdata,//dcache的查询结果，D级出（i_dcache_va的下个周期）
-    output logic o_d_stall,//dcache产生的暂停信号
+    input word   i_d_va,//dcache的虚拟地址，由alu产生，比物理地址(i_d_phyaddr)前一个周期到达
+    input word   i_d_phyaddr,//dcache的物理地址，时机与M级相同
+    input logic  i_d_cached, //指明数据是否经过dcache，1：经过，0：不经过
+    input logic  i_d_read, //数据的读信号，与i_d_phyaddr时机相同
+    input logic  i_d_write,//数据的写信号，与i_d_phyaddr时机相同
+    input logic  [2:0] i_d_size, //读出/写入的字节数 2的i_d_size次方代表要
+    input word   i_d_indata,//与i_dcache_phyaddr时机相同，写的内容
+    output word  o_d_outdata,
+    output logic o_d_valid,
 
-    input word   i_dsram_addr,//不通过dcache的数据物理地址（时机与i_dcache_phyaddr相同）
-    input logic  i_dsram_read,//不通过dcache的数据读信号（时机与i_dcache_phyaddr相同）
-    input logic  i_dsram_write,//不通过dcache的数据写信号（时机与i_dcache_phyaddr相同）
-    input logic  [3:0] i_dsram_byteen,//i_dsram_write拉高时表明哪些字节有效
-    input logic  [2:0] i_dsram_size,//不通过dcache时传输的字节数，直接与axi传输的arsize或awsize相连
-    input word   i_dsram_indata,//i_dsram_write拉高时写入的内容
-    output word  o_dsram_outdata,//不通过dcache的查询结果
-    output logic o_dsram_valid,//o_dsram_outdata的valid信号
+    //input logic  [3:0] i_dcache_byteen,//i_dcache_write拉高时表明哪些字节是有效的%%
+    //input logic  i_dcache_read,//与i_dcache_phyaddr时机相同，通过dcache的读信号 %%
+    //input logic  i_dcache_write,//与i_dcache_phyaddr时机相同，通过dcache的写信号 %%
+    
+    //output word  i_dcache_outdata,//dcache的查询结果，D级出（i_dcache_va的下个周期）%%
+    //output logic o_d_stall,//dcache产生的暂停信号%%
+
+    //input word   i_dsram_addr,//不通过dcache的数据物理地址（时机与i_dcache_phyaddr相同）%%
+    //input logic  i_dsram_read,//不通过dcache的数据读信号（时机与i_dcache_phyaddr相同）%%
+    //input logic  i_dsram_write,//不通过dcache的数据写信号（时机与i_dcache_phyaddr相同）%%
+    //input logic  [3:0] i_dsram_byteen,//i_dsram_write拉高时表明哪些字节有效%%
+    //input logic  [2:0] i_dsram_size,//不通过dcache时传输的字节数，直接与axi传输的arsize或awsize相连%%
+    //input word   i_dsram_indata,//i_dsram_write拉高时写入的内容%%
+    //output word  o_dsram_outdata,//不通过dcache的查询结果%%
+    //output logic o_dsram_valid,//o_dsram_outdata的valid信号%%
 
 	input [DCACHE_TAG_WIDTH - 1 : 0] i_dcache_instr_tag,//mu级传入 index storetag指令中的tag 对dcache有效
 	input cache_op i_dcache_instr, //m级传入 表明是哪个cache指令 对dcache有效 
@@ -60,13 +71,13 @@ module cache_soc #(
     output logic [3 :0] arcache ,
     output logic [2 :0] arprot ,
     output logic arvalid ,
-    input logic arready ,
+    input  logic arready ,
 
-    input logic [3 :0] rid ,
-    input logic [31:0] rdata ,
-    input logic [1 :0] rresp ,
-    input logic rlast ,
-    input logic rvalid ,
+    input  logic [3 :0] rid ,
+    input  logic [31:0] rdata ,
+    input  logic [1 :0] rresp ,
+    input  logic rlast ,
+    input  logic rvalid ,
     output logic rready ,
 
     output logic [3 :0] awid ,
@@ -78,7 +89,7 @@ module cache_soc #(
     output logic [3 :0] awcache ,
     output logic [2 :0] awprot ,
     output logic awvalid ,
-    input logic awready ,
+    input  logic awready ,
 
     output logic [3 :0] wid ,
     output logic [31:0] wdata ,
@@ -87,23 +98,42 @@ module cache_soc #(
     output logic wvalid ,
     input  logic wready ,
 
-    input logic [3 :0] bid ,
-    input logic [1 :0] bresp ,
-    input bvalid ,
+    input  logic [3 :0] bid ,
+    input  logic [1 :0] bresp ,
+    input  logic bvalid ,
     output logic bready
 );
+
+assign o_i_valid = w_out_isram_valid || (!w_i_stall && i_i_cached && i_i_valid2);
+assign o_i_inst = w_out_isram_valid ? w_isram_inst : w_icache_inst;
+assign o_d_valid = w_out_dsram_valid || (!w_d_stall && i_d_cached && (i_d_read || i_d_write));
+assign o_d_outdata = w_out_dsram_valid ? w_dsram_data : w_dcache_data;
+
+always_comb begin
+    if(i_d_size == 3'b010)
+        w_d_byteen = 4'b1111;
+    else if (i_d_size == 3'b001) begin
+        w_d_byteen = i_d_phyaddr[1] ? 4'b1100 : 4'b0011;
+    end
+    else begin
+        w_d_byteen = 4'b0001 << (i_d_phyaddr[1:0]);
+    end
+end
 
 logic [$clog2(MEM_WRITE_FIFO_DEPTH) - 1 : 0] w_key;
 logic [$clog2(MEM_WRITE_FIFO_DEPTH) - 2 : 0] w_dcache_lock;
 logic w_write_process;
+logic [3:0] w_d_byteen;
+word w_icache_inst, w_dcache_data;
 word w_write_addr;
 mem_read_resp w_resp;
 mem_read_req w_dcache_rreq, w_icache_rreq, w_isram_req, w_dsram_rreq;
 logic w_data_empty,w_dcache_start,w_dcache_end,w_memread_stall;
 logic w_inst_empty,w_icache_start,w_icache_end, w_dsram_wend;
 logic w_dcache_memread_we, w_dcache_memwrite_start,w_dcache_memwrite_end;
-logic w_dcache_memwrite_we, w_icache_memread_we;
+logic w_dcache_memwrite_we, w_icache_memread_we, w_i_stall, w_d_stall;
 logic r_isram_valid, r_dsram_read, r_dsram_write, w_isram_valid, w_dsram_read, w_dsram_write;
+logic w_out_isram_valid, w_out_dsram_valid;
 word w_memread_start_pc, w_memread_start_addr;
 word [DCACHE_LINE_WORD_NUM - 1 : 0] w_dcache_memwrite_data;
 word r_isram_inst, r_dsram_data, w_isram_inst, w_dsram_data;
@@ -127,21 +157,20 @@ end
 always_comb begin
     w_isram_inst = r_isram_inst;
     w_dsram_data = r_dsram_data;
-    if(o_isram_valid)begin
+    if(w_out_isram_valid)begin
         w_isram_inst = w_resp.data;
     end
-    if(o_dsram_valid)begin
+    if(w_out_dsram_valid)begin
         w_dsram_data = w_resp.data;
     end
 end
 
-assign w_isram_req.startaddr = i_isram_addr;
+assign w_isram_req.startaddr = i_i_phyaddr;
 assign w_isram_req.va = '0;
 assign w_isram_req.size = 3'b010;
 assign w_isram_req.len = 0;
 assign w_isram_req.status = 2'b01;
-assign o_isram_valid = w_resp.valid1 && w_resp.last;
-assign o_isram_inst = w_isram_inst;
+assign w_out_isram_valid = w_resp.valid1 && w_resp.last;
 
 new_icache #(
     .WORD_PER_LINE(ICACHE_WORD_PER_LINE),
@@ -153,12 +182,12 @@ icache1(
     .i_clk,
     .i_rst,
 
-    .i_valid1(i_icache_valid1), 
-    .i_valid2(i_icache_valid2),
-    .i_phy_addr(i_icache_phyaddr), 
-    .i_va(i_icache_npc), 
-    .o_inn_stall(o_i_stall),
-    .o_mdata_data(o_icache_inst),
+    .i_valid1(i_i_valid1), 
+    .i_valid2(i_i_valid2),
+    .i_phy_addr(i_i_phyaddr), 
+    .i_va(i_i_npc), 
+    .o_inn_stall(w_i_stall),
+    .o_mdata_data(w_icache_inst),
 
     .i_cache_instr(i_icache_instr),
     .i_cache_instr_addr(i_icache_instr_addr),
@@ -173,18 +202,17 @@ icache1(
 );
 
 assign w_dsram_rreq.status = 2'b11;
-assign w_dsram_rreq.startaddr = i_dsram_addr;
+assign w_dsram_rreq.startaddr = i_d_phyaddr;
 assign w_dsram_rreq.va = '0;
-assign w_dsram_rreq.size = i_dsram_size;
+assign w_dsram_rreq.size = i_d_size;
 assign w_dsram_rreq.len = 0;
 
 assign w_dsram_wreq.len = 0;
-assign w_dsram_wreq.wen = i_dsram_byteen;
-assign w_dsram_wreq.addr = i_dsram_addr;
-assign w_dsram_wreq.size = i_dsram_size;
+assign w_dsram_wreq.wen = w_d_byteen;
+assign w_dsram_wreq.addr = i_d_phyaddr;
+assign w_dsram_wreq.size = i_d_size;
 
-assign o_dsram_outdata = w_dsram_data;
-assign o_dsram_valid = (w_resp.valid3 && w_resp.last) || w_dsram_wend;
+assign w_out_dsram_valid = (w_resp.valid3 && w_resp.last) || w_dsram_wend;
 
 new_dcache #(
     .WORD_PER_LINE(DCACHE_LINE_WORD_NUM),
@@ -197,13 +225,13 @@ dcache1(
     .i_clk,
     .i_rst,
 
-    .i_valid(i_dcache_read | i_dcache_write), 
-    .i_phy_addr(i_dcache_phyaddr), 
-    .i_va(i_dcache_va), 
-    .i_wen(i_dcache_byteen),
-    .i_in_data(i_dcache_indata),
-    .o_inn_stall(o_d_stall),
-    .o_mdata_data(i_dcache_outdata),
+    .i_valid((i_dcache_read | i_dcache_write) && i_d_cached), 
+    .i_phy_addr(i_d_phyaddr), 
+    .i_va(i_d_va), 
+    .i_wen(w_d_byteen),
+    .i_in_data(i_d_indata),
+    .o_inn_stall(w_d_stall),
+    .o_mdata_data(w_dcache_data),
 
     .i_cache_instr(i_dcache_instr),
     .i_cache_instr_addr(i_dcache_instr_addr),
@@ -236,15 +264,15 @@ always_ff @(posedge i_clk) begin
         r_dsram_write <= 0;
     end
     else begin
-        r_isram_valid <= ~o_isram_valid && (i_isram_valid || r_isram_valid);
-        r_dsram_read <= ~o_dsram_valid && (i_dsram_read || r_dsram_read);
-        r_dsram_write <= ~o_dsram_valid && (i_dsram_write || r_dsram_write);
+        r_isram_valid <= ~w_out_isram_valid && ((!i_i_cached && i_i_valid2) || r_isram_valid);
+        r_dsram_read <= ~w_out_dsram_valid && ((i_d_read && !i_d_cached) || r_dsram_read);
+        r_dsram_write <= ~w_out_dsram_valid && ((i_d_write && !i_d_cached) || r_dsram_write);
     end
 end
 
-assign w_isram_valid = i_isram_valid && ~r_isram_valid;
-assign w_dsram_read  = i_dsram_read && ~r_dsram_read;
-assign w_dsram_write = i_dsram_write && ~r_dsram_write;
+assign w_isram_valid = !i_i_cached && i_i_valid2  && ~r_isram_valid;
+assign w_dsram_read  = (i_d_read && !i_d_cached) && ~r_dsram_read;
+assign w_dsram_write = (i_d_write && !i_d_cached) && ~r_dsram_write;
 
 mem_read # (
     .LEN_UNIT(ICACHE_WORD_PER_LINE),
@@ -288,7 +316,7 @@ mem_write #(
     .i_dcache_we(w_dcache_memwrite_we),
     .i_sram_we(w_dsram_write),
     .i_dcache_data(w_dcache_memwrite_data),
-    .i_sram_data(i_dsram_indata),
+    .i_sram_data(i_d_indata),
     .o_dcache_lock(w_dcache_lock),
     .o_sram_lock(),
     .o_key(w_key),
