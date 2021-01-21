@@ -15,11 +15,11 @@ module cache_soc #(
 
     input word   i_i_npc,//指令的pc，由npc模块产生，比物理地址（i_icache_phyaddr）前一个周期到达
     input word   i_i_phyaddr,//icache的物理地址，时机与I级相同
-    input logic  i_i_valid1,//i_icache_npc的valid信号
-    input logic  i_i_valid2,//i_icache_phyaddr的valid信号
+    input logic  i_i_valid1,//i_i_npc的valid信号
+    input logic  i_i_valid2,//i_i_phyaddr的valid信号
     input logic  i_i_cached, //指明指令是否经过icache，1：经过，0：不经过
-    output word  o_i_inst,//指令的查询结果，I级出（i_i_npc的下个周期）
-    output logic o_i_valid, //指令的valid信号
+    output word  o_i_inst,//指令的查询结果，
+    output logic o_i_valid, //o_i_inst的valid信号
 
     // output word  o_icache_inst,//icache的查询结果，I级出（i_icache_npc的下个周期）@@
     // output logic o_i_stall,//icache产生的暂停信号 @@
@@ -34,9 +34,9 @@ module cache_soc #(
     input logic  i_d_read, //数据的读信号，与i_d_phyaddr时机相同
     input logic  i_d_write,//数据的写信号，与i_d_phyaddr时机相同
     input logic  [2:0] i_d_size, //读出/写入的字节数 2的i_d_size次方代表要
-    input word   i_d_indata,//与i_dcache_phyaddr时机相同，写的内容
-    output word  o_d_outdata,
-    output logic o_d_valid,
+    input word   i_d_indata,//与i_d_phyaddr时机相同，写入的内容
+    output word  o_d_outdata,//数据读出的内容
+    output logic o_d_valid,//o_d_outdata的valid信号
 
     //input logic  [3:0] i_dcache_byteen,//i_dcache_write拉高时表明哪些字节是有效的%%
     //input logic  i_dcache_read,//与i_dcache_phyaddr时机相同，通过dcache的读信号 %%
