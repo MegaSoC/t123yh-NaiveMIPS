@@ -202,7 +202,7 @@ dcache1(
     .i_clk,
     .i_rst,
 
-    .i_valid((i_dcache_read | i_dcache_write) && i_d_cached), 
+    .i_valid((i_d_read | i_d_write) && i_d_cached), 
     .i_phy_addr(i_d_phyaddr), 
     .i_va(i_d_va), 
     .i_wen(w_d_byteen),
