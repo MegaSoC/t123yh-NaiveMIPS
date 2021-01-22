@@ -75,11 +75,11 @@ xpm_memory_tdpram #(
 		// Port A module ports
 		.clka           ( i_clk   ),
 		.rsta           ( i_rst   ),
-		.ena            ( 1   ),
+		.ena            ( 1'b1   ),
 		.regcea         ( 1'b0  ),
 		.wea            ( 4'b0 ), 
 		.addra          ( i_raddr ), 
-		.dina           ( w_din ),
+		.dina           ( '0 ),
 		.injectsbiterra ( 1'b0  ), // do not change
 		.injectdbiterra ( 1'b0  ), // do not change
 		.douta          ( w_rdata ),
@@ -89,7 +89,7 @@ xpm_memory_tdpram #(
 		// Port B module ports
 		.clkb           ( i_clk   ),
 		.rstb           ( i_rst   ),
-		.enb            ( 1   ),
+		.enb            ( 1'b1   ),
 		.regceb         ( 1'b0  ),
 		.web            ({4{i_wen}} & i_wbyteen), 
 		.addrb          ( i_waddr ),
@@ -177,7 +177,7 @@ xpm_memory_tdpram #(
 		// Port A module ports
 		.clka           ( i_clk   ),
 		.rsta           ( i_rst   ),
-		.ena            ( 1   ),
+		.ena            ( 1'b1   ),
 		.regcea         ( 1'b0  ),
 		.wea            ( 1'b0 ), 
 		.addra          ( i_raddr ), 
@@ -191,7 +191,7 @@ xpm_memory_tdpram #(
 		// Port B module ports
 		.clkb           ( i_clk   ),
 		.rstb           ( i_rst   ),
-		.enb            ( 1   ),
+		.enb            ( 1'b1   ),
 		.regceb         ( 1'b0  ),
 		.web            (i_wen), 
 		.addrb          ( i_waddr ),

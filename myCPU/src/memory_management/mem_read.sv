@@ -6,7 +6,6 @@ module mem_read # (
     ) (
     input logic i_clk,
     input logic i_rst,
-    input logic i_flush,
 
     input mem_read_req i_instr_req,
     input logic i_icache_we,
@@ -224,8 +223,8 @@ fifo_instance(
     .empty_o2(w_empty2),
     .full_o1(full),
     .full_o2(),
-    .flush_i1(0),
-    .flush_i2(0)
+    .flush_i1('0),
+    .flush_i2('0)
 );
     
 endmodule

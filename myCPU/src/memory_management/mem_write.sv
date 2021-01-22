@@ -248,8 +248,8 @@ dual_fifo_wrapper #(
     (
         .clk_i(i_clk),            // Clock
         .rst_i(i_rst),            // Reset active high
-        .flush_i1(0),          // flush the queue
-        .flush_i2(0),
+        .flush_i1('0),          // flush the queue
+        .flush_i2('0),
         .full_o1(w_full),           // queue is full
         .full_o2(),
         .empty_o1(w_empty1),          // queue is empty

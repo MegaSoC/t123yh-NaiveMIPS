@@ -280,7 +280,6 @@ mem_read # (
 ) mem_read(
     .i_clk,
     .i_rst,
-    .i_flush(0),
     .i_write_process(w_write_process),
     .i_write_address(w_write_addr),
     .i_instr_req(w_isram_valid ? w_isram_req : w_icache_rreq),
