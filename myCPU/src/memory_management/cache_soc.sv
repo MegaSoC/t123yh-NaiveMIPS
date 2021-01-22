@@ -21,13 +21,6 @@ module cache_soc #(
     output word  o_i_inst,//指令的查询结果，
     output logic o_i_valid, //o_i_inst的valid信号
 
-    // output word  o_icache_inst,//icache的查询结果，I级出（i_icache_npc的下个周期）@@
-    // output logic o_i_stall,//icache产生的暂停信号 @@
-    // input word   i_isram_addr,//不通过icache的指令物理地址（与i_icache_phyaddr时机相同）@@
-    // input logic  i_isram_valid,//i_isram_adddr的valid信号@@
-    // output logic o_isram_valid,//o_isram_inst的valid信号@@
-    // output word  o_isram_inst,//不通过icache的查询结果@@
-
     input word   i_d_va,//dcache的虚拟地址，由alu产生，比物理地址(i_d_phyaddr)前一个周期到达
     input word   i_d_phyaddr,//dcache的物理地址，时机与M级相同
     input logic  i_d_cached, //指明数据是否经过dcache，1：经过，0：不经过
@@ -37,22 +30,6 @@ module cache_soc #(
     input word   i_d_indata,//与i_d_phyaddr时机相同，写入的内容
     output word  o_d_outdata,//数据读出的内容
     output logic o_d_valid,//o_d_outdata的valid信号
-
-    //input logic  [3:0] i_dcache_byteen,//i_dcache_write拉高时表明哪些字节是有效的%%
-    //input logic  i_dcache_read,//与i_dcache_phyaddr时机相同，通过dcache的读信号 %%
-    //input logic  i_dcache_write,//与i_dcache_phyaddr时机相同，通过dcache的写信号 %%
-    
-    //output word  i_dcache_outdata,//dcache的查询结果，D级出（i_dcache_va的下个周期）%%
-    //output logic o_d_stall,//dcache产生的暂停信号%%
-
-    //input word   i_dsram_addr,//不通过dcache的数据物理地址（时机与i_dcache_phyaddr相同）%%
-    //input logic  i_dsram_read,//不通过dcache的数据读信号（时机与i_dcache_phyaddr相同）%%
-    //input logic  i_dsram_write,//不通过dcache的数据写信号（时机与i_dcache_phyaddr相同）%%
-    //input logic  [3:0] i_dsram_byteen,//i_dsram_write拉高时表明哪些字节有效%%
-    //input logic  [2:0] i_dsram_size,//不通过dcache时传输的字节数，直接与axi传输的arsize或awsize相连%%
-    //input word   i_dsram_indata,//i_dsram_write拉高时写入的内容%%
-    //output word  o_dsram_outdata,//不通过dcache的查询结果%%
-    //output logic o_dsram_valid,//o_dsram_outdata的valid信号%%
 
 	input [DCACHE_TAG_WIDTH - 1 : 0] i_dcache_instr_tag,//mu级传入 index storetag指令中的tag 对dcache有效
 	input cache_op i_dcache_instr, //m级传入 表明是哪个cache指令 对dcache有效 
