@@ -18,14 +18,14 @@ reg [3:0] op;
 
 wire [63:0] multiplyResult;
 wire [63:0] unsignedMultiplyResult;
-mult_signed_0 signedMul(.A(inA), .B(inB), .CLK(clk), .SCLR(start), .P(multiplyResult));
-mult_unsigned_0 unsignedMul(.A(inA), .B(inB), .CLK(clk), .SCLR(start), .P(unsignedMultiplyResult));
+mult_signed signedMul(.A(inA), .B(inB), .CLK(clk), .SCLR(start), .P(multiplyResult));
+mult_unsigned unsignedMul(.A(inA), .B(inB), .CLK(clk), .SCLR(start), .P(unsignedMultiplyResult));
 
 wire [63:0] signedDivResult;
 wire [63:0] unsignedDivResult;
 wire signedDivValid, unsignedDivValid;
 wire inputDataValid = busy;
-div_signed_0 signedDiv(
+div_signed signedDiv(
     .aclk(clk),
     .aresetn(!start),
     .s_axis_divisor_tvalid(inputDataValid),
@@ -35,7 +35,7 @@ div_signed_0 signedDiv(
     .m_axis_dout_tdata(signedDivResult),
     .m_axis_dout_tvalid(signedDivValid)
 );
-div_unsigned_0 unsignedDiv(
+div_unsigned unsignedDiv(
     .aclk(clk),
     .aresetn(!start),
     .s_axis_divisor_tvalid(inputDataValid),

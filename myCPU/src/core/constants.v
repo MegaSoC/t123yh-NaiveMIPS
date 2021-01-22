@@ -20,9 +20,9 @@
 `define cmpGreaterThanOrEqualToZero 5
 `define cmpGreaterThanZero 6
 
-`define memWidth4 1
-`define memWidth2 2
-`define memWidth1 3
+`define memWidth4 2'b10
+`define memWidth2 2'b01
+`define memWidth1 2'b00
 
 // `define DEBUG
 // `define VERBOSE

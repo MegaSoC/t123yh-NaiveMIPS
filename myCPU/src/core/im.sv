@@ -9,11 +9,15 @@ module InstructionMemory(
            output [31:0] outputPC,
            output [31:0] instruction,
            output reg exception,
-        output [31:0] inst_sram_addr,
-        input [31:0] inst_sram_rdata,
+           output [31:0] inst_sram_addr,
+           output inst_sram_readen,
+           input [31:0] inst_sram_rdata,
+           input inst_sram_valid,
            output bubble
        );
 
+// TODO: 判断什么时候需要 readen（比如流水线遇到异常时，就不应该读取后续指令）
+assign inst_sram_readen = 1;
 
 // reg [31:0] memory [4095:0];
 wire isHanging;
@@ -23,7 +27,7 @@ wire isHanging;
 reg [31:0] pc;
 reg hangState;
 assign outputPC = hangState ? 0 : pc;
-assign bubble = hangState;
+assign bubble = hangState || !inst_sram_valid;
 // assign instruction = isHanging ? 0 : memory[realAddress[13:2]];
 assign instruction = isHanging ? 0 : inst_sram_rdata;
 assign isHanging = hang || hangState;
@@ -41,53 +45,55 @@ logic [31:0] nextPC;
 assign inst_sram_addr = nextPC;
 
 always_comb begin
-    if (reset) begin
-        nextPC  = 32'hBFC00000;
-    end else begin
-        if (pcStall) begin
-            nextPC = pc;
-        end
-        else if (absJump) begin
-            nextPC = absJumpAddress;
-        end
-        else begin
-            if (hang) begin
-                nextPC = pc;
+                if (reset) begin
+                    nextPC  = 32'hBFC00000;
+                end
+                else begin
+                    if (pcStall || !inst_sram_valid) begin
+                        nextPC = pc;
+                    end
+                    else if (absJump) begin
+                        nextPC = absJumpAddress;
+                    end
+                    else begin
+                        if (hang) begin
+                            nextPC = pc;
+                        end
+                        if (!isHanging) begin
+                            nextPC = pc + 4;
+                        end
+                    end
+                end
             end
-            if (!isHanging) begin
-                nextPC = pc + 4;
-            end
-        end
-    end
-end
 
-always @(posedge clk) begin
+            always @(posedge clk) begin
 `ifdef DEBUG
-    // $display("@%h, delta = %d, instruction = %h", pc, relJumpDelta, instruction);
+                // $display("@%h, delta = %d, instruction = %h", pc, relJumpDelta, instruction);
 `endif
-    if (reset)
-    begin
-        hangState <= 0;
-    end
-    else begin
-        if (pcStall) begin
-        end
-        else if (absJump) begin
-            hangState <= 0;
-        end
-        else begin
-            if (hang) begin
-                hangState <= 1;
+                if (reset)
+                begin
+                    hangState <= 0;
+                end
+                else begin
+                    if (pcStall) begin
+                    end
+                    else if (absJump) begin
+                        hangState <= 0;
+                    end
+                    else begin
+                        if (hang) begin
+                            hangState <= 1;
+                        end
+                    end
+                end
+                pc <= nextPC;
             end
-        end
-    end
-    pc <= nextPC;
-end
 
-always @(*) begin
+            always @(*) begin
 `ifdef VERBOSE
-    $display("PC @ %h", pc);
+                $display("PC @ %h", pc);
 `endif
-end
 
-endmodule
+            end
+
+            endmodule

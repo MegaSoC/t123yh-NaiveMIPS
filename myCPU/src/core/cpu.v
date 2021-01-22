@@ -4,21 +4,25 @@ module CPU (
            input reset,
            input [5:0] irq,
 
-    output [31:0] inst_sram_addr,
-    input [31:0] inst_sram_rdata,
+           output [31:0] inst_sram_addr,
+           output inst_sram_readen,
+           input [31:0] inst_sram_rdata,
+           input inst_sram_valid,
 
-    output data_sram_en,
-    output [3:0] data_sram_wen,
-    output [31:0] data_sram_addr,
-    output [31:0] data_sram_wdata,
-    input [31:0] data_sram_rdata,
+           output reg [31:0] data_sram_vaddr,
+           output data_sram_read,
+           output data_sram_write,
+           output [31:0] data_sram_wdata,
+           output [2:0] data_sram_size,
+           input [31:0] data_sram_rdata,
+           input data_sram_valid,
 
-    output [31:0] debug_wb_pc,
-    output [3:0] debug_wb_rf_wen,
-    output [4:0] debug_wb_rf_wnum,
-    output [31:0] debug_wb_rf_wdata
+           output [31:0] debug_wb_pc,
+           output [3:0] debug_wb_rf_wen,
+           output [4:0] debug_wb_rf_wnum,
+           output [31:0] debug_wb_rf_wdata
        );
-       
+
 reg [31:0] effectivePC;
 
 reg [31:0] W_pc;
@@ -102,10 +106,12 @@ reg F_isDelaySlot;
 InstructionMemory F_im (
                       .clk(clk),
                       .reset(reset),
-                      .inst_sram_rdata(inst_sram_rdata),
-                      .inst_sram_addr(inst_sram_addr),
                       .absJump(F_jump),
                       .absJumpAddress(F_jumpAddr),
+                      .inst_sram_rdata(inst_sram_rdata),
+                      .inst_sram_addr(inst_sram_addr),
+                      .inst_sram_readen(inst_sram_readen),
+                      .inst_sram_valid(inst_sram_valid),
                       .pcStall(F_stall),
                       .hang(exceptionLevel >= `stallFetch)
                   );
@@ -287,7 +293,8 @@ reg [31:0] D_real_pc;
 always @(*) begin
     if (D_last_bubble) begin
         D_real_pc <= F_im.pc;
-    end else begin
+    end
+    else begin
         D_real_pc <= D_pc;
     end
 end
@@ -473,13 +480,13 @@ reg [31:0] E_real_pc;
 always @(*) begin
     if (E_bubble) begin
         E_real_pc <= D_real_pc;
-    end else begin
+    end
+    else begin
         E_real_pc <= E_pc;
     end
 end
 
 // ======== Memory Stage ========
-
 wire M_stall = stallLevel >= `stallMemory;
 reg M_bubble;
 wire M_insert_bubble = M_bubble || M_data_waiting;
@@ -500,6 +507,17 @@ reg [4:0] M_last_cause;
 reg [31:0] M_badVAddr;
 
 reg M_isDelaySlot;
+
+wire M_memory_waiting;
+// keep vaddr when busy
+always @(*) begin
+    if (!M_memory_waiting) begin
+        data_sram_vaddr = E_alu.out;
+    end else begin
+        data_sram_vaddr = M_aluOutput;
+    end
+end
+
 
 always @(posedge clk) begin
     if (reset) begin
@@ -609,7 +627,7 @@ ForwardController M_regRead2_forward (
                       .src3Reg(5'b0)
                   );
 
-assign M_data_waiting = M_regRead1_forward.stallExec || M_regRead2_forward.stallExec;
+assign M_data_waiting = M_regRead1_forward.stallExec || M_regRead2_forward.stallExec || M_memory_waiting;
 
 DataMemory M_dm(
                .clk(clk),
@@ -618,13 +636,15 @@ DataMemory M_dm(
                .readEnable(!M_data_waiting && M_ctrl.memLoad),
                .address(M_aluOutput),
                .writeDataIn(M_regRead2_forward.value), // register@regRead2
-        .widthCtrl(M_ctrl.memWidthCtrl),
-
-                       .data_sram_en(data_sram_en),
-        .data_sram_wen(data_sram_wen),
-        .data_sram_addr(data_sram_addr),
-        .data_sram_wdata(data_sram_wdata)
+               .widthCtrl(M_ctrl.memWidthCtrl)
            );
+
+assign M_memory_waiting = (M_ctrl.memStore || M_ctrl.memLoad) && !data_sram_valid;
+
+assign data_sram_read = M_dm.readEnable;
+assign data_sram_write = M_dm.writeEnable;
+assign data_sram_wdata = M_regRead2_forward.value;
+assign data_sram_size = M_ctrl.memWidthCtrl;
 
 reg [4:0] M_cause;
 always @(*) begin
@@ -661,6 +681,7 @@ reg [31:0] W_lastWriteData;
 reg W_last_exception;
 reg [4:0] W_last_cause;
 reg [31:0] W_badVAddr;
+reg [31:0] W_memData;
 
 reg W_bubble;
 reg W_isDelaySlot;
@@ -671,6 +692,7 @@ always @(posedge clk) begin
         W_pc <= 0;
         W_aluOutput <= 0;
         W_lastWriteData <= 0;
+        W_memData <= 0;
         W_lastWriteDataValid <= 0;
         W_last_exception <= 0;
         W_badVAddr <= 0;
@@ -684,6 +706,7 @@ always @(posedge clk) begin
         W_lastWriteData <= M_regWriteData;
         W_lastWriteDataValid <= M_regWriteDataValid;
         W_isDelaySlot <= M_isDelaySlot;
+        W_memData <= data_sram_rdata;
         W_badVAddr <= M_badVAddr;
         if (M_exception) begin
             $display("Exception occurred at %h, caused by %d", M_pc, M_cause);
@@ -694,12 +717,12 @@ always @(posedge clk) begin
 end
 
 DataMemoryReader W_reader(
-        .data_sram_rdata(data_sram_rdata),
-        .readEnable(W_ctrl.memLoad),
-        .address(W_aluOutput),
-        .widthCtrl(W_ctrl.memWidthCtrl),
-        .extendCtrl(W_ctrl.memReadSignExtend)
-);
+                     .data_sram_rdata(data_sram_rdata),
+                     .readEnable(W_ctrl.memLoad),
+                     .address(W_aluOutput),
+                     .widthCtrl(W_ctrl.memWidthCtrl),
+                     .extendCtrl(W_ctrl.memReadSignExtend)
+                 );
 
 assign W_exception = !W_bubble && W_last_exception;
 assign cp0.isException = W_exception;
@@ -740,42 +763,6 @@ always @(*) begin
             end
         endcase
     end
-end
-
-always @(*) begin
-    effectivePC = 0;
-    if (!W_bubble && W_exception) begin
-        effectivePC = W_pc;
-    end
-    else if (!M_bubble && M_exception) begin
-        effectivePC = M_pc;
-    end
-    else if (!E_bubble) begin
-        effectivePC = E_pc;
-    end
-    else if (!D_last_bubble) begin
-        effectivePC = D_pc;
-    end else begin
-        effectivePC = F_im.pc;
-    end
-    /*
-    if (exceptionLevel <= `stallExecution) begin
-        if (!E_bubble) begin
-            effectivePC = E_pc;
-        end
-        else begin
-            effectivePC = D_pc;
-        end
-    end
-    else begin
-        if (!M_bubble) begin
-            effectivePC = M_pc;
-        end
-        else begin
-            effectivePC = W_pc;
-        end
-    end
-    */
 end
 
 endmodule
