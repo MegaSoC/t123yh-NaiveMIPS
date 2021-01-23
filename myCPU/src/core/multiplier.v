@@ -1,117 +1,65 @@
-`include "constants.v"
-
-module Multiplier (
-           input reset,
-           input clk,
-           input start,
-           input [31:0] A,
-           input [31:0] B,
-           input [3:0] ctrl,
-           output reg busy,
-           output reg [31:0] HI,
-           output reg [31:0] LO
-       );
-
-localparam MultiplicationDelay = 7;
-reg [31:0] inA, inB;
-reg [3:0] op;
-
-wire [63:0] multiplyResult;
-wire [63:0] unsignedMultiplyResult;
-mult_signed signedMul(.A(inA), .B(inB), .CLK(clk), .SCLR(start), .P(multiplyResult));
-mult_unsigned unsignedMul(.A(inA), .B(inB), .CLK(clk), .SCLR(start), .P(unsignedMultiplyResult));
-
-wire [63:0] signedDivResult;
-wire [63:0] unsignedDivResult;
-wire signedDivValid, unsignedDivValid;
-wire inputDataValid = busy;
-div_signed signedDiv(
-    .aclk(clk),
-    .aresetn(!start),
-    .s_axis_divisor_tvalid(inputDataValid),
-    .s_axis_divisor_tdata(inB),
-    .s_axis_dividend_tvalid(inputDataValid),
-    .s_axis_dividend_tdata(inA),
-    .m_axis_dout_tdata(signedDivResult),
-    .m_axis_dout_tvalid(signedDivValid)
-);
-div_unsigned unsignedDiv(
-    .aclk(clk),
-    .aresetn(!start),
-    .s_axis_divisor_tvalid(inputDataValid),
-    .s_axis_divisor_tdata(inB),
-    .s_axis_dividend_tvalid(inputDataValid),
-    .s_axis_dividend_tdata(inA),
-    .m_axis_dout_tdata(unsignedDivResult),
-    .m_axis_dout_tvalid(unsignedDivValid)
+module Multiplier(
+    input clk,
+    input [31:0] A,
+    input [31:0] B,
+    output reg [63:0] result,
+    input start,
+    input sign,
+    output busy
 );
 
-reg [3:0] counter;
-reg ready;
-always @(*) begin
-    ready = 0;
-    case (op)
-        `mtMultiply, `mtMultiplyUnsigned,`mtMSUB, `mtMADD, `mtMADDU:
-            ready = counter > MultiplicationDelay;
-        `mtDivide:
-            ready = signedDivValid;
-        `mtDivideUnsigned:
-            ready = unsignedDivValid;
-    endcase
-end
-
+wire negA = A[31] && sign, negB = B[31] && sign;
+reg negResult;
+reg [4:0] timer;
+wire [63:0] ans;
+assign busy = timer[0];
 always @(posedge clk) begin
-    if (reset) begin
-        HI <= 0;
-        LO <= 0;
-        busy <= 0;
-        counter <= 'bX;
-    end
-    else if (start) begin
-        if (ctrl == `mtSetHI) begin
-            HI <= A;
-        end
-        else if (ctrl == `mtSetLO) begin
-            LO <= A;
-        end
-        else begin
-            inA <= A;
-            inB <= B;
-            op <= ctrl;
-            counter <= 0;
-            busy <= 1;
-        end
-    end
-    else if (busy) begin
-        if (ready) begin
-            counter <= 'bX;
-            busy <= 0;
-            case (op)
-                `mtMultiply:
-                    {HI, LO} <= multiplyResult;
-                `mtMSUB:
-                    {HI, LO} <= {HI, LO} - multiplyResult;
-                `mtMADD:
-                    {HI, LO} <= {HI, LO} + multiplyResult;
-                `mtMADDU:
-                    {HI, LO} <= {HI, LO} + unsignedMultiplyResult;
-                `mtMultiplyUnsigned:
-                    {HI, LO} <= unsignedMultiplyResult;
-                `mtDivide: begin
-                    if (inB != 0) begin
-                        {LO, HI} <= signedDivResult;
-                    end
-                end
-                `mtDivideUnsigned: begin
-                    if (inB != 0) begin
-                        {LO, HI} <= unsignedDivResult;
-                    end
-                end
-            endcase
-        end else begin
-            counter <= counter + 1;
+    if (start) begin
+        timer <= 'hF;
+        negResult <= negA != negB;
+        result <= 'bx;
+    end else begin
+        timer <= timer >> 1;
+        if (timer[1:0] == 1) begin
+            result <= negResult ? -ans : ans;
         end
     end
 end
+
+wire [63:0] A64 = {32'b0, negA ? -A : A}, B64 = {32'b0, negB ? -B : B};
+wire [63:0] wire0[31:0];
+reg [63:0] tree0[15:0];
+reg [63:0] tree1[7:0];
+reg [63:0] tree2[3:0];
+reg [63:0] tree3[1:0];
+assign ans = tree3[0] + tree3[1];
+
+generate
+    genvar i;
+    for(i=0; i<32; i=i+1)
+    begin
+        assign wire0[i] = A64[i] == 0 ? 0: (B64 << i);
+    end
+
+    for(i=0; i<16; i=i+1)
+    begin
+        always @(posedge clk) tree0[i] <= wire0[i] + wire0[31-i];
+    end
+
+    for(i=0; i<8; i=i+1)
+    begin
+        always @(posedge clk) tree1[i] <= tree0[i] + tree0[15-i];
+    end
+
+    for(i=0; i<4; i=i+1)
+    begin
+        always @(posedge clk) tree2[i] <= tree1[i] + tree1[7-i];
+    end
+
+    for(i=0; i<2; i=i+1)
+    begin
+        always @(posedge clk) tree3[i] <= tree2[i] + tree2[3-i];
+    end
+endgenerate
 
 endmodule

@@ -464,7 +464,7 @@ always @(*) begin
     end
 end
 
-Multiplier E_mul(
+XALU E_mul(
                .ctrl(E_ctrl.mulCtrl),
                .start(!E_data_waiting && E_mulStart),
                .reset(reset),
