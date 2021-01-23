@@ -717,14 +717,6 @@ always @(posedge clk) begin
     end
 end
 
-DataMemoryReader W_reader(
-                     .data_sram_rdata(data_sram_rdata),
-                     .readEnable(W_ctrl.memLoad),
-                     .address(W_aluOutput),
-                     .widthCtrl(W_ctrl.memWidthCtrl),
-                     .extendCtrl(W_ctrl.memReadSignExtend)
-                 );
-
 assign W_exception = !W_bubble && W_last_exception;
 assign cp0.isException = W_exception;
 assign cp0.exceptionPC = W_pc;
@@ -757,7 +749,7 @@ always @(*) begin
         grfWriteData = 'bx;
         case (W_ctrl.grfWriteSource)
             `grfWriteMem: begin
-                grfWriteData = W_reader.readData;
+                grfWriteData = W_memData;
             end
             `grfWriteCP0: begin
                 grfWriteData = cp0.readData;
