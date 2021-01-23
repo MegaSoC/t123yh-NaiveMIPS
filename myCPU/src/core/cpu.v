@@ -508,10 +508,9 @@ reg [31:0] M_badVAddr;
 
 reg M_isDelaySlot;
 
-wire M_memory_waiting;
 // keep vaddr when busy
 always @(*) begin
-    if (!M_memory_waiting) begin
+    if (!M_data_waiting) begin
         data_sram_vaddr = E_alu.out;
     end else begin
         data_sram_vaddr = M_aluOutput;
@@ -627,13 +626,15 @@ ForwardController M_regRead2_forward (
                       .src3Reg(5'b0)
                   );
 
-assign M_data_waiting = M_regRead1_forward.stallExec || M_regRead2_forward.stallExec || M_memory_waiting;
+wire M_source_waiting = M_regRead1_forward.stallExec || M_regRead2_forward.stallExec;
+wire M_memory_waiting;
+assign M_data_waiting = M_source_waiting || M_memory_waiting;
 
 DataMemory M_dm(
                .clk(clk),
                .reset(reset),
-               .writeEnable(!M_data_waiting && M_ctrl.memStore),
-               .readEnable(!M_data_waiting && M_ctrl.memLoad),
+               .writeEnable(!M_source_waiting && M_ctrl.memStore),
+               .readEnable(!M_source_waiting && M_ctrl.memLoad),
                .address(M_aluOutput),
                .writeDataIn(M_regRead2_forward.value), // register@regRead2
                .widthCtrl(M_ctrl.memWidthCtrl)
