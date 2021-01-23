@@ -55,9 +55,11 @@ always_comb begin
                     nextPC  = 32'hBFC00000;
                 end
                 else begin
+                if (pendingRead) begin
+                    notJumping = absJump;
+                end
                     if (pcStall || pendingRead) begin
                         nextPC = pc;
-                        notJumping = absJump;
                     end
                     else if (absJump) begin
                         nextPC = absJumpAddress;
