@@ -160,7 +160,7 @@ icache1(
     .i_rst,
 
     .i_valid1(i_i_valid1), 
-    .i_valid2(i_i_valid2),
+    .i_valid2(i_i_valid2 && i_i_cached),
     .i_phy_addr(i_i_phyaddr), 
     .i_va(i_i_npc), 
     .o_inn_stall(w_i_stall),
@@ -205,7 +205,7 @@ dcache1(
     .i_valid((i_d_read | i_d_write) && i_d_cached), 
     .i_phy_addr(i_d_phyaddr), 
     .i_va(i_d_va), 
-    .i_wen(w_d_byteen),
+    .i_wen(w_d_byteen & {4{i_d_write}}),
     .i_in_data(i_d_indata),
     .o_inn_stall(w_d_stall),
     .o_mdata_data(w_dcache_data),
