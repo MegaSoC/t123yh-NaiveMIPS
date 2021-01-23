@@ -27,10 +27,13 @@ wire isHanging;
 reg [31:0] pc;
 reg hangState;
 assign outputPC = hangState ? 0 : pc;
-assign bubble = hangState || !inst_sram_valid;
+wire pendingRead = !pcStall && !inst_sram_valid;
+assign bubble = hangState || pendingRead;
 // assign instruction = isHanging ? 0 : memory[realAddress[13:2]];
 assign instruction = isHanging ? 0 : inst_sram_rdata;
 assign isHanging = hang || hangState;
+reg pendingJump;
+reg [31:0] pendingJumpAddr;
 
 always @(*) begin
     exception = 0;
@@ -43,23 +46,31 @@ end
 
 logic [31:0] nextPC;
 assign inst_sram_addr = nextPC;
+logic notJumping, jumped;
 
 always_comb begin
+    notJumping = 0;
+    jumped = 0;
                 if (reset) begin
                     nextPC  = 32'hBFC00000;
                 end
                 else begin
-                    if (pcStall || !inst_sram_valid) begin
+                    if (pcStall || pendingRead) begin
                         nextPC = pc;
+                        notJumping = absJump;
                     end
                     else if (absJump) begin
                         nextPC = absJumpAddress;
+                    end
+                    else if (pendingJump) begin
+                        nextPC = pendingJumpAddr;
+                        jumped = 1;
                     end
                     else begin
                         if (hang) begin
                             nextPC = pc;
                         end
-                        if (!isHanging) begin
+                        else if (!isHanging) begin
                             nextPC = pc + 4;
                         end
                     end
@@ -73,6 +84,8 @@ always_comb begin
                 if (reset)
                 begin
                     hangState <= 0;
+                    pendingJump <= 0;
+                    pendingJumpAddr <= 0;
                 end
                 else begin
                     if (pcStall) begin
@@ -83,6 +96,14 @@ always_comb begin
                     else begin
                         if (hang) begin
                             hangState <= 1;
+                        end
+                    end
+                    if (notJumping) begin
+                        pendingJump <= 1;
+                        pendingJumpAddr <= absJumpAddress;
+                    end else begin
+                        if (jumped) begin
+                            pendingJump <= 0;
                         end
                     end
                 end
