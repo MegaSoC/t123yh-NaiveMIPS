@@ -11,8 +11,8 @@ module XALU(
            output reg [31:0] HI,
            output reg [31:0] LO
        );
-reg [3:0] op;
-
+reg [3:0] ctrl_reg;
+wire [3:0] op = start ? ctrl : ctrl_reg;
 logic ready, sign;
 Multiplier mult(.clk(clk), .A(A), .B(B), .start(start), .sign(sign));
 Divider div(.clk(clk), .A(A), .B(B), .start(start), .sign(sign));
@@ -47,7 +47,7 @@ always @(posedge clk) begin
             LO <= A;
         end
         else begin
-            op <= ctrl;
+            ctrl_reg <= ctrl;
             busy <= 1;
         end
     end
