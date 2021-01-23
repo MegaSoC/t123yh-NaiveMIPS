@@ -150,12 +150,15 @@ module mycpu_top(
 
     reg [31:0] i_paddr;
     reg cache_valid2;
+    reg i_cached;
     always @(posedge aclk) begin
         if (global_reset) begin
             i_paddr <= 0;
             cache_valid2 <= 0;
+            i_cached <= 0;
         end else begin
             i_paddr <= {3'b0,core.inst_sram_addr[28:0]};
+            i_cached <= core.inst_sram_addr[31:29] == 3'b100;
             cache_valid2 <= core.inst_sram_readen;
         end
     end
@@ -164,20 +167,23 @@ module mycpu_top(
     assign cache.i_i_valid2 = cache_valid2;
     assign cache.i_i_npc = core.inst_sram_addr;
     assign cache.i_i_phyaddr = i_paddr;
-    assign cache.i_i_cached = 1;
+    assign cache.i_i_cached = i_cached;
 
     reg [31:0] d_paddr;
+    reg d_cached;
     always @(posedge aclk) begin
         if (global_reset) begin
             d_paddr <= 0;
+            d_cached <= 0;
         end else begin
             d_paddr <= {3'b0, core.data_sram_vaddr[28:0]};
+            d_cached <= core.data_sram_vaddr[31:29] == 3'b100;
         end
     end
 
     assign cache.i_d_va = core.data_sram_vaddr;
     assign cache.i_d_phyaddr = d_paddr;
-    assign cache.i_d_cached = 1;
+    assign cache.i_d_cached = d_cached;
     assign cache.i_d_read = core.data_sram_read;
     assign cache.i_d_write = core.data_sram_write;
     assign cache.i_d_size = core.data_sram_size;
