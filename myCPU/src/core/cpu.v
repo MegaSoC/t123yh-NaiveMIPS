@@ -644,7 +644,7 @@ assign M_memory_waiting = (M_ctrl.memStore || M_ctrl.memLoad) && !data_sram_vali
 
 assign data_sram_read = M_dm.readEnable;
 assign data_sram_write = M_dm.writeEnable;
-assign data_sram_wdata = M_regRead2_forward.value;
+assign data_sram_wdata = M_dm.writeDataOut;
 assign data_sram_size = M_ctrl.memWidthCtrl;
 
 reg [4:0] M_cause;
@@ -717,6 +717,14 @@ always @(posedge clk) begin
     end
 end
 
+DataMemoryReader W_reader(
+        .data_sram_rdata(W_memData),
+        .readEnable(W_ctrl.memLoad),
+        .address(W_aluOutput),
+        .widthCtrl(W_ctrl.memWidthCtrl),
+        .extendCtrl(W_ctrl.memReadSignExtend)
+);
+
 assign W_exception = !W_bubble && W_last_exception;
 assign cp0.isException = W_exception;
 assign cp0.exceptionPC = W_pc;
@@ -749,7 +757,7 @@ always @(*) begin
         grfWriteData = 'bx;
         case (W_ctrl.grfWriteSource)
             `grfWriteMem: begin
-                grfWriteData = W_memData;
+                grfWriteData = W_reader.readData;
             end
             `grfWriteCP0: begin
                 grfWriteData = cp0.readData;
