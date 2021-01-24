@@ -29,8 +29,8 @@ reg [31:0] W_pc;
 wire D_data_waiting;
 wire E_data_waiting;
 wire M_data_waiting;
-reg [2:0] stallLevel;
-always @(*) begin
+logic [2:0] stallLevel;
+always_comb begin
     stallLevel = `stallNone;
     if (D_data_waiting) begin
         stallLevel = `stallDecode;
@@ -43,14 +43,18 @@ always @(*) begin
     end
 end
 
-reg [2:0] exceptionLevel;
-wire F_exception;
-reg D_exception;
-reg E_exception;
-reg M_exception;
-wire W_exception;
+logic [2:0] exceptionLevel;
+logic F_exception;
+reg D_last_exception;
+logic D_exception;
+reg E_last_exception;
+logic E_exception;
+reg M_last_exception;
+logic M_exception;
+reg W_last_exception;
+logic W_exception;
 
-always @(*) begin
+always_comb begin
     exceptionLevel = `stallNone;
     if (F_exception) begin
         exceptionLevel = `stallFetch;
@@ -127,7 +131,6 @@ reg D_last_bubble;
 wire D_insert_bubble = D_last_bubble || D_data_waiting;
 reg [31:0] D_currentInstruction;
 reg [31:0] D_pc;
-reg D_last_exception;
 reg D_isDelaySlot;
 reg [4:0] D_last_cause;
 reg [31:0] D_badVAddr;
@@ -149,7 +152,6 @@ always @(posedge clk) begin
             D_isDelaySlot <= 0;
         end
         else begin
-            D_last_bubble <= F_insert_bubble || exceptionLevel >= `stallDecode;
             if (!D_stall) begin
                 D_badVAddr <= F_badVAddr;
                 D_isDelaySlot <= F_isDelaySlot;
@@ -157,6 +159,9 @@ always @(posedge clk) begin
                 D_last_cause <= F_cause;
                 D_currentInstruction <= F_im.instruction;
                 D_pc <= F_im.outputPC;
+                D_last_bubble <= F_insert_bubble || exceptionLevel >= `stallDecode;
+            end else begin
+                D_last_bubble <= D_last_bubble || exceptionLevel >= `stallDecode;
             end
         end
     end
@@ -171,7 +176,7 @@ Controller D_ctrl(
            );
 
 reg [4:0] D_cause;
-always @(*) begin
+always_comb begin
     D_cause = 'bx;
     D_exception = 0;
     if (D_last_bubble) begin
@@ -264,7 +269,7 @@ Comparator cmp(
                .B(D_regRead2_forward.value),
                .ctrl(D_ctrl.cmpCtrl)
            );
-always @(*) begin
+always_comb begin
     F_jump = 0;
     F_jumpAddr = 0;
     F_isDelaySlot = 0;
@@ -290,7 +295,7 @@ always @(*) begin
 end
 
 reg [31:0] D_real_pc;
-always @(*) begin
+always_comb begin
     if (D_last_bubble) begin
         D_real_pc <= F_im.pc;
     end
@@ -312,7 +317,6 @@ reg [31:0] E_regRead2;
 reg E_regWriteDataValid;
 reg [31:0] E_regWriteData;
 
-reg E_last_exception;
 reg [4:0] E_last_cause;
 reg [31:0] E_badVAddr;
 
@@ -322,7 +326,7 @@ assign forwardValidE = E_regWriteDataValid;
 assign forwardAddressE = E_ctrl.destinationRegister;
 assign forwardValueE = E_regWriteData;
 
-always @(*) begin
+always_comb begin
     E_regWriteDataValid = 0;
     E_regWriteData = 'bx;
     case (E_ctrl.grfWriteSource)
@@ -421,7 +425,7 @@ ArithmeticLogicUnit E_alu(
                     );
 
 reg [4:0] E_cause;
-always @(*) begin
+always_comb begin
     E_cause = 'bx;
     E_exception = 0;
     if (E_bubble) begin
@@ -451,7 +455,7 @@ reg E_mul_collision;
 assign E_data_waiting = E_regRead1_forward.stallExec || E_regRead2_forward.stallExec || E_mul_collision;
 reg E_mulStart;
 
-always @(*) begin
+always_comb begin
     E_mulStart = 0;
     E_mul_collision = 0;
     if (E_ctrl.mulEnable || E_ctrl.grfWriteSource == `grfWriteMul) begin
@@ -477,7 +481,7 @@ wire [31:0] E_mul_value = E_ctrl.mulOutputSel ? E_mul.HI : E_mul.LO;
 
 reg [31:0] E_real_pc;
 
-always @(*) begin
+always_comb begin
     if (E_bubble) begin
         E_real_pc <= D_real_pc;
     end
@@ -502,14 +506,13 @@ reg [31:0] M_lastWriteData;
 
 reg M_regWriteDataValid;
 reg [31:0] M_regWriteData;
-reg M_last_exception;
 reg [4:0] M_last_cause;
 reg [31:0] M_badVAddr;
 
 reg M_isDelaySlot;
 
 // keep vaddr when busy
-always @(*) begin
+always_comb begin
     if (!M_data_waiting) begin
         data_sram_vaddr = E_alu.out;
     end else begin
@@ -567,7 +570,7 @@ end
 assign forwardAddressM = M_ctrl.destinationRegister;
 assign forwardValueM = M_regWriteData;
 assign forwardValidM = M_regWriteDataValid;
-always @(*) begin
+always_comb begin
     if (M_lastWriteDataValid) begin
         M_regWriteData = M_lastWriteData;
         M_regWriteDataValid = 1;
@@ -627,28 +630,28 @@ ForwardController M_regRead2_forward (
                   );
 
 wire M_source_waiting = M_regRead1_forward.stallExec || M_regRead2_forward.stallExec;
-wire M_memory_waiting;
-assign M_data_waiting = M_source_waiting || M_memory_waiting;
 
 DataMemory M_dm(
                .clk(clk),
                .reset(reset),
-               .writeEnable(!M_source_waiting && M_ctrl.memStore),
-               .readEnable(!M_source_waiting && M_ctrl.memLoad),
+               .dataValid(!M_source_waiting),
+               .writeEnable(M_ctrl.memStore),
+               .readEnable(M_ctrl.memLoad),
                .address(M_aluOutput),
                .writeDataIn(M_regRead2_forward.value), // register@regRead2
-               .widthCtrl(M_ctrl.memWidthCtrl)
+               .widthCtrl(M_ctrl.memWidthCtrl),
+
+               .writeEnableOut(data_sram_write),
+               .readEnableOut(data_sram_read),
+               .writeDataOut(data_sram_wdata)
            );
-
-assign M_memory_waiting = (M_ctrl.memStore || M_ctrl.memLoad) && !data_sram_valid;
-
-assign data_sram_read = M_dm.readEnable;
-assign data_sram_write = M_dm.writeEnable;
-assign data_sram_wdata = M_dm.writeDataOut;
 assign data_sram_size = M_ctrl.memWidthCtrl;
 
+wire M_memory_waiting = (M_ctrl.memStore || M_ctrl.memLoad) && !data_sram_valid;
+assign M_data_waiting = M_source_waiting || M_memory_waiting;
+
 reg [4:0] M_cause;
-always @(*) begin
+always_comb begin
     M_exception = 0;
     M_cause = 'bx;
     M_badVAddr = M_lastBadVAddr;
@@ -679,7 +682,6 @@ reg [31:0] W_aluOutput;
 reg [31:0] W_regRead1;
 reg W_lastWriteDataValid;
 reg [31:0] W_lastWriteData;
-reg W_last_exception;
 reg [4:0] W_last_cause;
 reg [31:0] W_badVAddr;
 reg [31:0] W_memData;
@@ -748,7 +750,7 @@ assign forwardValidW = 1;
 assign forwardAddressW = W_ctrl.destinationRegister;
 assign forwardValueW = grfWriteData;
 
-always @(*) begin
+always_comb begin
     grfWriteAddress = W_ctrl.destinationRegister;
     if (W_lastWriteDataValid) begin
         grfWriteData = W_lastWriteData;
