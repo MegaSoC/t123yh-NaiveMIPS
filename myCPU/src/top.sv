@@ -75,6 +75,7 @@ module mycpu_top(
     CPU core(
         .clk(aclk),
         .reset(global_reset),
+        .irq(ext_int),
         
         .debug_wb_pc(debug_wb_pc),
         .debug_wb_rf_wdata(debug_wb_rf_wdata),
