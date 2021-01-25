@@ -23,27 +23,29 @@ module CPU (
            output [31:0] debug_wb_rf_wdata
        );
 
-reg [31:0] effectivePC;
-
 reg [31:0] W_pc;
 wire D_data_waiting;
 wire E_data_waiting;
 wire M_data_waiting;
-logic [2:0] stallLevel;
+
+const bit [4:0] l_None = 0, l_F = 5'b00001, l_D = 5'b00011, l_E = 5'b00111, l_M = 5'b01111, l_W = 5'b11111;
+const int m_F = 0, m_D = 1, m_E = 2, m_M = 3, m_W = 4;
+
+logic [4:0] stallLevel;
 always_comb begin
-    stallLevel = `stallNone;
+    stallLevel = l_None;
     if (D_data_waiting) begin
-        stallLevel = `stallDecode;
+        stallLevel = l_D;
     end
     if (E_data_waiting) begin
-        stallLevel = `stallExecution;
+        stallLevel = l_E;
     end
     if (M_data_waiting) begin
-        stallLevel = `stallMemory;
+        stallLevel = l_M;
     end
 end
 
-logic [2:0] exceptionLevel;
+logic [4:0] exceptionLevel;
 logic F_exception;
 reg D_last_exception;
 logic D_exception;
@@ -55,21 +57,21 @@ reg W_last_exception;
 logic W_exception;
 
 always_comb begin
-    exceptionLevel = `stallNone;
+    exceptionLevel = l_None;
     if (F_exception) begin
-        exceptionLevel = `stallFetch;
+        exceptionLevel = l_F;
     end
     if (D_exception) begin
-        exceptionLevel = `stallDecode;
+        exceptionLevel = l_D;
     end
     if (E_exception) begin
-        exceptionLevel = `stallExecution;
+        exceptionLevel = l_E;
     end
     if (M_exception) begin
-        exceptionLevel = `stallMemory;
+        exceptionLevel = l_M;
     end
     if (W_exception) begin
-        exceptionLevel = `stallWriteBack;
+        exceptionLevel = l_W;
     end
 end
 
@@ -77,7 +79,7 @@ CP0 cp0(
         .clk(clk),
         .reset(reset),
         .externalInterrupt(irq),
-        .hasExceptionInPipeline(exceptionLevel >= `stallMemory)
+        .hasExceptionInPipeline(| exceptionLevel)
     );
 
 // Forwarding logic:
@@ -102,31 +104,33 @@ wire [4:0] forwardAddressW;
 wire [31:0] forwardValueW;
 
 // ======== Fetch Stage ========
-reg F_jump;
-reg [31:0] F_jumpAddr;
-wire F_stall = stallLevel >= `stallFetch;
+logic F_jump;
+logic [31:0] F_jumpAddr;
 reg F_isDelaySlot;
 
 InstructionMemory F_im (
                       .clk(clk),
                       .reset(reset),
-                      .absJump(F_jump),
+
+                      .absJump(!stallLevel[m_F] && F_jump), // Don't jump when stalled
                       .absJumpAddress(F_jumpAddr),
+
+                      .stall(stallLevel[m_F]),
+                      .exception(exceptionLevel[m_F]),
+                      
                       .inst_sram_rdata(inst_sram_rdata),
                       .inst_sram_addr(inst_sram_addr),
                       .inst_sram_readen(inst_sram_readen),
-                      .inst_sram_valid(inst_sram_valid),
-                      .pcStall(F_stall),
-                      .hang(exceptionLevel >= `stallFetch)
+                      .inst_sram_valid(inst_sram_valid)
                   );
 
-assign F_exception = F_im.exception;
+assign F_exception = F_im.adel;
+wire [4:0] F_cause = F_im.adel ? `causeAdEL : 'bx;
 wire F_insert_bubble = F_im.bubble;
-wire [4:0] F_cause = F_im.exception ? `causeAdEL : 'bx;
 wire [31:0] F_badVAddr = F_im.exception ? F_im.outputPC : 'bx;
 
 // ======== Decode Stage ========
-wire D_stall = stallLevel >= `stallDecode;
+wire D_stall = stallLevel[m_D];
 reg D_last_bubble;
 wire D_insert_bubble = D_last_bubble || D_data_waiting;
 reg [31:0] D_currentInstruction;
@@ -159,9 +163,9 @@ always @(posedge clk) begin
                 D_last_cause <= F_cause;
                 D_currentInstruction <= F_im.instruction;
                 D_pc <= F_im.outputPC;
-                D_last_bubble <= F_insert_bubble || exceptionLevel >= `stallDecode;
+                D_last_bubble <= F_insert_bubble || exceptionLevel[m_D];
             end else begin
-                D_last_bubble <= D_last_bubble || exceptionLevel >= `stallDecode;
+                D_last_bubble <= D_last_bubble || exceptionLevel[m_D];
             end
         end
     end
@@ -277,19 +281,21 @@ always_comb begin
         F_jump = 1;
         F_jumpAddr = cp0.jumpAddress;
     end
-    else if (D_ctrl.branch) begin
+    else if (!D_data_waiting) begin
+        if (D_ctrl.branch) begin
         F_isDelaySlot = 1;
         F_jump = cmp.action;
         F_jumpAddr = D_pc + 4 + (D_ctrl.immediate << 2);
-    end
-    else if (D_ctrl.absJump) begin
-        F_isDelaySlot = 1;
-        F_jump = 1;
-        if (D_ctrl.absJumpLoc == `absJumpImmediate) begin
-            F_jumpAddr = {D_pc[31:28], D_ctrl.immediate[25:0], 2'b00};
         end
-        else begin
-            F_jumpAddr = D_regRead1_forward.value;
+        else if (D_ctrl.absJump) begin
+            F_isDelaySlot = 1;
+            F_jump = 1;
+            if (D_ctrl.absJumpLoc == `absJumpImmediate) begin
+                F_jumpAddr = {D_pc[31:28], D_ctrl.immediate[25:0], 2'b00};
+            end
+            else begin
+                F_jumpAddr = D_regRead1_forward.value;
+            end
         end
     end
 end
@@ -306,7 +312,7 @@ end
 
 // ======== Execution Stage ========
 
-wire E_stall = stallLevel >= `stallExecution;
+wire E_stall = stallLevel[m_E];
 reg E_bubble;
 wire E_insert_bubble = E_bubble || E_data_waiting;
 reg [31:0] E_currentInstruction;
@@ -357,7 +363,7 @@ always @(posedge clk) begin
         else if (!E_stall) begin
             E_last_exception <= D_exception;
             E_last_cause <= D_cause;
-            E_bubble <= D_insert_bubble || exceptionLevel >= `stallExecution;
+            E_bubble <= D_insert_bubble || exceptionLevel[m_E];
             E_currentInstruction <= D_currentInstruction;
             E_pc <= D_real_pc;
             E_regRead1 <= D_regRead1_forward.value;
@@ -366,7 +372,7 @@ always @(posedge clk) begin
             E_badVAddr <= D_badVAddr;
         end
         else begin
-            E_bubble <= E_bubble || exceptionLevel >= `stallExecution;
+            E_bubble <= E_bubble || exceptionLevel[m_E];
             E_regRead1 <= E_regRead1_forward.value;
             E_regRead2 <= E_regRead2_forward.value;
         end
@@ -435,7 +441,7 @@ always_comb begin
         E_cause = E_last_cause;
         E_exception = 1;
     end
-    else if (E_ctrl.checkOverflow && E_alu.overflow) begin
+    else if (!E_data_waiting && E_ctrl.checkOverflow && E_alu.overflow) begin
         if (E_ctrl.memLoad) begin
             E_cause = `causeAdEL;
             E_exception = 1;
@@ -451,9 +457,8 @@ always_comb begin
     end
 end
 
-reg E_mul_collision;
+logic E_mul_collision, E_mulStart;
 assign E_data_waiting = E_regRead1_forward.stallExec || E_regRead2_forward.stallExec || E_mul_collision;
-reg E_mulStart;
 
 always_comb begin
     E_mulStart = 0;
@@ -491,7 +496,7 @@ always_comb begin
 end
 
 // ======== Memory Stage ========
-wire M_stall = stallLevel >= `stallMemory;
+wire M_stall = stallLevel[m_M];
 reg M_bubble;
 wire M_insert_bubble = M_bubble || M_data_waiting;
 reg [31:0] M_currentInstruction;
@@ -545,7 +550,7 @@ always @(posedge clk) begin
             M_isDelaySlot <= E_isDelaySlot;
         end
         else if (!M_stall) begin
-            M_bubble <= E_insert_bubble || exceptionLevel >= `stallMemory;
+            M_bubble <= E_insert_bubble || exceptionLevel[m_M];
             M_last_exception <= E_exception;
             M_last_cause <= E_cause;
             M_currentInstruction <= E_currentInstruction;
@@ -560,7 +565,7 @@ always @(posedge clk) begin
             M_isDelaySlot <= E_isDelaySlot;
         end
         else begin
-            M_bubble <= M_bubble || exceptionLevel >= `stallMemory;
+            M_bubble <= M_bubble || exceptionLevel[m_M];
             M_regRead1 <= M_regRead1_forward.value;
             M_regRead2 <= M_regRead2_forward.value;
         end
@@ -647,7 +652,7 @@ DataMemory M_dm(
            );
 assign data_sram_size = M_ctrl.memWidthCtrl;
 
-wire M_memory_waiting = (M_ctrl.memStore || M_ctrl.memLoad) && !data_sram_valid;
+wire M_memory_waiting = (M_dm.writeEnableOut || M_dm.readEnableOut) && !data_sram_valid;
 assign M_data_waiting = M_source_waiting || M_memory_waiting;
 
 reg [4:0] M_cause;
