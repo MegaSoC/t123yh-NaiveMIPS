@@ -116,7 +116,7 @@ InstructionMemory F_im (
                       .absJumpAddress(F_jumpAddr),
 
                       .stall(stallLevel[m_F]),
-                      .exception(exceptionLevel[m_F]),
+                      .exception(exceptionLevel[m_D]),
                       
                       .inst_sram_rdata(inst_sram_rdata),
                       .inst_sram_addr(inst_sram_addr),
@@ -127,7 +127,7 @@ InstructionMemory F_im (
 assign F_exception = F_im.adel;
 wire [4:0] F_cause = F_im.adel ? `causeAdEL : 'bx;
 wire F_insert_bubble = F_im.bubble;
-wire [31:0] F_badVAddr = F_im.exception ? F_im.outputPC : 'bx;
+wire [31:0] F_badVAddr = F_im.adel ? F_im.outputPC : 'bx;
 
 // ======== Decode Stage ========
 wire D_stall = stallLevel[m_D];

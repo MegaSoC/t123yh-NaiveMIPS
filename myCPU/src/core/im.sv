@@ -53,7 +53,7 @@ always_comb begin
             pendingException_next = 0;
             pendingJump_next = 0;
             if (!pendingException && !exception)
-                bubble = !inst_sram_valid;
+                bubble = !inst_sram_valid && !adel;
             if (!absJump && !pendingJump) begin
                 if (!bubble)
                     pc_next = pc + 4;
@@ -65,6 +65,9 @@ always_comb begin
             end
             else if (absJump) begin
                 pc_next = absJumpAddress;
+            end
+            if (pc_next[1:0] != 0) begin
+                inst_sram_readen = 0;
             end
         end else begin
             pendingException_next = 0;
