@@ -106,7 +106,6 @@ wire [31:0] forwardValueW;
 // ======== Fetch Stage ========
 logic F_jump;
 logic [31:0] F_jumpAddr;
-reg F_isDelaySlot;
 
 InstructionMemory F_im (
                       .clk(clk),
@@ -158,7 +157,7 @@ always @(posedge clk) begin
         else begin
             if (!D_stall) begin
                 D_badVAddr <= F_badVAddr;
-                D_isDelaySlot <= F_isDelaySlot;
+                D_isDelaySlot <= F_im.isDelaySlot;
                 D_last_exception <= F_exception;
                 D_last_cause <= F_cause;
                 D_currentInstruction <= F_im.instruction;
@@ -276,19 +275,20 @@ Comparator cmp(
 always_comb begin
     F_jump = 0;
     F_jumpAddr = 0;
-    F_isDelaySlot = 0;
     if (cp0.jump) begin
         F_jump = 1;
         F_jumpAddr = cp0.jumpAddress;
     end
     else if (!D_data_waiting) begin
         if (D_ctrl.branch) begin
-        F_isDelaySlot = 1;
-        F_jump = cmp.action;
-        F_jumpAddr = D_pc + 4 + (D_ctrl.immediate << 2);
+            F_jump = 1;
+            if (cmp.action) begin
+                F_jumpAddr = D_pc + 4 + (D_ctrl.immediate << 2);
+            end else begin
+                F_jumpAddr = D_pc + 8;
+            end
         end
         else if (D_ctrl.absJump) begin
-            F_isDelaySlot = 1;
             F_jump = 1;
             if (D_ctrl.absJumpLoc == `absJumpImmediate) begin
                 F_jumpAddr = {D_pc[31:28], D_ctrl.immediate[25:0], 2'b00};

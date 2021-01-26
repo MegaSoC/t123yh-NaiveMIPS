@@ -13,6 +13,7 @@ module InstructionMemory(
            output [31:0] instruction,
            output logic bubble,
            output logic adel,
+           output logic isDelaySlot,
 
            output [31:0] inst_sram_addr,
            output logic inst_sram_readen,
@@ -40,6 +41,7 @@ assign adel = pc[1:0] != 0;
 
 always_comb begin
     inst_sram_readen = 1;
+    isDelaySlot = 0;
     bubble = 1;
     pendingJump_next = pendingJump;
     if (canSendNewCommand) begin
@@ -62,9 +64,11 @@ always_comb begin
             end
             else if (pendingJump) begin
                 pc_next = pendingJumpAddr;
+                isDelaySlot = 1;
             end
             else if (absJump) begin
                 pc_next = absJumpAddress;
+                isDelaySlot = 1;
             end
             if (pc_next[1:0] != 0) begin
                 inst_sram_readen = 0;
