@@ -128,11 +128,17 @@ wire [4:0] F_cause = F_im.adel ? `causeAdEL : 'bx;
 wire F_insert_bubble = F_im.bubble;
 wire [31:0] F_badVAddr = F_im.adel ? F_im.outputPC : 'bx;
 
+Decoder F_dec (
+    .instruction(F_im.instruction),
+    .reset(reset),
+    .bubble(F_im.bubble)
+);
+
 // ======== Decode Stage ========
 wire D_stall = stallLevel[m_D];
 reg D_last_bubble;
 wire D_insert_bubble = D_last_bubble || D_data_waiting;
-reg [31:0] D_currentInstruction;
+ControlSignals D_ctrl;
 reg [31:0] D_pc;
 reg D_isDelaySlot;
 reg [4:0] D_last_cause;
@@ -145,11 +151,13 @@ always @(posedge clk) begin
         D_pc <= 0;
         D_isDelaySlot <= 0;
         D_badVAddr <= 0;
-        D_currentInstruction <= 0;
+        D_ctrl <= kControlNop;
     end
     else begin
         if (cp0.interruptNow) begin
+            // TODO: verify interrupt delay slot operation
             D_last_bubble <= 1;
+            D_ctrl <= kControlNop;
             D_last_exception <= 0;
             D_pc <= 0;
             D_isDelaySlot <= 0;
@@ -160,23 +168,16 @@ always @(posedge clk) begin
                 D_isDelaySlot <= F_im.isDelaySlot;
                 D_last_exception <= F_exception;
                 D_last_cause <= F_cause;
-                D_currentInstruction <= F_im.instruction;
                 D_pc <= F_im.outputPC;
                 D_last_bubble <= F_insert_bubble || exceptionLevel[m_D];
+                D_ctrl <= (F_insert_bubble || exceptionLevel[m_D] || F_exception) ? kControlNop : F_dec.controls;
             end else begin
                 D_last_bubble <= D_last_bubble || exceptionLevel[m_D];
+                D_ctrl <= (D_last_bubble || exceptionLevel[m_D]) ? kControlNop : D_ctrl;
             end
         end
     end
 end
-
-Controller D_ctrl(
-               .instruction(D_currentInstruction),
-               .reset(reset),
-               .currentStage(`stageD),
-               .bubble(D_last_bubble || D_last_exception),
-               .debugPC(D_pc)
-           );
 
 reg [4:0] D_cause;
 always_comb begin
@@ -232,7 +233,7 @@ assign debug_wb_rf_wdata = grfWriteData;
 ForwardController D_regRead1_forward (
                       .request(D_ctrl.regRead1),
                       .original(D_grf.readOutput1),
-                      .enabled(D_ctrl.regRead1Required),
+                      .enabled(D_ctrl.absJump || D_ctrl.branch),
                       .debugPC(D_pc),
                       .debugStage("D"),
 
@@ -250,7 +251,7 @@ ForwardController D_regRead1_forward (
 ForwardController D_regRead2_forward (
                       .request(D_ctrl.regRead2),
                       .original(D_grf.readOutput2),
-                      .enabled(D_ctrl.regRead2Required),
+                      .enabled(D_ctrl.absJump || D_ctrl.branch),
                       .debugPC(D_pc),
                       .debugStage("D"),
 
@@ -315,7 +316,7 @@ end
 wire E_stall = stallLevel[m_E];
 reg E_bubble;
 wire E_insert_bubble = E_bubble || E_data_waiting;
-reg [31:0] E_currentInstruction;
+ControlSignals E_ctrl;
 reg [31:0] E_pc;
 reg [31:0] E_regRead1;
 reg [31:0] E_regRead2;
@@ -352,10 +353,12 @@ always @(posedge clk) begin
         E_regRead2 <= 0;
         E_badVAddr <= 0;
         E_isDelaySlot <= 0;
+        E_ctrl <= kControlNop;
     end
     else begin
         if (cp0.interruptNow) begin
             E_bubble <= 1;
+            E_ctrl <= kControlNop;
             E_last_exception <= 0;
             E_pc <= 0;
             E_isDelaySlot <= 0;
@@ -364,34 +367,26 @@ always @(posedge clk) begin
             E_last_exception <= D_exception;
             E_last_cause <= D_cause;
             E_bubble <= D_insert_bubble || exceptionLevel[m_E];
-            E_currentInstruction <= D_currentInstruction;
             E_pc <= D_real_pc;
             E_regRead1 <= D_regRead1_forward.value;
             E_regRead2 <= D_regRead2_forward.value;
             E_isDelaySlot <= D_isDelaySlot;
             E_badVAddr <= D_badVAddr;
+            E_ctrl <= (D_insert_bubble || exceptionLevel[m_E] || D_exception) ? kControlNop : D_ctrl;
         end
         else begin
             E_bubble <= E_bubble || exceptionLevel[m_E];
             E_regRead1 <= E_regRead1_forward.value;
             E_regRead2 <= E_regRead2_forward.value;
+            E_ctrl <= (E_bubble || exceptionLevel[m_E]) ? kControlNop : E_ctrl;
         end
     end
 end
 
-Controller E_ctrl(
-               .instruction(E_currentInstruction),
-               .reset(reset),
-               .currentStage(`stageE),
-               .bubble(E_bubble || E_last_exception),
-               .debugPC(E_pc)
-           );
-
-
 ForwardController E_regRead1_forward (
                       .request(E_ctrl.regRead1),
                       .original(E_regRead1),
-                      .enabled(E_ctrl.regRead1Required),
+                      .enabled(E_ctrl.aluCtrl != `aluDisabled || E_ctrl.mulCtrl != `mtDisabled),
                       .debugPC(E_pc),
                       .debugStage("E"),
 
@@ -409,7 +404,7 @@ ForwardController E_regRead1_forward (
 ForwardController E_regRead2_forward (
                       .request(E_ctrl.regRead2),
                       .original(E_regRead2),
-                      .enabled(E_ctrl.regRead2Required),
+                      .enabled((E_ctrl.aluCtrl != `aluDisabled || E_ctrl.mulCtrl != `mtDisabled) && E_ctrl.aluSrc),
                       .debugPC(E_pc),
                       .debugStage("E"),
 
@@ -499,7 +494,7 @@ end
 wire M_stall = stallLevel[m_M];
 reg M_bubble;
 wire M_insert_bubble = M_bubble || M_data_waiting;
-reg [31:0] M_currentInstruction;
+ControlSignals M_ctrl;
 reg [31:0] M_pc;
 reg [31:0] M_aluOutput;
 reg [31:0] M_mulOutput;
@@ -530,7 +525,6 @@ always @(posedge clk) begin
     if (reset) begin
         M_bubble <= 1;
         M_last_exception <= 0;
-        M_currentInstruction <= 0;
         M_pc <= 0;
         M_aluOutput <= 0;
         M_lastBadVAddr <= 0;
@@ -540,6 +534,7 @@ always @(posedge clk) begin
         M_lastWriteDataValid <= 0;
         M_lastWriteData <= 0;
         M_isDelaySlot <= 0;
+        M_ctrl <= kControlNop;
     end
     else begin
         if (cp0.interruptNow) begin
@@ -548,12 +543,12 @@ always @(posedge clk) begin
             M_last_cause <= `causeInt;
             M_pc <= E_real_pc;
             M_isDelaySlot <= E_isDelaySlot;
+            M_ctrl <= kControlNop;
         end
         else if (!M_stall) begin
             M_bubble <= E_insert_bubble || exceptionLevel[m_M];
             M_last_exception <= E_exception;
             M_last_cause <= E_cause;
-            M_currentInstruction <= E_currentInstruction;
             M_pc <= E_real_pc;
             M_aluOutput <= E_alu.out;
             M_lastBadVAddr <= E_badVAddr;
@@ -563,11 +558,13 @@ always @(posedge clk) begin
             M_lastWriteDataValid <= E_regWriteDataValid;
             M_lastWriteData <= E_regWriteData;
             M_isDelaySlot <= E_isDelaySlot;
+            M_ctrl <= (E_insert_bubble || exceptionLevel[m_M] || E_exception) ? kControlNop : E_ctrl;
         end
         else begin
             M_bubble <= M_bubble || exceptionLevel[m_M];
             M_regRead1 <= M_regRead1_forward.value;
             M_regRead2 <= M_regRead2_forward.value;
+            M_ctrl <= (M_bubble || exceptionLevel[m_M]) ? kControlNop : M_ctrl;
         end
     end
 end
@@ -596,18 +593,10 @@ always_comb begin
     end
 end
 
-Controller M_ctrl(
-               .instruction(M_currentInstruction),
-               .reset(reset),
-               .currentStage(`stageM),
-               .bubble(M_bubble || M_last_exception),
-               .debugPC(M_pc)
-           );
-
 ForwardController M_regRead1_forward (
                       .request(M_ctrl.regRead1),
                       .original(M_regRead1),
-                      .enabled(M_ctrl.regRead1Required),
+                      .enabled(0),
                       .debugPC(M_pc),
                       .debugStage("M"),
 
@@ -622,7 +611,7 @@ ForwardController M_regRead1_forward (
 ForwardController M_regRead2_forward (
                       .request(M_ctrl.regRead2),
                       .original(M_regRead2),
-                      .enabled(M_ctrl.regRead2Required),
+                      .enabled(E_ctrl.memStore),
                       .debugPC(M_pc),
                       .debugStage("M"),
 
@@ -682,7 +671,7 @@ end
 
 // ======== WriteBack Stage ========
 
-reg [31:0] W_currentInstruction;
+ControlSignals W_ctrl;
 reg [31:0] W_aluOutput;
 reg [31:0] W_regRead1;
 reg W_lastWriteDataValid;
@@ -696,7 +685,6 @@ reg W_isDelaySlot;
 always @(posedge clk) begin
     if (reset) begin
         W_bubble <= 1;
-        W_currentInstruction <= 0;
         W_pc <= 0;
         W_aluOutput <= 0;
         W_lastWriteData <= 0;
@@ -704,11 +692,11 @@ always @(posedge clk) begin
         W_lastWriteDataValid <= 0;
         W_last_exception <= 0;
         W_badVAddr <= 0;
+        W_ctrl <= kControlNop;
     end
     else begin
         W_regRead1 <= M_regRead1_forward.value;
         W_bubble <= M_insert_bubble;
-        W_currentInstruction <= M_currentInstruction;
         W_pc <= M_pc;
         W_aluOutput <= M_aluOutput;
         W_lastWriteData <= M_regWriteData;
@@ -725,6 +713,7 @@ always @(posedge clk) begin
         end
         W_last_exception <= M_exception;
         W_last_cause <= M_cause;
+        W_ctrl <= (M_insert_bubble || M_exception) ? kControlNop : M_ctrl;
     end
 end
 
@@ -740,14 +729,6 @@ assign W_exception = !W_bubble && W_last_exception;
 assign cp0.isException = W_exception;
 assign cp0.exceptionPC = W_pc;
 assign cp0.exceptionCause = W_last_cause;
-
-Controller W_ctrl(
-               .instruction(W_currentInstruction),
-               .reset(reset),
-               .currentStage(`stageW),
-               .bubble(W_bubble || W_last_exception),
-               .debugPC(W_pc)
-           );
 
 assign cp0.writeEnable = W_ctrl.writeCP0;
 assign cp0.number = W_ctrl.numberCP0;
