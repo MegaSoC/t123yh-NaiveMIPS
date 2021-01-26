@@ -36,11 +36,7 @@ always @(posedge clk) begin
     end
     else begin
         if (writeAddress != 0) begin
-`ifdef DEBUG
-            $display("@%h: $%d <= %h", debugPC, writeAddress, writeData);
-`else
-            $display("%d@%h: $%d <= %h", $time, debugPC, writeAddress, writeData);
-`endif
+           // $display("@%h: $%d <= %h", debugPC, writeAddress, writeData);
             registers[writeAddress] <= writeData;
         end
     end
