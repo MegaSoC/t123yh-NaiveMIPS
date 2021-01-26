@@ -20,7 +20,7 @@ module new_icache#(
 	input logic [31:0] i_va, //提前�?????????????个周期进入cache
 	output logic o_inn_stall,//传给外部表示cache中需要暂�?????????????
 	output logic [31:0] o_mdata_data,
-	output logic o_mvalid,
+	output logic o_valid,
 
 	input mem_read_resp i_resp,
 	input logic i_memread_empty,
@@ -302,7 +302,6 @@ end
 
 // assign o_mdata_data = r_receiving_hit ? r_data : w_data;
 assign o_mdata_data = w_data;
-assign o_mvalid = w_mvalid;
 assign w_inn_stall = w_state != IDLE_RECEIVING && w_state != IDLE;
 assign o_inn_stall = w_inn_stall;
 //pipeline1 process 
@@ -429,7 +428,7 @@ for(genvar i = 0; i < SET_ASSOC; i++) begin: gen_data_mem_group
 end
 
 //pipeline3
-
+assign o_valid = w_rbuffer_hita | w_receiving_hit | w_pipe_hit;
 always_comb begin
 	w_data = r_data;
 	if(w_rbuffer_hita)begin
