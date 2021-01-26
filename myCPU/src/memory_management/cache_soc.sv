@@ -41,7 +41,7 @@ module cache_soc #(
 
     output logic [3 :0] arid ,
     output logic [31:0] araddr ,
-    output logic [7 :0] arlen ,
+    output logic [3 :0] arlen ,
     output logic [2 :0] arsize ,
     output logic [1 :0] arburst ,
     output logic [1 :0] arlock ,
@@ -59,7 +59,7 @@ module cache_soc #(
 
     output logic [3 :0] awid ,
     output logic [31:0] awaddr ,
-    output logic [7 :0] awlen ,
+    output logic [3 :0] awlen ,
     output logic [2 :0] awsize ,
     output logic [1 :0] awburst ,
     output logic [1 :0] awlock ,
