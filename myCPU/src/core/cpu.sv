@@ -717,7 +717,11 @@ always @(posedge clk) begin
         W_memData <= data_sram_rdata;
         W_badVAddr <= M_badVAddr;
         if (M_exception) begin
-            $display("Exception occurred at %h, caused by %d", M_pc, M_cause);
+            if (M_cause == 16) begin
+                $display("Exception returned at %h", M_pc);
+            end else begin
+                $display("Exception occurred at %h, caused by %d", M_pc, M_cause);
+            end
         end
         W_last_exception <= M_exception;
         W_last_cause <= M_cause;
