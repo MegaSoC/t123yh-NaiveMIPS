@@ -75,8 +75,8 @@ always_comb begin
                 inst_sram_readen = 0;
             end
         end else begin
-            pendingException_next = 0;
-            pendingJump_next = 0;
+            pendingException_next = pendingException;
+            pendingJump_next = pendingJump;
             pc_next = pc;
         end
     end else begin
