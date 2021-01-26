@@ -1,4 +1,3 @@
-`include "constants.v"
 module ForwardController (
            input [4:0] request,
            input [31:0] original,

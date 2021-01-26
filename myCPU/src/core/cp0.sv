@@ -1,4 +1,4 @@
-`include "constants.v"
+`include "constants.svh"
 
 module CP0(
            input clk,

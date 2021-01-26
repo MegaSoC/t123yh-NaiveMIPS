@@ -1,4 +1,4 @@
-`include "constants.v"
+`include "constants.svh"
 module DataMemory(
            input clk,
            input reset,

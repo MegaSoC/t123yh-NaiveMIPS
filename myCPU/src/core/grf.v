@@ -1,4 +1,3 @@
-`include "constants.v"
 module GeneralRegisterFile(
            input [4:0] readAddress1,
            output reg [31:0] readOutput1,

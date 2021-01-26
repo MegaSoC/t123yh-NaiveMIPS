@@ -1,5 +1,8 @@
 `timescale 1ns / 1ps
 
+`ifndef _NANOMIPS_CONSTANTS_SVH
+`define _NANOMIPS_CONSTANTS_SVH
+
 `define aluDisabled 0
 `define aluSub 1
 `define aluOr 2
@@ -67,3 +70,4 @@
 `define causeOv 12
 `define causeSyscall 8
 `define causeBreak 9
+`endif

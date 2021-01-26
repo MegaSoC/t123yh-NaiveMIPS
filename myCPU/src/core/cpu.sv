@@ -1,4 +1,4 @@
-`include "constants.v"
+`include "constants.svh"
 module CPU (
            input clk,
            input reset,
