@@ -226,6 +226,7 @@ always_comb begin
     memWidthCtrl = 0;
     memReadSignExtend = 0;
     checkOverflow = 0;
+    cmpCtrl = 'bx;
     mulOutputSel = 'bx;
     mulCtrl = `mtDisabled;
     generateException = `ctrlNoException;

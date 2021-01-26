@@ -16,6 +16,8 @@ module DataMemory(
 
 always_comb begin
     exception = 0;
+    readEnableOut = 0;
+    writeEnableOut = 0;
     if (dataValid) begin
         if (readEnable || writeEnable) begin
             if (widthCtrl == `memWidth4) begin

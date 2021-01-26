@@ -13,6 +13,7 @@ logic [15:0] halfWord;
 logic [7:0] readbyte;
 always_comb begin
     readData = 0;
+    readbyte = 'bx;
     if (!readEnable) begin
         readData = 'bX;
     end 

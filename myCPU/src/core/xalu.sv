@@ -19,6 +19,7 @@ Divider div(.clk(clk), .A(A), .B(B), .start(start), .sign(sign));
 
 always_comb begin
     ready = 0;
+    sign = 'bx;
     case (op)
         `mtMultiply, `mtMultiplyUnsigned,`mtMSUB, `mtMADD, `mtMADDU:
             ready = !mult.busy;

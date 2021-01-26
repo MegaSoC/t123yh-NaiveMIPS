@@ -40,6 +40,7 @@ assign inst_sram_addr = pc_next;
 assign adel = pc[1:0] != 0;
 
 always_comb begin
+    pc_next = 'bx;
     inst_sram_readen = 1;
     isDelaySlot = 0;
     bubble = 1;
