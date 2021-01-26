@@ -22,6 +22,7 @@ module new_dcache#(
 	input logic [31:0] i_in_data,
 	output logic o_inn_stall,//传给外部表示cache中需要暂�?????????????
 	output logic [31:0] o_mdata_data,
+	output logic o_valid,
 
 	input mem_read_resp i_resp,
 	input logic i_memread_empty,
@@ -499,6 +500,8 @@ for(genvar i = 0; i < SET_ASSOC; i++) begin: gen_data_mem_group
 end
 
 //pipeline3
+
+assign o_valid = w_rbuffer_hita | w_wbuffer_hit | w_receiving_hit | w_pipe_hit;
 
 always_comb begin
 	w_data = r_data;

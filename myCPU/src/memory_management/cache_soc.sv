@@ -83,7 +83,8 @@ module cache_soc #(
 
 assign o_i_valid = w_out_isram_valid || (!w_i_stall && i_i_cached && i_i_valid2);
 assign o_i_inst = w_out_isram_valid ? w_isram_inst : w_icache_inst;
-assign o_d_valid = w_out_dsram_valid || (!w_d_stall && i_d_cached && (i_d_read || i_d_write));
+//assign o_d_valid = w_out_dsram_valid || (!w_d_stall && i_d_cached && (i_d_read || i_d_write));
+assign o_d_valid = w_out_dsram_valid | w_dcache_valid;
 assign o_d_outdata = w_out_dsram_valid ? w_dsram_data : w_dcache_data;
 
 always_comb begin
@@ -110,7 +111,7 @@ logic w_inst_empty,w_icache_start,w_icache_end, w_dsram_wend;
 logic w_dcache_memread_we, w_dcache_memwrite_start,w_dcache_memwrite_end;
 logic w_dcache_memwrite_we, w_icache_memread_we, w_i_stall, w_d_stall;
 logic r_isram_valid, r_dsram_read, r_dsram_write, w_isram_valid, w_dsram_read, w_dsram_write;
-logic w_out_isram_valid, w_out_dsram_valid;
+logic w_out_isram_valid, w_out_dsram_valid, w_dcache_valid;
 word w_memread_start_pc, w_memread_start_addr;
 word [DCACHE_LINE_WORD_NUM - 1 : 0] w_dcache_memwrite_data;
 word r_isram_inst, r_dsram_data, w_isram_inst, w_dsram_data;
@@ -208,6 +209,7 @@ dcache1(
     .i_wen(w_d_byteen & {4{i_d_write}}),
     .i_in_data(i_d_indata),
     .o_inn_stall(w_d_stall),
+    .o_valid(w_dcache_valid),
     .o_mdata_data(w_dcache_data),
 
     .i_cache_instr(i_dcache_instr),
