@@ -72,17 +72,63 @@ module mycpu_top(
 
     wire global_reset = !(aresetn && myaresetn);
     
+    word w_inst_sram_addr, w_i_paddr, w_data_sram_vaddr, w_data_sram_wdata;
+    logic [2:0] w_data_sram_size;
+    logic w_data_sram_read, w_data_sram_write, w_inst_sram_readen;
+
+    word w_d_outdata, w_i_inst;
+    logic w_i_valid, w_d_valid;
+    
     CPU core(
         .clk(aclk),
         .reset(global_reset),
         .irq(ext_int),
+        
+        .inst_sram_rdata(w_i_inst),
+        .inst_sram_valid(w_i_valid),
+        .inst_sram_addr(w_inst_sram_addr),
+        .inst_sram_readen(w_inst_sram_readen),
+
+        .data_sram_rdata(w_d_outdata),
+        .data_sram_valid(w_d_valid),
+        .data_sram_vaddr(w_data_sram_vaddr),
+        .data_sram_read(w_data_sram_read),
+        .data_sram_write(w_data_sram_write),
+        .data_sram_wdata(w_data_sram_wdata),
+        .data_sram_size(w_data_sram_size),
         
         .debug_wb_pc(debug_wb_pc),
         .debug_wb_rf_wdata(debug_wb_rf_wdata),
         .debug_wb_rf_wnum(debug_wb_rf_wnum),
         .debug_wb_rf_wen(debug_wb_rf_wen)
     );
+    
+    reg [31:0] i_paddr;
+    reg cache_valid2;
+    reg i_cached;
+    always @(posedge aclk) begin
+        if (global_reset) begin
+            i_paddr <= 0;
+            cache_valid2 <= 0;
+            i_cached <= 0;
+        end else begin
+            i_paddr <= {3'b0,core.inst_sram_addr[28:0]};
+            i_cached <= core.inst_sram_addr[31:29] == 3'b100;
+            cache_valid2 <= core.inst_sram_readen;
+        end
+    end
 
+    reg [31:0] d_paddr;
+    reg d_cached;
+    always @(posedge aclk) begin
+        if (global_reset) begin
+            d_paddr <= 0;
+            d_cached <= 0;
+        end else begin
+            d_paddr <= {3'b0, core.data_sram_vaddr[28:0]};
+            d_cached <= core.data_sram_vaddr[31:29] == 3'b100;
+        end
+    end
 
      cache_soc 
    #(
@@ -100,8 +146,31 @@ module mycpu_top(
                   .i_clk(aclk),
                   .i_rst(global_reset),
 
-	              .i_dcache_instr(CACHE_NOP),
+	              .i_i_valid1(w_inst_sram_readen),
+                  .i_i_valid2(cache_valid2),
+                  .i_i_npc(w_inst_sram_addr),
+                  .i_i_phyaddr(i_paddr),
+                  .i_i_cached(i_cached),
+                  .o_i_valid(w_i_valid),
+                  .o_i_inst(w_i_inst),
+
+                  .i_d_va(w_data_sram_vaddr),
+                  .i_d_phyaddr(d_paddr),
+                  .i_d_cached(d_cached),
+                  .i_d_read(w_data_sram_read),
+                  .i_d_write(w_data_sram_write),
+                  .i_d_size(w_data_sram_size),
+                  .i_d_indata(w_data_sram_wdata),
+                  .o_d_valid(w_d_valid),
+                  .o_d_outdata(w_d_outdata),
+                  
                   .i_icache_instr(CACHE_NOP),
+                  .i_icache_instr_tag('0),
+                  .i_icache_instr_addr('0),
+
+                  .i_dcache_instr(CACHE_NOP),
+                  .i_dcache_instr_tag('0),
+                  .i_dcache_instr_addr('0),
 
                   .arid,
                   .araddr,
@@ -145,52 +214,5 @@ module mycpu_top(
                   .bready
 
     );
-
-    assign core.inst_sram_valid = cache.o_i_valid;
-    assign core.inst_sram_rdata = cache.o_i_inst;
-
-    reg [31:0] i_paddr;
-    reg cache_valid2;
-    reg i_cached;
-    always @(posedge aclk) begin
-        if (global_reset) begin
-            i_paddr <= 0;
-            cache_valid2 <= 0;
-            i_cached <= 0;
-        end else begin
-            i_paddr <= {3'b0,core.inst_sram_addr[28:0]};
-            i_cached <= core.inst_sram_addr[31:29] == 3'b100;
-            cache_valid2 <= core.inst_sram_readen;
-        end
-    end
-
-    assign cache.i_i_valid1 = core.inst_sram_readen;
-    assign cache.i_i_valid2 = cache_valid2;
-    assign cache.i_i_npc = core.inst_sram_addr;
-    assign cache.i_i_phyaddr = i_paddr;
-    assign cache.i_i_cached = i_cached;
-
-    reg [31:0] d_paddr;
-    reg d_cached;
-    always @(posedge aclk) begin
-        if (global_reset) begin
-            d_paddr <= 0;
-            d_cached <= 0;
-        end else begin
-            d_paddr <= {3'b0, core.data_sram_vaddr[28:0]};
-            d_cached <= core.data_sram_vaddr[31:29] == 3'b100;
-        end
-    end
-
-    assign cache.i_d_va = core.data_sram_vaddr;
-    assign cache.i_d_phyaddr = d_paddr;
-    assign cache.i_d_cached = d_cached;
-    assign cache.i_d_read = core.data_sram_read;
-    assign cache.i_d_write = core.data_sram_write;
-    assign cache.i_d_size = core.data_sram_size;
-    assign cache.i_d_indata = core.data_sram_wdata;
-    assign core.data_sram_rdata = cache.o_d_outdata;
-    assign core.data_sram_valid = cache.o_d_valid;
-
 
 endmodule
