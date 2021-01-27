@@ -98,8 +98,11 @@ always @(posedge clk) begin
     end
 end
 
+reg countPlus;
+
 always @(posedge clk) begin
     if (reset) begin
+        countPlus <= 0;
         `EPC <= 0;
         `PrId <= 32'hDEADBEEF;
         `IE <= 0;
@@ -110,8 +113,9 @@ always @(posedge clk) begin
         clearTimerInterrupt <= 0;
     end
     else begin
+        countPlus <= ~countPlus;
         if (isException || !writeEnable || number != `CountNumber) begin
-            `Count <= `Count + 1;
+            `Count <= `Count + countPlus;
         end
 
         // interruptSource <= externalInterrupt;
