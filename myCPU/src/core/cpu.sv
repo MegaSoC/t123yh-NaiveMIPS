@@ -595,7 +595,7 @@ ForwardController M_regRead1_forward (
 ForwardController M_regRead2_forward (
                       .request(M_ctrl.regRead2),
                       .original(M_regRead2),
-                      .enabled(E_ctrl.memStore),
+                      .enabled(M_ctrl.memStore),
                       .debugPC(M_pc),
                       .debugStage("M"),
 
