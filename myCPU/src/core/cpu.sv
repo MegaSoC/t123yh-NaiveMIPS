@@ -156,25 +156,24 @@ always @(posedge clk) begin
     else begin
         if (cp0.interruptNow) begin
             // TODO: verify interrupt delay slot operation
-            D_last_bubble <= 1;
-            D_ctrl <= kControlNop;
-            D_last_exception <= 0;
-            D_pc <= 0;
-            D_isDelaySlot <= 0;
+            D_badVAddr <= 0;
+            D_isDelaySlot <= F_im.isDelaySlot;
+            D_pc <= F_im.outputPC;
+            D_last_exception <= 1;
+            D_last_cause <= `causeInt;
+            D_last_bubble <= exceptionLevel[m_D];
         end
-        else begin
-            if (!D_stall) begin
-                D_badVAddr <= F_badVAddr;
-                D_isDelaySlot <= F_im.isDelaySlot;
-                D_last_exception <= F_exception;
-                D_last_cause <= F_cause;
-                D_pc <= F_im.outputPC;
-                D_last_bubble <= F_insert_bubble || exceptionLevel[m_D];
-                D_ctrl <= (F_insert_bubble || exceptionLevel[m_D] || F_exception) ? kControlNop : F_dec.controls;
-            end else begin
-                D_last_bubble <= D_last_bubble || exceptionLevel[m_D];
-                D_ctrl <= (D_last_bubble || exceptionLevel[m_D]) ? kControlNop : D_ctrl;
-            end
+        else if (!D_stall) begin
+            D_badVAddr <= F_badVAddr;
+            D_isDelaySlot <= F_im.isDelaySlot;
+            D_last_exception <= F_exception;
+            D_last_cause <= F_cause;
+            D_pc <= F_im.outputPC;
+            D_last_bubble <= F_insert_bubble || exceptionLevel[m_D];
+            D_ctrl <= (F_insert_bubble || exceptionLevel[m_D] || F_exception) ? kControlNop : F_dec.controls;
+        end else begin
+            D_last_bubble <= D_last_bubble || exceptionLevel[m_D];
+            D_ctrl <= (D_last_bubble || exceptionLevel[m_D]) ? kControlNop : D_ctrl;
         end
     end
 end
@@ -356,14 +355,7 @@ always @(posedge clk) begin
         E_ctrl <= kControlNop;
     end
     else begin
-        if (cp0.interruptNow) begin
-            E_bubble <= 1;
-            E_ctrl <= kControlNop;
-            E_last_exception <= 0;
-            E_pc <= 0;
-            E_isDelaySlot <= 0;
-        end
-        else if (!E_stall) begin
+        if (!E_stall) begin
             E_last_exception <= D_exception;
             E_last_cause <= D_cause;
             E_bubble <= D_insert_bubble || exceptionLevel[m_E];
@@ -537,15 +529,7 @@ always @(posedge clk) begin
         M_ctrl <= kControlNop;
     end
     else begin
-        if (cp0.interruptNow) begin
-            M_bubble <= 0;
-            M_last_exception <= 1;
-            M_last_cause <= `causeInt;
-            M_pc <= E_real_pc;
-            M_isDelaySlot <= E_isDelaySlot;
-            M_ctrl <= kControlNop;
-        end
-        else if (!M_stall) begin
+        if (!M_stall) begin
             M_bubble <= E_insert_bubble || exceptionLevel[m_M];
             M_last_exception <= E_exception;
             M_last_cause <= E_cause;

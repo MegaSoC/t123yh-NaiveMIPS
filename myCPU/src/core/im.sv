@@ -86,6 +86,7 @@ always_comb begin
             pendingJump_next = 0;
         end
         if (absJump || pendingJump) begin
+            isDelaySlot = 1;
             pendingJump_next = 1;
         end
     end
