@@ -25,7 +25,6 @@ module InstructionMemory(
 
 reg [31:0] pc;
 logic [31:0] pc_next;
-logic expect_data;
 
 reg pendingException;
 logic pendingException_next;
