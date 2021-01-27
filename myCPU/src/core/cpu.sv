@@ -580,7 +580,7 @@ end
 ForwardController M_regRead1_forward (
                       .request(M_ctrl.regRead1),
                       .original(M_regRead1),
-                      .enabled(0),
+                      .enabled(M_ctrl.writeCP0),
                       .debugPC(M_pc),
                       .debugStage("M"),
 
@@ -608,6 +608,10 @@ ForwardController M_regRead2_forward (
                   );
 
 wire M_source_waiting = M_regRead1_forward.stallExec || M_regRead2_forward.stallExec;
+
+assign cp0.writeEnable = M_ctrl.writeCP0 && !M_source_waiting;
+assign cp0.number = M_ctrl.numberCP0;
+assign cp0.writeData = M_regRead1_forward.value;
 
 DataMemory M_dm(
                .clk(clk),
@@ -663,6 +667,7 @@ reg [31:0] W_lastWriteData;
 reg [4:0] W_last_cause;
 reg [31:0] W_badVAddr;
 reg [31:0] W_memData;
+reg [31:0] W_cp0Value;
 
 reg W_bubble;
 reg W_isDelaySlot;
@@ -677,6 +682,7 @@ always @(posedge clk) begin
         W_last_exception <= 0;
         W_badVAddr <= 0;
         W_ctrl <= kControlNop;
+        W_cp0Value <= 0;
     end
     else begin
         W_regRead1 <= M_regRead1_forward.value;
@@ -698,6 +704,7 @@ always @(posedge clk) begin
         W_last_exception <= M_exception;
         W_last_cause <= M_cause;
         W_ctrl <= (M_insert_bubble || M_exception) ? kControlNop : M_ctrl;
+        W_cp0Value <= cp0.readData;
     end
 end
 
@@ -714,9 +721,6 @@ assign cp0.isException = W_exception;
 assign cp0.exceptionPC = W_pc;
 assign cp0.exceptionCause = W_last_cause;
 
-assign cp0.writeEnable = W_ctrl.writeCP0;
-assign cp0.number = W_ctrl.numberCP0;
-assign cp0.writeData = W_regRead1;
 assign cp0.isBD = W_isDelaySlot;
 assign cp0.exceptionBadVAddr = W_badVAddr;
 
@@ -736,7 +740,7 @@ always_comb begin
                 grfWriteData = W_reader.readData;
             end
             `grfWriteCP0: begin
-                grfWriteData = cp0.readData;
+                grfWriteData = W_cp0Value;
             end
         endcase
     end
