@@ -632,6 +632,14 @@ assign data_sram_size = M_ctrl.memWidthCtrl;
 wire M_memory_waiting = (M_dm.writeEnableOut || M_dm.readEnableOut) && !data_sram_valid;
 assign M_data_waiting = M_source_waiting || M_memory_waiting;
 
+DataMemoryReader M_reader(
+        .data_sram_rdata(data_sram_rdata),
+        .readEnable(M_ctrl.memLoad),
+        .address(M_aluOutput),
+        .widthCtrl(M_ctrl.memWidthCtrl),
+        .extendCtrl(M_ctrl.memReadSignExtend)
+);
+
 reg [4:0] M_cause;
 always_comb begin
     M_exception = 0;
@@ -692,7 +700,7 @@ always @(posedge clk) begin
         W_lastWriteData <= M_regWriteData;
         W_lastWriteDataValid <= M_regWriteDataValid;
         W_isDelaySlot <= M_isDelaySlot;
-        W_memData <= data_sram_rdata;
+        W_memData <= M_reader.readData;
         W_badVAddr <= M_badVAddr;
         if (M_exception) begin
             if (M_cause == 16) begin
@@ -707,14 +715,6 @@ always @(posedge clk) begin
         W_cp0Value <= cp0.readData;
     end
 end
-
-DataMemoryReader W_reader(
-        .data_sram_rdata(W_memData),
-        .readEnable(W_ctrl.memLoad),
-        .address(W_aluOutput),
-        .widthCtrl(W_ctrl.memWidthCtrl),
-        .extendCtrl(W_ctrl.memReadSignExtend)
-);
 
 assign W_exception = !W_bubble && W_last_exception;
 assign cp0.isException = W_exception;
@@ -737,7 +737,7 @@ always_comb begin
         grfWriteData = 'bx;
         case (W_ctrl.grfWriteSource)
             `grfWriteMem: begin
-                grfWriteData = W_reader.readData;
+                grfWriteData = W_memData;
             end
             `grfWriteCP0: begin
                 grfWriteData = W_cp0Value;
