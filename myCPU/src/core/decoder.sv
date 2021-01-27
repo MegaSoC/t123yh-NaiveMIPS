@@ -21,8 +21,6 @@ wire [31:0] zeroExtendedImmediate = imm;
 wire [31:0] shiftedImmediate = {imm, 16'b0};
 wire [31:0] signExtendedImmediate = $signed(imm);
 
-assign controls.mulEnable = controls.mulCtrl != `mtDisabled;
-
 const bit [4:0] reg_ra = 31;
 
 const bit [5:0] R = 6'b000000;
@@ -510,6 +508,7 @@ always_comb begin
             controls.generateException = `ctrlUnknownInstruction;
         end
     endcase
+    controls.mulEnable = controls.mulCtrl != `mtDisabled;
 end
 
 endmodule
