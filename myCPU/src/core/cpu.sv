@@ -52,16 +52,13 @@ logic M_exception;
 
 always_comb begin
     exceptionLevel = l_None;
-    if (F_exception) begin
-        exceptionLevel = l_F;
-    end
-    if (D_exception) begin
+    if (D_last_exception) begin
         exceptionLevel = l_D;
     end
-    if (E_exception) begin
+    if (E_last_exception) begin
         exceptionLevel = l_E;
     end
-    if (M_exception) begin
+    if (M_last_exception) begin
         exceptionLevel = l_M;
     end
 end
@@ -102,11 +99,11 @@ InstructionMemory F_im (
                       .clk(clk),
                       .reset(reset),
 
-                      .absJump(!stallLevel[m_F] && F_jump), // Don't jump when stalled
+                      .absJump(F_jump), // Don't jump when stalled
                       .absJumpAddress(F_jumpAddr),
 
-                      .stall(stallLevel[m_F]),
-                      .exception(exceptionLevel[m_D]),
+                      .stall(stallLevel[m_F] && !F_jump),
+                      .exception(exceptionLevel[m_F]),
                       
                       .inst_sram_rdata(inst_sram_rdata),
                       .inst_sram_addr(inst_sram_addr),
@@ -161,10 +158,10 @@ always @(posedge clk) begin
             D_last_cause <= F_cause;
             D_pc <= F_im.outputPC;
             D_last_bubble <= F_insert_bubble || exceptionLevel[m_D];
-            D_ctrl <= (F_insert_bubble || exceptionLevel[m_D] || F_exception) ? kControlNop : F_dec.controls;
+            D_ctrl <= (F_insert_bubble || exceptionLevel[m_F] || F_exception) ? kControlNop : F_dec.controls;
         end else begin
-            D_last_bubble <= D_last_bubble || exceptionLevel[m_D];
-            D_ctrl <= (D_last_bubble || exceptionLevel[m_D]) ? kControlNop : D_ctrl;
+            D_last_bubble <= D_last_bubble || exceptionLevel[m_F];
+            D_ctrl <= (D_last_bubble || exceptionLevel[m_F]) ? kControlNop : D_ctrl;
         end
     end
 end
@@ -264,7 +261,7 @@ always_comb begin
         F_jump = 1;
         F_jumpAddr = cp0.jumpAddress;
     end
-    else if (!D_data_waiting) begin
+    else if (!D_stall) begin
         if (D_ctrl.branch) begin
             F_jump = 1;
             if (cmp.action) begin
@@ -361,14 +358,14 @@ always @(posedge clk) begin
             E_regRead2 <= D_regRead2_forward.value;
             E_isDelaySlot <= D_isDelaySlot;
             E_badVAddr <= D_badVAddr;
-            E_ctrl <= (D_insert_bubble || exceptionLevel[m_E] || D_exception) ? kControlNop : D_ctrl;
+            E_ctrl <= (D_insert_bubble || exceptionLevel[m_D] || D_exception) ? kControlNop : D_ctrl;
             E_memAddress <= D_memAddress;
         end
         else begin
-            E_bubble <= E_bubble || exceptionLevel[m_E];
+            E_bubble <= E_bubble || exceptionLevel[m_D];
             E_regRead1 <= E_regRead1_forward.value;
             E_regRead2 <= E_regRead2_forward.value;
-            E_ctrl <= (E_bubble || exceptionLevel[m_E]) ? kControlNop : E_ctrl;
+            E_ctrl <= (E_bubble || exceptionLevel[m_D]) ? kControlNop : E_ctrl;
         end
     end
 end
@@ -422,18 +419,8 @@ always_comb begin
         E_exception = 1;
     end
     else if (!E_data_waiting && E_ctrl.checkOverflow && E_alu.overflow) begin
-        if (E_ctrl.memLoad) begin
-            E_cause = `causeAdEL;
-            E_exception = 1;
-        end
-        else if (E_ctrl.memStore) begin
-            E_cause = `causeAdES;
-            E_exception = 1;
-        end
-        else begin
-            E_cause = `causeOv;
-            E_exception = 1;
-        end
+        E_cause = `causeOv;
+        E_exception = 1;
     end
     else if (E_dm.exception) begin
         E_exception = 1;
@@ -458,7 +445,7 @@ always_comb begin
         if (E_mul.busy) begin
             E_mul_collision = 1;
         end
-        else if (E_ctrl.mulEnable && !M_exception) begin
+        else if (E_ctrl.mulEnable && !exceptionLevel[m_E]) begin
             E_mulStart = 1;
         end
     end
@@ -478,7 +465,7 @@ wire [31:0] E_mul_value = E_ctrl.mulOutputSel ? E_mul.HI : E_mul.LO;
 DataMemory E_dm(
                .clk(clk),
                .reset(reset),
-               .dataValid(!E_source_waiting),
+               .dataValid(!E_source_waiting && !exceptionLevel[m_E]),
                .writeEnable(E_ctrl.memStore),
                .readEnable(E_ctrl.memLoad),
                .address(E_memAddress),
@@ -501,7 +488,7 @@ DataMemoryReader E_reader(
         .extendCtrl(E_ctrl.memReadSignExtend)
 );
 
-assign cp0.writeEnable = E_ctrl.writeCP0;
+assign cp0.writeEnable = E_ctrl.writeCP0 && !E_source_waiting && !exceptionLevel[m_E];
 assign cp0.number = E_ctrl.numberCP0;
 assign cp0.writeData = E_regRead1_forward.value;
 
@@ -569,7 +556,7 @@ always @(posedge clk) begin
         M_lastWriteDataValid <= E_regWriteDataValid;
         M_lastWriteData <= E_regWriteData;
         M_isDelaySlot <= E_isDelaySlot;
-        M_ctrl <= (E_insert_bubble || exceptionLevel[m_M] || E_exception) ? kControlNop : E_ctrl;
+        M_ctrl <= (E_insert_bubble || exceptionLevel[m_E] || E_exception) ? kControlNop : E_ctrl;
         M_cp0Value <= cp0.readData;
         if (E_exception) begin
             if (E_cause == 16) begin
