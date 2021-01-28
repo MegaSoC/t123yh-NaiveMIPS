@@ -11,22 +11,24 @@ module XALU(
            output reg [31:0] HI,
            output reg [31:0] LO
        );
+
+reg [31:0] bufA, bufB;
+reg bufStart;
 reg [3:0] ctrl_reg;
-wire [3:0] op = start ? ctrl : ctrl_reg;
 logic ready, sign;
-Multiplier mult(.clk(clk), .A(A), .B(B), .start(start), .sign(sign));
-Divider div(.clk(clk), .A(A), .B(B), .start(start), .sign(sign));
+Multiplier mult(.clk(clk), .A(bufA), .B(bufB), .start(bufStart), .sign(sign));
+Divider div(.clk(clk), .A(bufA), .B(bufB), .start(bufStart), .sign(sign));
 
 always_comb begin
     ready = 0;
     sign = 'bx;
-    case (op)
+    case (ctrl_reg)
         `mtMultiply, `mtMultiplyUnsigned,`mtMSUB, `mtMADD, `mtMADDU:
             ready = !mult.busy;
         `mtDivide, `mtDivideUnsigned:
             ready = !div.busy;
     endcase
-    case (op)
+    case (ctrl_reg)
         `mtDivideUnsigned, `mtMultiplyUnsigned, `mtMADDU:
             sign = 0;
         `mtDivide, `mtMultiply, `mtMSUB, `mtMADD:
@@ -39,6 +41,10 @@ always @(posedge clk) begin
         HI <= 0;
         LO <= 0;
         busy <= 0;
+        bufA <= 0;
+        bufB <= 0;
+        bufStart <= 0;
+        ctrl_reg <= 0;
     end
     else if (start) begin
         if (ctrl == `mtSetHI) begin
@@ -48,14 +54,19 @@ always @(posedge clk) begin
             LO <= A;
         end
         else begin
+            bufA <= A;
+            bufB <= B;
             ctrl_reg <= ctrl;
             busy <= 1;
+            bufStart <= 1;
         end
     end
     else if (busy) begin
-        if (ready) begin
+        if (bufStart)
+            bufStart <= 0;
+        else if (ready) begin
             busy <= 0;
-            case (op)
+            case (ctrl_reg)
                 `mtMultiply, `mtMultiplyUnsigned:
                     {HI, LO} <= mult.result;
                 `mtMSUB:
