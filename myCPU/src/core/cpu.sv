@@ -23,7 +23,6 @@ module CPU (
            output [31:0] debug_wb_rf_wdata
        );
 
-reg [31:0] W_pc;
 wire D_data_waiting;
 wire E_data_waiting;
 wire M_data_waiting;
@@ -40,9 +39,6 @@ always_comb begin
     if (E_data_waiting) begin
         stallLevel = l_E;
     end
-    if (M_data_waiting) begin
-        stallLevel = l_M;
-    end
 end
 
 logic [4:0] exceptionLevel;
@@ -53,8 +49,6 @@ reg E_last_exception;
 logic E_exception;
 reg M_last_exception;
 logic M_exception;
-reg W_last_exception;
-logic W_exception;
 
 always_comb begin
     exceptionLevel = l_None;
@@ -69,9 +63,6 @@ always_comb begin
     end
     if (M_exception) begin
         exceptionLevel = l_M;
-    end
-    if (W_exception) begin
-        exceptionLevel = l_W;
     end
 end
 
@@ -221,13 +212,8 @@ GeneralRegisterFile D_grf(
 
                         .readAddress1(D_ctrl.regRead1),
                         .readAddress2(D_ctrl.regRead2),
-                        .debugPC(W_pc)
+                        .debugPC(debug_wb_pc)
                     );
-
-assign debug_wb_pc = W_pc;
-assign debug_wb_rf_wen = grfWriteAddress != 0 ? 4'b1111 : 0;
-assign debug_wb_rf_wnum = grfWriteAddress;
-assign debug_wb_rf_wdata = grfWriteData;
 
 ForwardController D_regRead1_forward (
                       .request(D_ctrl.regRead1),
@@ -242,9 +228,8 @@ ForwardController D_regRead1_forward (
                       .src2Valid(forwardValidM),
                       .src2Reg(forwardAddressM),
                       .src2Value(forwardValueM),
-                      .src3Valid(forwardValidW),
-                      .src3Reg(forwardAddressW),
-                      .src3Value(forwardValueW)
+
+                      .src3Reg(5'b0)
                   );
 
 ForwardController D_regRead2_forward (
@@ -260,9 +245,8 @@ ForwardController D_regRead2_forward (
                       .src2Valid(forwardValidM),
                       .src2Reg(forwardAddressM),
                       .src2Value(forwardValueM),
-                      .src3Valid(forwardValidW),
-                      .src3Reg(forwardAddressW),
-                      .src3Value(forwardValueW)
+
+                      .src3Reg(5'b0)
                   );
 
 assign D_data_waiting = D_regRead1_forward.stallExec || D_regRead2_forward.stallExec;
@@ -313,15 +297,6 @@ end
 
 // ======== Execution Stage ========
 
-// keep vaddr when busy
-always_comb begin
-    if (!E_data_waiting) begin
-        data_sram_vaddr = D_memAddress;
-    end else begin
-        data_sram_vaddr = E_memAddress;
-    end
-end
-
 wire E_stall = stallLevel[m_E];
 reg E_bubble;
 wire E_insert_bubble = E_bubble || E_data_waiting;
@@ -343,6 +318,15 @@ reg E_isDelaySlot;
 assign forwardValidE = E_regWriteDataValid;
 assign forwardAddressE = E_ctrl.destinationRegister;
 assign forwardValueE = E_regWriteData;
+
+// keep vaddr when busy
+always_comb begin
+    if (!E_data_waiting) begin
+        data_sram_vaddr = D_memAddress;
+    end else begin
+        data_sram_vaddr = E_memAddress;
+    end
+end
 
 always_comb begin
     E_regWriteDataValid = 0;
@@ -400,10 +384,7 @@ ForwardController E_regRead1_forward (
                       .src1Reg(forwardAddressM),
                       .src1Value(forwardValueM),
 
-                      .src2Valid(forwardValidW),
-                      .src2Reg(forwardAddressW),
-                      .src2Value(forwardValueW),
-
+                      .src2Reg(5'b0),
                       .src3Reg(5'b0)
                   );
 
@@ -418,10 +399,7 @@ ForwardController E_regRead2_forward (
                       .src1Reg(forwardAddressM),
                       .src1Value(forwardValueM),
 
-                      .src2Valid(forwardValidW),
-                      .src2Reg(forwardAddressW),
-                      .src2Value(forwardValueW),
-
+                      .src2Reg(5'b0),
                       .src3Reg(5'b0)
                   );
 
@@ -540,7 +518,6 @@ always_comb begin
 end
 
 // ======== Memory Stage ========
-wire M_stall = stallLevel[m_M];
 reg M_bubble;
 wire M_insert_bubble = M_bubble || M_data_waiting;
 ControlSignals M_ctrl;
@@ -551,14 +528,13 @@ reg [31:0] M_regRead1;
 reg [31:0] M_memData;
 reg [31:0] M_regRead2;
 reg [31:0] M_lastBadVAddr;
+reg [4:0] M_last_cause;
 reg M_lastWriteDataValid;
 reg [31:0] M_lastWriteData;
 reg [31:0] M_cp0Value;
 
-reg M_regWriteDataValid;
-reg [31:0] M_regWriteData;
-reg [4:0] M_last_cause;
-reg [31:0] M_badVAddr;
+logic M_regWriteDataValid;
+logic [31:0] M_regWriteData;
 
 reg M_isDelaySlot;
 
@@ -580,28 +556,27 @@ always @(posedge clk) begin
         M_cp0Value <= 0;
     end
     else begin
-        if (!M_stall) begin
-            M_bubble <= E_insert_bubble || exceptionLevel[m_M];
-            M_last_exception <= E_exception;
-            M_last_cause <= E_cause;
-            M_pc <= E_real_pc;
-            M_aluOutput <= E_alu.out;
-            M_lastBadVAddr <= E_badVAddr_next;
-            M_memData <= E_reader.readData;
-            M_mulOutput <= E_mul_value;
-            M_regRead1 <= E_regRead1_forward.value;
-            M_regRead2 <= E_regRead2_forward.value;
-            M_lastWriteDataValid <= E_regWriteDataValid;
-            M_lastWriteData <= E_regWriteData;
-            M_isDelaySlot <= E_isDelaySlot;
-            M_ctrl <= (E_insert_bubble || exceptionLevel[m_M] || E_exception) ? kControlNop : E_ctrl;
-            M_cp0Value <= cp0.readData;
-        end
-        else begin
-            M_bubble <= M_bubble || exceptionLevel[m_M];
-            M_regRead1 <= M_regRead1_forward.value;
-            M_regRead2 <= M_regRead2_forward.value;
-            M_ctrl <= (M_bubble || exceptionLevel[m_M]) ? kControlNop : M_ctrl;
+        M_bubble <= E_insert_bubble || exceptionLevel[m_M];
+        M_last_exception <= E_exception;
+        M_last_cause <= E_cause;
+        M_pc <= E_real_pc;
+        M_aluOutput <= E_alu.out;
+        M_lastBadVAddr <= E_badVAddr_next;
+        M_memData <= E_reader.readData;
+        M_mulOutput <= E_mul_value;
+        M_regRead1 <= E_regRead1_forward.value;
+        M_regRead2 <= E_regRead2_forward.value;
+        M_lastWriteDataValid <= E_regWriteDataValid;
+        M_lastWriteData <= E_regWriteData;
+        M_isDelaySlot <= E_isDelaySlot;
+        M_ctrl <= (E_insert_bubble || exceptionLevel[m_M] || E_exception) ? kControlNop : E_ctrl;
+        M_cp0Value <= cp0.readData;
+        if (E_exception) begin
+            if (E_cause == 16) begin
+                $display("Exception returned at %h", E_pc);
+            end else begin
+                $display("Exception occurred at %h, caused by %d", E_pc, E_cause);
+            end
         end
     end
 end
@@ -637,120 +612,20 @@ always_comb begin
         endcase
     end
 end
+assign grfWriteAddress = M_ctrl.destinationRegister;
+assign grfWriteData = M_regWriteData;
 
-ForwardController M_regRead1_forward (
-                      .request(M_ctrl.regRead1),
-                      .original(M_regRead1),
-                      .enabled(),
-                      .debugPC(M_pc),
-                      .debugStage("M"),
+assign M_exception = !M_bubble && M_last_exception;
+assign cp0.isException = M_last_exception;
+assign cp0.exceptionPC = M_pc;
+assign cp0.exceptionCause = M_last_cause;
+assign cp0.isBD = M_isDelaySlot;
+assign cp0.exceptionBadVAddr = M_lastBadVAddr;
 
-                      .src1Valid(forwardValidW),
-                      .src1Reg(forwardAddressW),
-                      .src1Value(forwardValueW),
+assign debug_wb_pc = M_pc;
+assign debug_wb_rf_wen = grfWriteAddress != 0 ? 4'b1111 : 0;
+assign debug_wb_rf_wnum = grfWriteAddress;
+assign debug_wb_rf_wdata = grfWriteData;
 
-                      .src2Reg(5'b0),
-                      .src3Reg(5'b0)
-                  );
-
-ForwardController M_regRead2_forward (
-                      .request(M_ctrl.regRead2),
-                      .original(M_regRead2),
-                      .enabled(1'b0),
-                      .debugPC(M_pc),
-                      .debugStage("M"),
-
-                      .src1Valid(forwardValidW),
-                      .src1Reg(forwardAddressW),
-                      .src1Value(forwardValueW),
-
-                      .src2Reg(5'b0),
-                      .src3Reg(5'b0)
-                  );
-
-assign M_data_waiting = 0;
-
-reg [4:0] M_cause;
-always_comb begin
-    M_exception = 0;
-    M_cause = 'bx;
-    M_badVAddr = M_lastBadVAddr;
-    if (M_bubble) begin
-        M_exception = 0;
-    end
-    else  if (M_last_exception) begin
-        M_exception = 1;
-        M_cause = M_last_cause;
-    end
-end
-
-// ======== WriteBack Stage ========
-
-ControlSignals W_ctrl;
-reg [31:0] W_aluOutput;
-reg [31:0] W_regRead1;
-reg W_lastWriteDataValid;
-reg [31:0] W_lastWriteData;
-reg [4:0] W_last_cause;
-reg [31:0] W_badVAddr;
-
-reg W_bubble;
-reg W_isDelaySlot;
-always @(posedge clk) begin
-    if (reset) begin
-        W_bubble <= 1;
-        W_pc <= 0;
-        W_aluOutput <= 0;
-        W_lastWriteData <= 0;
-        W_lastWriteDataValid <= 0;
-        W_last_exception <= 0;
-        W_badVAddr <= 0;
-        W_ctrl <= kControlNop;
-    end
-    else begin
-        W_regRead1 <= M_regRead1_forward.value;
-        W_bubble <= M_insert_bubble;
-        W_pc <= M_pc;
-        W_aluOutput <= M_aluOutput;
-        W_lastWriteData <= M_regWriteData;
-        W_lastWriteDataValid <= M_regWriteDataValid;
-        W_isDelaySlot <= M_isDelaySlot;
-        W_badVAddr <= M_badVAddr;
-        if (M_exception) begin
-            if (M_cause == 16) begin
-                $display("Exception returned at %h", M_pc);
-            end else begin
-                $display("Exception occurred at %h, caused by %d", M_pc, M_cause);
-            end
-        end
-        W_last_exception <= M_exception;
-        W_last_cause <= M_cause;
-        W_ctrl <= (M_insert_bubble || M_exception) ? kControlNop : M_ctrl;
-    end
-end
-
-assign W_exception = !W_bubble && W_last_exception;
-assign cp0.isException = W_exception;
-assign cp0.exceptionPC = W_pc;
-assign cp0.exceptionCause = W_last_cause;
-
-assign cp0.isBD = W_isDelaySlot;
-assign cp0.exceptionBadVAddr = W_badVAddr;
-
-assign forwardValidW = 1;
-assign forwardAddressW = W_ctrl.destinationRegister;
-assign forwardValueW = grfWriteData;
-
-always_comb begin
-    grfWriteAddress = W_ctrl.destinationRegister;
-    if (W_lastWriteDataValid) begin
-        grfWriteData = W_lastWriteData;
-    end
-    else begin
-        grfWriteData = 'bx;
-        case (W_ctrl.grfWriteSource)
-        endcase
-    end
-end
 
 endmodule
