@@ -130,19 +130,17 @@ const bit debug = 1;
     controls.memLoad = 1; \
     controls.grfWriteSource = `grfWriteMem; \
     controls.destinationRegister = rti; \
-    controls.aluSrc = 1; \
-    controls.aluCtrl = `aluAdd; \
     controls.checkOverflow = 1; \
-    controls.immediate = signExtendedImmediate; 
+    controls.immediate = signExtendedImmediate; \
+    controls.calculateAddress = 1;
 
 `define simpleMemoryStore \
     controls.regRead1 = rsi; \
     controls.regRead2 = rti; \
     controls.memStore = 1; \
-    controls.aluSrc = 1; \
-    controls.aluCtrl = `aluAdd; \
     controls.checkOverflow = 1; \
-    controls.immediate = signExtendedImmediate;
+    controls.immediate = signExtendedImmediate; \
+    controls.calculateAddress = 1;
 
 `define simpleMUL   \
     controls.regRead1 = rsi; \

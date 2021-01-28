@@ -232,7 +232,7 @@ assign debug_wb_rf_wdata = grfWriteData;
 ForwardController D_regRead1_forward (
                       .request(D_ctrl.regRead1),
                       .original(D_grf.readOutput1),
-                      .enabled(D_ctrl.absJump || D_ctrl.branch),
+                      .enabled(D_ctrl.absJump || D_ctrl.branch || D_ctrl.calculateAddress),
                       .debugPC(D_pc),
                       .debugStage("D"),
 
@@ -266,6 +266,7 @@ ForwardController D_regRead2_forward (
                   );
 
 assign D_data_waiting = D_regRead1_forward.stallExec || D_regRead2_forward.stallExec;
+wire [31:0] D_memAddress = D_regRead1_forward.value + D_ctrl.immediate;
 
 Comparator cmp(
                .A(D_regRead1_forward.value),
@@ -312,6 +313,15 @@ end
 
 // ======== Execution Stage ========
 
+// keep vaddr when busy
+always_comb begin
+    if (!E_data_waiting) begin
+        data_sram_vaddr = D_memAddress;
+    end else begin
+        data_sram_vaddr = E_memAddress;
+    end
+end
+
 wire E_stall = stallLevel[m_E];
 reg E_bubble;
 wire E_insert_bubble = E_bubble || E_data_waiting;
@@ -319,12 +329,14 @@ ControlSignals E_ctrl;
 reg [31:0] E_pc;
 reg [31:0] E_regRead1;
 reg [31:0] E_regRead2;
+reg [31:0] E_memAddress;
 
 reg E_regWriteDataValid;
 reg [31:0] E_regWriteData;
 
 reg [4:0] E_last_cause;
 reg [31:0] E_badVAddr;
+logic [31:0] E_badVAddr_next;
 
 reg E_isDelaySlot;
 
@@ -353,6 +365,7 @@ always @(posedge clk) begin
         E_badVAddr <= 0;
         E_isDelaySlot <= 0;
         E_ctrl <= kControlNop;
+        E_memAddress <= 0;
     end
     else begin
         if (!E_stall) begin
@@ -365,6 +378,7 @@ always @(posedge clk) begin
             E_isDelaySlot <= D_isDelaySlot;
             E_badVAddr <= D_badVAddr;
             E_ctrl <= (D_insert_bubble || exceptionLevel[m_E] || D_exception) ? kControlNop : D_ctrl;
+            E_memAddress <= D_memAddress;
         end
         else begin
             E_bubble <= E_bubble || exceptionLevel[m_E];
@@ -396,7 +410,7 @@ ForwardController E_regRead1_forward (
 ForwardController E_regRead2_forward (
                       .request(E_ctrl.regRead2),
                       .original(E_regRead2),
-                      .enabled((E_ctrl.aluCtrl != `aluDisabled || E_ctrl.mulCtrl != `mtDisabled) && E_ctrl.aluSrc),
+                      .enabled(((E_ctrl.aluCtrl != `aluDisabled || E_ctrl.mulCtrl != `mtDisabled) && E_ctrl.aluSrc) || E_ctrl.memStore),
                       .debugPC(E_pc),
                       .debugStage("E"),
 
@@ -421,6 +435,7 @@ reg [4:0] E_cause;
 always_comb begin
     E_cause = 'bx;
     E_exception = 0;
+    E_badVAddr_next = E_badVAddr;
     if (E_bubble) begin
         E_exception = 0;
     end
@@ -442,10 +457,21 @@ always_comb begin
             E_exception = 1;
         end
     end
+    else if (E_dm.exception) begin
+        E_exception = 1;
+        if (E_ctrl.memLoad) begin
+            E_cause = `causeAdEL;
+            E_badVAddr_next = E_memAddress;
+        end
+        else if (E_ctrl.memStore) begin
+            E_cause = `causeAdES;
+            E_badVAddr_next = E_memAddress;
+        end
+    end
 end
 
 logic E_mul_collision, E_mulStart;
-assign E_data_waiting = E_regRead1_forward.stallExec || E_regRead2_forward.stallExec || E_mul_collision;
+wire E_source_waiting = E_regRead1_forward.stallExec || E_regRead2_forward.stallExec;
 
 always_comb begin
     E_mulStart = 0;
@@ -471,6 +497,33 @@ XALU E_mul(
 
 wire [31:0] E_mul_value = E_ctrl.mulOutputSel ? E_mul.HI : E_mul.LO;
 
+DataMemory E_dm(
+               .clk(clk),
+               .reset(reset),
+               .dataValid(!E_source_waiting),
+               .writeEnable(E_ctrl.memStore),
+               .readEnable(E_ctrl.memLoad),
+               .address(E_memAddress),
+               .writeDataIn(E_regRead2_forward.value), // register@regRead2
+               .widthCtrl(E_ctrl.memWidthCtrl),
+
+               .writeEnableOut(data_sram_write),
+               .readEnableOut(data_sram_read),
+               .writeDataOut(data_sram_wdata)
+           );
+assign data_sram_size = E_ctrl.memWidthCtrl;
+
+wire E_memory_waiting = (E_dm.writeEnableOut || E_dm.readEnableOut) && !data_sram_valid;
+
+DataMemoryReader E_reader(
+        .data_sram_rdata(data_sram_rdata),
+        .readEnable(E_ctrl.memLoad),
+        .address(E_memAddress),
+        .widthCtrl(E_ctrl.memWidthCtrl),
+        .extendCtrl(E_ctrl.memReadSignExtend)
+);
+
+assign E_data_waiting = E_source_waiting || E_mul_collision || E_memory_waiting;
 reg [31:0] E_real_pc;
 
 always_comb begin
@@ -491,6 +544,7 @@ reg [31:0] M_pc;
 reg [31:0] M_aluOutput;
 reg [31:0] M_mulOutput;
 reg [31:0] M_regRead1;
+reg [31:0] M_memData;
 reg [31:0] M_regRead2;
 reg [31:0] M_lastBadVAddr;
 reg M_lastWriteDataValid;
@@ -502,16 +556,6 @@ reg [4:0] M_last_cause;
 reg [31:0] M_badVAddr;
 
 reg M_isDelaySlot;
-
-// keep vaddr when busy
-always_comb begin
-    if (!M_data_waiting) begin
-        data_sram_vaddr = E_alu.out;
-    end else begin
-        data_sram_vaddr = M_aluOutput;
-    end
-end
-
 
 always @(posedge clk) begin
     if (reset) begin
@@ -527,6 +571,7 @@ always @(posedge clk) begin
         M_lastWriteData <= 0;
         M_isDelaySlot <= 0;
         M_ctrl <= kControlNop;
+        M_memData <= 0;
     end
     else begin
         if (!M_stall) begin
@@ -535,7 +580,8 @@ always @(posedge clk) begin
             M_last_cause <= E_cause;
             M_pc <= E_real_pc;
             M_aluOutput <= E_alu.out;
-            M_lastBadVAddr <= E_badVAddr;
+            M_lastBadVAddr <= E_badVAddr_next;
+            M_memData <= E_reader.readData;
             M_mulOutput <= E_mul_value;
             M_regRead1 <= E_regRead1_forward.value;
             M_regRead2 <= E_regRead2_forward.value;
@@ -573,6 +619,10 @@ always_comb begin
                 M_regWriteData = M_mulOutput;
                 M_regWriteDataValid = 1;
             end
+            `grfWriteMem: begin
+                M_regWriteData = M_memData;
+                M_regWriteDataValid = 1;
+            end
         endcase
     end
 end
@@ -595,7 +645,7 @@ ForwardController M_regRead1_forward (
 ForwardController M_regRead2_forward (
                       .request(M_ctrl.regRead2),
                       .original(M_regRead2),
-                      .enabled(M_ctrl.memStore),
+                      .enabled(1'b0),
                       .debugPC(M_pc),
                       .debugStage("M"),
 
@@ -607,38 +657,11 @@ ForwardController M_regRead2_forward (
                       .src3Reg(5'b0)
                   );
 
-wire M_source_waiting = M_regRead1_forward.stallExec || M_regRead2_forward.stallExec;
+assign M_data_waiting = 0;
 
-assign cp0.writeEnable = M_ctrl.writeCP0 && !M_source_waiting;
+assign cp0.writeEnable = M_ctrl.writeCP0;
 assign cp0.number = M_ctrl.numberCP0;
 assign cp0.writeData = M_regRead1_forward.value;
-
-DataMemory M_dm(
-               .clk(clk),
-               .reset(reset),
-               .dataValid(!M_source_waiting),
-               .writeEnable(M_ctrl.memStore),
-               .readEnable(M_ctrl.memLoad),
-               .address(M_aluOutput),
-               .writeDataIn(M_regRead2_forward.value), // register@regRead2
-               .widthCtrl(M_ctrl.memWidthCtrl),
-
-               .writeEnableOut(data_sram_write),
-               .readEnableOut(data_sram_read),
-               .writeDataOut(data_sram_wdata)
-           );
-assign data_sram_size = M_ctrl.memWidthCtrl;
-
-wire M_memory_waiting = (M_dm.writeEnableOut || M_dm.readEnableOut) && !data_sram_valid;
-assign M_data_waiting = M_source_waiting || M_memory_waiting;
-
-DataMemoryReader M_reader(
-        .data_sram_rdata(data_sram_rdata),
-        .readEnable(M_ctrl.memLoad),
-        .address(M_aluOutput),
-        .widthCtrl(M_ctrl.memWidthCtrl),
-        .extendCtrl(M_ctrl.memReadSignExtend)
-);
 
 reg [4:0] M_cause;
 always_comb begin
@@ -652,17 +675,6 @@ always_comb begin
         M_exception = 1;
         M_cause = M_last_cause;
     end
-    else if (M_dm.exception) begin
-        M_exception = 1;
-        if (M_ctrl.memLoad) begin
-            M_cause = `causeAdEL;
-            M_badVAddr = M_aluOutput;
-        end
-        else if (M_ctrl.memStore) begin
-            M_cause = `causeAdES;
-            M_badVAddr = M_aluOutput;
-        end
-    end
 end
 
 // ======== WriteBack Stage ========
@@ -674,7 +686,6 @@ reg W_lastWriteDataValid;
 reg [31:0] W_lastWriteData;
 reg [4:0] W_last_cause;
 reg [31:0] W_badVAddr;
-reg [31:0] W_memData;
 reg [31:0] W_cp0Value;
 
 reg W_bubble;
@@ -685,7 +696,6 @@ always @(posedge clk) begin
         W_pc <= 0;
         W_aluOutput <= 0;
         W_lastWriteData <= 0;
-        W_memData <= 0;
         W_lastWriteDataValid <= 0;
         W_last_exception <= 0;
         W_badVAddr <= 0;
@@ -700,7 +710,6 @@ always @(posedge clk) begin
         W_lastWriteData <= M_regWriteData;
         W_lastWriteDataValid <= M_regWriteDataValid;
         W_isDelaySlot <= M_isDelaySlot;
-        W_memData <= M_reader.readData;
         W_badVAddr <= M_badVAddr;
         if (M_exception) begin
             if (M_cause == 16) begin
@@ -736,9 +745,6 @@ always_comb begin
     else begin
         grfWriteData = 'bx;
         case (W_ctrl.grfWriteSource)
-            `grfWriteMem: begin
-                grfWriteData = W_memData;
-            end
             `grfWriteCP0: begin
                 grfWriteData = W_cp0Value;
             end

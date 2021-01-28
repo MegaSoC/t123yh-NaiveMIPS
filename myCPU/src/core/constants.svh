@@ -96,8 +96,9 @@ typedef struct packed {
     bit [2:0] generateException;
     bit writeCP0;
     bit [4:0] numberCP0;
+    bit calculateAddress;
 } ControlSignals;
 
-const ControlSignals kControlNop = '{mulEnable: 0, memLoad: 0, memStore: 0, grfWriteSource: `grfWriteDisable, branch: 0, destinationRegister: 0, aluSrc: 0, aluCtrl: `aluDisabled, absJump: 0, regRead1: 0, regRead2: 0, memWidthCtrl: 0, memReadSignExtend: 0, checkOverflow: 0, cmpCtrl: 'bx, mulOutputSel: 'bx, mulCtrl: `mtDisabled, generateException: `ctrlNoException, writeCP0: 0, numberCP0: 0, immediate: 'bx, absJumpLoc: 'bx};
+const ControlSignals kControlNop = '{mulEnable: 0, memLoad: 0, memStore: 0, grfWriteSource: `grfWriteDisable, branch: 0, destinationRegister: 0, aluSrc: 0, aluCtrl: `aluDisabled, absJump: 0, regRead1: 0, regRead2: 0, memWidthCtrl: 0, memReadSignExtend: 0, checkOverflow: 0, cmpCtrl: 'bx, mulOutputSel: 'bx, mulCtrl: `mtDisabled, generateException: `ctrlNoException, writeCP0: 0, numberCP0: 0, immediate: 'bx, absJumpLoc: 'bx, calculateAddress: 0};
 
 `endif
