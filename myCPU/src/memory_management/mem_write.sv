@@ -18,6 +18,7 @@
     input mem_write_req i_sram_req,
 
     output logic o_empty,
+    output logic o_sram_empty,
     output logic o_sram_full,
     output logic o_sram_start,
     output logic o_sram_end,
@@ -79,12 +80,13 @@ logic [$clog2(FIFO_DEPTH) - 1 : 0] r_key1, r_key2,w_key;
 logic [$clog2(FIFO_DEPTH) - 2 : 0] w_dcache_lock, w_sram_lock, w_lock, r_sram_req_num;
 mem_write_req r_dcache_req, r_sram_req, w_out_req;
 assign w_empty = w_empty1 && w_empty2;
+assign o_sram_empty = w_empty1;
 assign w_dcache_lock = gen_lock(r_buffer_history[0]);
 assign w_sram_lock = gen_lock(r_buffer_history[1]);
 assign o_dcache_lock = w_dcache_lock;
 assign o_sram_lock = w_sram_lock;
 assign o_empty = w_empty;
-assign o_sram_full = r_sram_req_num >= (BUFFER_NUM - 2);
+assign o_sram_full = r_sram_req_num >= (BUFFER_NUM - 1);
 assign w_push1 = i_sram_we;
 assign w_push2 = i_dcache_we;
 assign w_key_select = w_key[$clog2(FIFO_DEPTH) - 1];

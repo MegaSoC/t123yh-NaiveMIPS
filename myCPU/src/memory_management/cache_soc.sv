@@ -81,26 +81,9 @@ module cache_soc #(
     output logic bready
 );
 
-assign o_i_valid = w_out_isram_valid | w_icache_valid;
-assign o_i_inst = w_out_isram_valid ? w_isram_inst : w_icache_inst;
-//assign o_d_valid = w_out_dsram_valid || (!w_d_stall && i_d_cached && (i_d_read || i_d_write));
-assign o_d_valid = w_out_dsram_valid | w_dcache_valid;
-assign o_d_outdata = w_out_dsram_valid ? w_dsram_data : w_dcache_data;
-
-always_comb begin
-    if(i_d_size == 3'b010)
-        w_d_byteen = 4'b1111;
-    else if (i_d_size == 3'b001) begin
-        w_d_byteen = i_d_phyaddr[1] ? 4'b1100 : 4'b0011;
-    end
-    else begin
-        w_d_byteen = 4'b0001 << (i_d_phyaddr[1:0]);
-    end
-end
-
 logic [$clog2(MEM_WRITE_FIFO_DEPTH) - 1 : 0] w_key;
 logic [$clog2(MEM_WRITE_FIFO_DEPTH) - 2 : 0] w_dcache_lock;
-logic w_write_process;
+logic w_write_process, w_sram_empty, w_sram_full;
 logic [3:0] w_d_byteen;
 word w_icache_inst, w_dcache_data;
 word w_write_addr;
@@ -120,6 +103,23 @@ axi_r_resp w_axi_r_resp;
 axi_r_req  w_axi_r_req;
 axi_w_resp w_axi_w_resp;
 axi_w_req  w_axi_w_req;
+
+assign o_i_valid = w_out_isram_valid | w_icache_valid;
+assign o_i_inst = w_out_isram_valid ? w_isram_inst : w_icache_inst;
+//assign o_d_valid = w_out_dsram_valid || (!w_d_stall && i_d_cached && (i_d_read || i_d_write));
+assign o_d_valid = w_out_dsram_valid | w_dcache_valid;
+assign o_d_outdata = w_out_dsram_valid ? w_dsram_data : w_dcache_data;
+
+always_comb begin
+    if(i_d_size == 3'b010)
+        w_d_byteen = 4'b1111;
+    else if (i_d_size == 3'b001) begin
+        w_d_byteen = i_d_phyaddr[1] ? 4'b1100 : 4'b0011;
+    end
+    else begin
+        w_d_byteen = 4'b0001 << (i_d_phyaddr[1:0]);
+    end
+end
 
 always_ff @(posedge i_clk) begin
     if(i_rst)begin
@@ -191,7 +191,7 @@ assign w_dsram_wreq.wen = w_d_byteen;
 assign w_dsram_wreq.addr = i_d_phyaddr;
 assign w_dsram_wreq.size = i_d_size;
 
-assign w_out_dsram_valid = (w_resp.valid3 && w_resp.last) || w_dsram_wend;
+assign w_out_dsram_valid = (w_resp.valid3 && w_resp.last) || w_dsram_write;
 
 new_dcache #(
     .WORD_PER_LINE(DCACHE_LINE_WORD_NUM),
@@ -245,14 +245,14 @@ always_ff @(posedge i_clk) begin
     end
     else begin
         r_isram_valid <= ~w_out_isram_valid && ((!i_i_cached && i_i_valid2) || r_isram_valid);
-        r_dsram_read <= ~w_out_dsram_valid && ((i_d_read && !i_d_cached) || r_dsram_read);
-        r_dsram_write <= ~w_out_dsram_valid && ((i_d_write && !i_d_cached) || r_dsram_write);
+        r_dsram_read <= ~w_out_dsram_valid && ((i_d_read && !i_d_cached && w_sram_empty) || r_dsram_read);
+        r_dsram_write <= ~w_dsram_wend && ((i_d_write && !i_d_cached) || r_dsram_write);
     end
 end
 
 assign w_isram_valid = !i_i_cached && i_i_valid2  && ~r_isram_valid;
-assign w_dsram_read  = (i_d_read && !i_d_cached) && ~r_dsram_read;
-assign w_dsram_write = (i_d_write && !i_d_cached) && ~r_dsram_write;
+assign w_dsram_read  = (i_d_read && !i_d_cached && w_sram_empty) && ~r_dsram_read;
+assign w_dsram_write = (i_d_write && !i_d_cached) && ~w_sram_full;
 
 mem_read # (
     .LEN_UNIT(ICACHE_WORD_PER_LINE),
@@ -301,8 +301,8 @@ mem_write #(
     .o_key(w_key),
     .i_dcache_req(w_dcache_wreq),
     .i_sram_req(w_dsram_wreq),
-    //.o_empty(),
-    .o_sram_full(),
+    .o_sram_empty(w_sram_empty),
+    .o_sram_full(w_sram_full),
     .o_sram_start(),
     .o_sram_end(w_dsram_wend),
     .o_dcache_start(w_dcache_memwrite_start),
