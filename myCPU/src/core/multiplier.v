@@ -1,6 +1,5 @@
 module Multiplier(
     input clk,
-    input resetn,
     input start,
     input sign,
     input [31:0] A,
