@@ -218,7 +218,7 @@ GeneralRegisterFile D_grf(
 ForwardController D_regRead1_forward (
                       .request(D_ctrl.regRead1),
                       .original(D_grf.readOutput1),
-                      .enabled(D_ctrl.absJump || D_ctrl.branch || D_ctrl.calculateAddress),
+                      .enabled(D_ctrl.aluCtrl != `aluDisabled || D_ctrl.absJump || D_ctrl.branch || D_ctrl.calculateAddress),
                       .debugPC(D_pc),
                       .debugStage("D"),
 
@@ -235,7 +235,7 @@ ForwardController D_regRead1_forward (
 ForwardController D_regRead2_forward (
                       .request(D_ctrl.regRead2),
                       .original(D_grf.readOutput2),
-                      .enabled(D_ctrl.absJump || D_ctrl.branch),
+                      .enabled(D_ctrl.absJump || D_ctrl.branch || D_ctrl.aluCtrl != `aluDisabled),
                       .debugPC(D_pc),
                       .debugStage("D"),
 
@@ -285,6 +285,12 @@ always_comb begin
     end
 end
 
+ArithmeticLogicUnit D_alu(
+                        .ctrl(D_ctrl.aluCtrl),
+                        .A(D_regRead1_forward.value),
+                        .B(D_ctrl.aluSrc ? D_ctrl.immediate : D_regRead2_forward.value)
+                    );
+
 reg [31:0] D_real_pc;
 always_comb begin
     if (D_last_bubble) begin
@@ -305,6 +311,8 @@ reg [31:0] E_pc;
 reg [31:0] E_regRead1;
 reg [31:0] E_regRead2;
 reg [31:0] E_memAddress;
+reg [31:0] E_aluOutput;
+reg E_aluOverflow;
 
 reg E_regWriteDataValid;
 reg [31:0] E_regWriteData;
@@ -336,6 +344,10 @@ always_comb begin
             E_regWriteData = E_pc + 8;
             E_regWriteDataValid = 1;
         end
+        `grfWriteALU: begin
+            E_regWriteData = E_aluOutput;
+            E_regWriteDataValid = 1;
+        end
     endcase
 end
 
@@ -350,6 +362,8 @@ always @(posedge clk) begin
         E_isDelaySlot <= 0;
         E_ctrl <= kControlNop;
         E_memAddress <= 0;
+        E_aluOutput <= 0;
+        E_aluOverflow <= 0;
     end
     else begin
         if (!E_stall) begin
@@ -363,6 +377,8 @@ always @(posedge clk) begin
             E_badVAddr <= D_badVAddr;
             E_ctrl <= (D_insert_bubble || exceptionLevel[m_E] || D_exception) ? kControlNop : D_ctrl;
             E_memAddress <= D_memAddress;
+            E_aluOutput <= D_alu.out;
+            E_aluOverflow <= D_alu.overflow;
         end
         else begin
             E_bubble <= E_bubble || exceptionLevel[m_E];
@@ -376,7 +392,7 @@ end
 ForwardController E_regRead1_forward (
                       .request(E_ctrl.regRead1),
                       .original(E_regRead1),
-                      .enabled(E_ctrl.aluCtrl != `aluDisabled || E_ctrl.mulCtrl != `mtDisabled || M_ctrl.writeCP0),
+                      .enabled(E_ctrl.mulCtrl != `mtDisabled || M_ctrl.writeCP0),
                       .debugPC(E_pc),
                       .debugStage("E"),
 
@@ -391,7 +407,7 @@ ForwardController E_regRead1_forward (
 ForwardController E_regRead2_forward (
                       .request(E_ctrl.regRead2),
                       .original(E_regRead2),
-                      .enabled(((E_ctrl.aluCtrl != `aluDisabled || E_ctrl.mulCtrl != `mtDisabled) && E_ctrl.aluSrc) || E_ctrl.memStore),
+                      .enabled(E_ctrl.mulCtrl != `mtDisabled || E_ctrl.memStore),
                       .debugPC(E_pc),
                       .debugStage("E"),
 
@@ -402,12 +418,6 @@ ForwardController E_regRead2_forward (
                       .src2Reg(5'b0),
                       .src3Reg(5'b0)
                   );
-
-ArithmeticLogicUnit E_alu(
-                        .ctrl(E_ctrl.aluCtrl),
-                        .A(E_regRead1_forward.value),
-                        .B(E_ctrl.aluSrc ? E_ctrl.immediate : E_regRead2_forward.value)
-                    );
 
 reg [4:0] E_cause;
 always_comb begin
@@ -421,19 +431,9 @@ always_comb begin
         E_cause = E_last_cause;
         E_exception = 1;
     end
-    else if (!E_data_waiting && E_ctrl.checkOverflow && E_alu.overflow) begin
-        if (E_ctrl.memLoad) begin
-            E_cause = `causeAdEL;
-            E_exception = 1;
-        end
-        else if (E_ctrl.memStore) begin
-            E_cause = `causeAdES;
-            E_exception = 1;
-        end
-        else begin
-            E_cause = `causeOv;
-            E_exception = 1;
-        end
+    else if (E_ctrl.checkOverflow && E_aluOverflow) begin
+        E_cause = `causeOv;
+        E_exception = 1;
     end
     else if (E_dm.exception) begin
         E_exception = 1;
@@ -470,7 +470,7 @@ XALU E_mul(
                .reset(reset),
                .clk(clk),
                .A(E_regRead1_forward.value),
-               .B(E_ctrl.aluSrc ? E_ctrl.immediate : E_regRead2_forward.value)
+               .B(E_regRead2_forward.value)
            );
 
 wire [31:0] E_mul_value = E_ctrl.mulOutputSel ? E_mul.HI : E_mul.LO;
@@ -522,7 +522,6 @@ reg M_bubble;
 wire M_insert_bubble = M_bubble || M_data_waiting;
 ControlSignals M_ctrl;
 reg [31:0] M_pc;
-reg [31:0] M_aluOutput;
 reg [31:0] M_mulOutput;
 reg [31:0] M_regRead1;
 reg [31:0] M_memData;
@@ -543,7 +542,6 @@ always @(posedge clk) begin
         M_bubble <= 1;
         M_last_exception <= 0;
         M_pc <= 0;
-        M_aluOutput <= 0;
         M_lastBadVAddr <= 0;
         M_mulOutput <= 0;
         M_regRead1 <= 0;
@@ -560,7 +558,6 @@ always @(posedge clk) begin
         M_last_exception <= E_exception;
         M_last_cause <= E_cause;
         M_pc <= E_real_pc;
-        M_aluOutput <= E_alu.out;
         M_lastBadVAddr <= E_badVAddr_next;
         M_memData <= E_reader.readData;
         M_mulOutput <= E_mul_value;
@@ -593,10 +590,6 @@ always_comb begin
         M_regWriteDataValid = 0;
         M_regWriteData = 'bx;
         case (M_ctrl.grfWriteSource)
-            `grfWriteALU: begin
-                M_regWriteData = M_aluOutput;
-                M_regWriteDataValid = 1;
-            end
             `grfWriteMul: begin
                 M_regWriteData = M_mulOutput;
                 M_regWriteDataValid = 1;
