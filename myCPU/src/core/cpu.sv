@@ -89,11 +89,6 @@ wire forwardValidM;
 wire [4:0] forwardAddressM;
 wire [31:0] forwardValueM;
 
-// From Write
-wire forwardValidW;
-wire [4:0] forwardAddressW;
-wire [31:0] forwardValueW;
-
 // ======== Fetch Stage ========
 logic F_jump;
 logic [31:0] F_jumpAddr;
@@ -219,34 +214,26 @@ ForwardController D_regRead1_forward (
                       .request(D_ctrl.regRead1),
                       .original(D_grf.readOutput1),
                       .enabled(D_ctrl.aluCtrl != `aluDisabled || D_ctrl.absJump || D_ctrl.branch || D_ctrl.calculateAddress),
-                      .debugPC(D_pc),
-                      .debugStage("D"),
 
                       .src1Valid(forwardValidE),
                       .src1Reg(forwardAddressE),
                       .src1Value(forwardValueE),
                       .src2Valid(forwardValidM),
                       .src2Reg(forwardAddressM),
-                      .src2Value(forwardValueM),
-
-                      .src3Reg(5'b0)
+                      .src2Value(forwardValueM)
                   );
 
 ForwardController D_regRead2_forward (
                       .request(D_ctrl.regRead2),
                       .original(D_grf.readOutput2),
                       .enabled(D_ctrl.absJump || D_ctrl.branch || D_ctrl.aluCtrl != `aluDisabled),
-                      .debugPC(D_pc),
-                      .debugStage("D"),
 
                       .src1Valid(forwardValidE),
                       .src1Reg(forwardAddressE),
                       .src1Value(forwardValueE),
                       .src2Valid(forwardValidM),
                       .src2Reg(forwardAddressM),
-                      .src2Value(forwardValueM),
-
-                      .src3Reg(5'b0)
+                      .src2Value(forwardValueM)
                   );
 
 assign D_data_waiting = D_regRead1_forward.stallExec || D_regRead2_forward.stallExec;
@@ -393,30 +380,24 @@ ForwardController E_regRead1_forward (
                       .request(E_ctrl.regRead1),
                       .original(E_regRead1),
                       .enabled(E_ctrl.mulCtrl != `mtDisabled || M_ctrl.writeCP0),
-                      .debugPC(E_pc),
-                      .debugStage("E"),
 
                       .src1Valid(forwardValidM),
                       .src1Reg(forwardAddressM),
                       .src1Value(forwardValueM),
 
-                      .src2Reg(5'b0),
-                      .src3Reg(5'b0)
+                      .src2Reg(5'b0)
                   );
 
 ForwardController E_regRead2_forward (
                       .request(E_ctrl.regRead2),
                       .original(E_regRead2),
                       .enabled(E_ctrl.mulCtrl != `mtDisabled || E_ctrl.memStore),
-                      .debugPC(E_pc),
-                      .debugStage("E"),
 
                       .src1Valid(forwardValidM),
                       .src1Reg(forwardAddressM),
                       .src1Value(forwardValueM),
 
-                      .src2Reg(5'b0),
-                      .src3Reg(5'b0)
+                      .src2Reg(5'b0)
                   );
 
 reg [4:0] E_cause;
@@ -519,13 +500,10 @@ end
 
 // ======== Memory Stage ========
 reg M_bubble;
-wire M_insert_bubble = M_bubble || M_data_waiting;
 ControlSignals M_ctrl;
 reg [31:0] M_pc;
 reg [31:0] M_mulOutput;
-reg [31:0] M_regRead1;
 reg [31:0] M_memData;
-reg [31:0] M_regRead2;
 reg [31:0] M_lastBadVAddr;
 reg [4:0] M_last_cause;
 reg M_lastWriteDataValid;
@@ -544,8 +522,6 @@ always @(posedge clk) begin
         M_pc <= 0;
         M_lastBadVAddr <= 0;
         M_mulOutput <= 0;
-        M_regRead1 <= 0;
-        M_regRead2 <= 0;
         M_lastWriteDataValid <= 0;
         M_lastWriteData <= 0;
         M_isDelaySlot <= 0;
@@ -561,8 +537,6 @@ always @(posedge clk) begin
         M_lastBadVAddr <= E_badVAddr_next;
         M_memData <= E_reader.readData;
         M_mulOutput <= E_mul_value;
-        M_regRead1 <= E_regRead1_forward.value;
-        M_regRead2 <= E_regRead2_forward.value;
         M_lastWriteDataValid <= E_regWriteDataValid;
         M_lastWriteData <= E_regWriteData;
         M_isDelaySlot <= E_isDelaySlot;
@@ -619,6 +593,5 @@ assign debug_wb_pc = M_pc;
 assign debug_wb_rf_wen = grfWriteAddress != 0 ? 4'b1111 : 0;
 assign debug_wb_rf_wnum = grfWriteAddress;
 assign debug_wb_rf_wdata = grfWriteData;
-
 
 endmodule

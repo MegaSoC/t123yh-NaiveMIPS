@@ -2,8 +2,6 @@ module ForwardController (
            input [4:0] request,
            input [31:0] original,
            input enabled,
-           input [31:0] debugPC,
-           input [7:0] debugStage,
            output reg [31:0] value,
            output stallExec,
 
@@ -14,11 +12,7 @@ module ForwardController (
 
            input src2Valid,
            input [4:0] src2Reg,
-           input [31:0] src2Value,
-
-           input src3Valid,
-           input [4:0] src3Reg,
-           input [31:0] src3Value
+           input [31:0] src2Value
        );
 
 reg stall;
@@ -47,16 +41,6 @@ always @(*) begin
         else begin
             stall = 0;
             value = src2Value;
-        end
-    end
-    else if (src3Reg == request) begin
-        if (!src3Valid) begin
-            stall = 1;
-            value = 'bx;
-        end
-        else begin
-            stall = 0;
-            value = src3Value;
         end
     end
     else begin
