@@ -1,65 +1,75 @@
 module Multiplier(
     input clk,
-    input [31:0] A,
-    input [31:0] B,
-    output reg [63:0] result,
+    input resetn,
     input start,
     input sign,
+    input [31:0] A,
+    input [31:0] B,
+    output [63:0] result,
     output busy
 );
 
-wire negA = A[31] && sign, negB = B[31] && sign;
-reg negResult;
-reg [4:0] timer;
-wire [63:0] ans;
-assign busy = timer[0];
-always @(posedge clk) begin
-    if (start) begin
-        timer <= 'hF;
-        negResult <= negA != negB;
-        result <= 'bx;
-    end else begin
-        timer <= timer >> 1;
-        if (timer[1:0] == 1) begin
-            result <= negResult ? -ans : ans;
-        end
-    end
-end
+  wire [63:0] x_ext = {{32{A[31] & sign}}, A};
+  wire [34:0] y_ext = {{2{B[31] & sign}}, B, 1'b0};
+  wire [63:0] part_prod [16:0];     // partial product
+  wire [16:0] part_switch [63:0];   // switched partial product
+  wire [16:0] part_carry;
+  assign busy = 0;
 
-wire [63:0] A64 = {32'b0, negA ? -A : A}, B64 = {32'b0, negB ? -B : B};
-wire [63:0] wire0[31:0];
-reg [63:0] tree0[15:0];
-reg [63:0] tree1[7:0];
-reg [63:0] tree2[3:0];
-reg [63:0] tree3[1:0];
-assign ans = tree3[0] + tree3[1];
-
-generate
-    genvar i;
-    for(i=0; i<32; i=i+1)
-    begin
-        assign wire0[i] = A64[i] == 0 ? 0: (B64 << i);
+  genvar i, j;
+  generate
+    for (i=0; i<17; i=i+1) begin
+      booth_gen #(.width(64))
+      part_mul(
+        .x(x_ext << 2*i),
+        .y(y_ext[(i+1)*2:i*2]),
+        .p(part_prod[i]),
+        .c(part_carry[i])
+      );
+      for (j=0; j<64; j=j+1) begin
+        assign part_switch[j][i] = part_prod[i][j];
+      end
     end
+  endgenerate
 
-    for(i=0; i<16; i=i+1)
-    begin
-        always @(posedge clk) tree0[i] <= wire0[i] + wire0[31-i];
+  reg [16:0] part_switch_reg [63:0];
+  reg [16:0] part_carry_reg;
+  integer k;
+  always @(posedge clk) begin
+    for (k=0; k<64; k=k+1) begin
+      part_switch_reg[k] <= part_switch[k];
     end
+    part_carry_reg <= part_carry;
+  end
 
-    for(i=0; i<8; i=i+1)
-    begin
-        always @(posedge clk) tree1[i] <= tree0[i] + tree0[15-i];
+  wire [14:0] wallace_carry [64:0];
+  assign wallace_carry[0] = part_carry_reg[14:0];
+  wire [63:0] out_carry, out_sum;
+  generate
+    for (i=0; i<64; i=i+1) begin
+      wallace_unit_17 u_wallace(
+        .in(part_switch_reg[i]),
+        .cin(wallace_carry[i]),
+        .c(out_carry[i]),
+        .out(out_sum[i]),
+        .cout(wallace_carry[i+1])
+      );
     end
-
-    for(i=0; i<4; i=i+1)
-    begin
-        always @(posedge clk) tree2[i] <= tree1[i] + tree1[7-i];
-    end
-
-    for(i=0; i<2; i=i+1)
-    begin
-        always @(posedge clk) tree3[i] <= tree2[i] + tree2[3-i];
-    end
-endgenerate
+  endgenerate
+  
+`ifdef MUL_BARRIER_2
+  reg [63:0] add_a_reg, add_b_reg;
+  reg add_cin_reg;
+  
+  always @(posedge clk) begin
+    add_a_reg <= {out_carry[62:0], part_carry_reg[15]};
+    add_b_reg <= out_sum;
+    add_cin_reg <= part_carry_reg[16];
+  end
+  
+  assign result = add_a_reg + add_b_reg + add_cin_reg;
+`else
+  assign result = {out_carry[62:0], part_carry_reg[15]} + out_sum + part_carry_reg[16];
+`endif
 
 endmodule
