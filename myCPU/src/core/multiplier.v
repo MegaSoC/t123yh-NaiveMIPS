@@ -73,3 +73,55 @@ module Multiplier(
 `endif
 
 endmodule
+
+module booth_gen #(
+    parameter integer width = 32
+)
+(
+    input [width-1:0] x,
+    input [2:0] y,  // {y[i+1], y[i], y[i-1]}
+    output [width-1:0] p,
+    output c
+);
+
+  wire [width:0] x_ = {x, 1'b0};
+  generate
+    genvar i;
+    for (i=0; i<width; i=i+1) begin
+      assign p[i] = (y == 3'b001 || y == 3'b010) & x_[i+1]
+                  | (y == 3'b101 || y == 3'b110) & ~x_[i+1]
+                  | (y == 3'b011) & x_[i]
+                  | (y == 3'b100) & ~x_[i];
+    end
+  endgenerate
+  assign c = y == 3'b100 || y == 3'b101 || y == 3'b110;
+
+endmodule
+
+module wallace_unit_17(
+    input [16:0] in,
+    input [14:0] cin,
+    output c,
+    output out,
+    output [14:0] cout
+);
+
+  wire [14:0] s;
+  assign {cout[0], s[0]} = in[16] + in[15] + in[14];
+  assign {cout[1], s[1]} = in[13] + in[12] + in[11];
+  assign {cout[2], s[2]} = in[10] + in[9] + in[8];
+  assign {cout[3], s[3]} = in[7] + in[6] + in[5];
+  assign {cout[4], s[4]} = in[4] + in[3] + in[2];
+  assign {cout[5], s[5]} = in[1] + in[0];
+  assign {cout[6], s[6]} = s[0] + s[1] + s[2];
+  assign {cout[7], s[7]} = s[3] + s[4] + s[5];
+  assign {cout[8], s[8]} = cin[0] + cin[1] + cin[2];
+  assign {cout[9], s[9]} = cin[3] + cin[4] + cin[5];
+  assign {cout[10], s[10]} = s[6] + s[7] + s[8];
+  assign {cout[11], s[11]} = s[9] + cin[6] + cin[7];
+  assign {cout[12], s[12]} = s[10] + s[11] + cin[8];
+  assign {cout[13], s[13]} = cin[9] + cin[10] + cin[11];
+  assign {cout[14], s[14]} = s[12] + s[13] + cin[12];
+  assign {c, out} = s[14] + cin[13] + cin[14];
+
+endmodule
