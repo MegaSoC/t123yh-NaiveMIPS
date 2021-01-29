@@ -379,7 +379,7 @@ end
 ForwardController E_regRead1_forward (
                       .request(E_ctrl.regRead1),
                       .original(E_regRead1),
-                      .enabled(E_ctrl.mulCtrl != `mtDisabled || M_ctrl.writeCP0),
+                      .enabled(E_ctrl.mulCtrl != `mtDisabled || E_ctrl.writeCP0),
 
                       .src1Valid(forwardValidM),
                       .src1Reg(forwardAddressM),
