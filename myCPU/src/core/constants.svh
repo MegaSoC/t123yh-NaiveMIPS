@@ -74,31 +74,63 @@
 typedef struct packed {
     bit [4:0] regRead1;
     bit [4:0] regRead2;
+    bit [3:0] grfWriteSource;
+    bit [4:0] destinationRegister;
+    bit [31:0] immediate;
 
-    bit [3:0] mulCtrl;
     bit mulEnable;
     bit mulOutputSel;
+    bit [3:0] mulCtrl;
 
     bit memLoad;
+    bit memStore;
+    bit calculateAddress;
     bit [1:0] memWidthCtrl;
     bit memReadSignExtend;
-    bit memStore;
+
     bit branch;
-    bit [31:0] immediate;
-    bit [4:0] destinationRegister;
-    bit aluSrc;
-    bit [3:0] aluCtrl;
     bit [3:0] cmpCtrl;
     bit absJump;
     bit absJumpLoc; // 1 = immediate; 0 = register
-    bit [3:0] grfWriteSource;
+
+    bit aluSrc;
+    bit [3:0] aluCtrl;
     bit checkOverflow;
+
     bit [2:0] generateException;
     bit writeCP0;
     bit [4:0] numberCP0;
-    bit calculateAddress;
 } ControlSignals;
 
-const ControlSignals kControlNop = '{mulEnable: 0, memLoad: 0, memStore: 0, grfWriteSource: `grfWriteDisable, branch: 0, destinationRegister: 0, aluSrc: 0, aluCtrl: `aluDisabled, absJump: 0, regRead1: 0, regRead2: 0, memWidthCtrl: 0, memReadSignExtend: 0, checkOverflow: 0, cmpCtrl: 'bx, mulOutputSel: 'bx, mulCtrl: `mtDisabled, generateException: `ctrlNoException, writeCP0: 0, numberCP0: 0, immediate: 'bx, absJumpLoc: 'bx, calculateAddress: 0};
+const ControlSignals kControlNop = '{
+    regRead1: 0, 
+    regRead2: 0, 
+    grfWriteSource: `grfWriteDisable, 
+    destinationRegister: 0, 
+    immediate: 'bx, 
+
+    mulEnable: 0, 
+    mulOutputSel: 'bx, 
+    mulCtrl: `mtDisabled, 
+
+    memLoad: 0,
+    memStore: 0, 
+    calculateAddress: 0,
+    memWidthCtrl: 0, 
+    memReadSignExtend: 0, 
+
+    branch: 0, 
+    cmpCtrl: 'bx, 
+    absJump: 0, 
+    absJumpLoc: 'bx,
+
+    aluSrc: 0, 
+    aluCtrl: `aluDisabled, 
+    checkOverflow: 0, 
+
+    generateException: `ctrlNoException, 
+    writeCP0: 0, 
+    numberCP0: 0
+};
 
 `endif
