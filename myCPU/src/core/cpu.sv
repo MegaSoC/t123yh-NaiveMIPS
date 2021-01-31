@@ -66,7 +66,7 @@ always_comb begin
     end
 end
 
-CP0 cp0(
+ExceptionController cp0(
         .clk(clk),
         .reset(reset),
         .externalInterrupt(irq),

@@ -1,12 +1,8 @@
 `include "constants.svh"
 
-module CP0(
+module ExceptionController(
            input clk,
            input reset,
-           input writeEnable,
-           input [4:0] number,
-           input [31:0] writeData,
-           output [31:0] readData,
 
            input hasExceptionInPipeline,
 
@@ -18,39 +14,9 @@ module CP0(
 
            output reg jump,
            output reg [31:0] jumpAddress,
-
-           output interruptNow,
-           input [15:10] externalInterrupt
        );
 
 wire [31:0] exceptionHandler = 32'hBFC00380;
-
-reg [31:0] registers [15:0];
-
-`define CauseNumber 13
-`define CompareNumber 11
-`define CountNumber 9
-
-assign readData = registers[number];
-
-`define EPC registers[14]
-`define PrId registers[15]
-`define SR registers[12]
-`define EXL `SR[1]
-`define IE `SR[0]
-`define IM `SR[15:8]
-`define Cause registers[13]
-`define BD `Cause[31]
-`define IP `Cause[15:8]
-`define ExcCode `Cause[6:2]
-`define BadVAddr registers[8]
-`define Count registers[`CountNumber]
-`define Compare registers[`CompareNumber]
-
-assign BDReg = `BD;
-wire EXLReg = `EXL;
-wire [4:0] ExcCodeReg = `ExcCode;
-wire [31:0] EPCReg = `EPC;
 
 always @(*) begin
     jump = 0;
