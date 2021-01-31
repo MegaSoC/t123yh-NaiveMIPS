@@ -1,21 +1,25 @@
 `ifndef _NANOMIPS_GLOBAL_SVH
 `define _NANOMIPS_GLOBAL_SVH
 
-typedef enum {
-    cInt  = 0, 
-    cTLBMod = 1,
-    cTLBL = 2, 
-    cTLBS = 3,
-    cAdEL = 4,
-    cAdES = 5,
-    cSys  = 8,
-    cBp   = 9,
-    cRI   = 10,
-    cOv   = 12,
-    cERET = 31  // treat eret as a special type of exception
+`define TLB_IDX_BITS 	5
+
+typedef enum logic [4:0] {
+    cNone   = 5'bx,
+    cInt    = 5'd0, 
+    cTLBMod = 5'd1,
+    cTLBL   = 5'd2, 
+    cTLBS   = 5'd3,
+    cAdEL   = 5'd4,
+    cAdES   = 5'd5,
+    cSys    = 5'd8,
+    cBp     = 5'd9,
+    cRI     = 5'd10,
+    cOv     = 5'd12,
+    cERET   = 5'd31  // treat eret as a special type of exception
 } ExcCode_t;
 
-typedef enum {
+typedef enum logic [7:0] {
+    cp0_nX          = 8'bx,
     cp0_nIndex      = 8'b00000000,
     cp0_nRandom     = 8'b00001000,
     cp0_nEntryLo0   = 8'b00010000,

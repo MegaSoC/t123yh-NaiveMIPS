@@ -123,7 +123,7 @@ const ControlSignals kControlNop = '{
 
     generateException: `ctrlNoException, 
     writeCP0: 0, 
-    numberCP0: 'bx
+    numberCP0: cp0_nX
 };
 
 `endif

@@ -20,13 +20,15 @@ module CP0 (
     output wire [31:0]  int_handler,
     output wire [31:0]  tlb_refill_handler,
 
-    input wire [4:0]    hardware_int, // must be synced to clk before passing in!
-    output wire         interrupt_pending
+    input wire [4:0]    hardware_int,
+    output wire         interrupt_pending,
+
+    output wire         kseg0_cached
 );
 
 reg [4:0] hardware_int_sample;
 
-always_ff @(posedge Clk) begin
+always_ff @(posedge clk) begin
     if (reset) begin
         hardware_int_sample <= 5'b0;
     end else begin
@@ -62,16 +64,18 @@ wire interrupt_flag = (|(cp0_reg_Status[15:8] & Cause_IP)) && allow_int;
 
 assign epc       = cp0_reg_EPC;
 
-alias SR_BEV = cp0_reg_Status[22];
-alias SR_EXL = cp0_reg_Status[1];
-alias SR_ERL = cp0_reg_Status[2];
-alias CAUSE_IV = cp0_reg_Cause[23];
+wire SR_BEV = cp0_reg_Status[22];
+wire SR_EXL = cp0_reg_Status[1];
+wire SR_ERL = cp0_reg_Status[2];
+wire CAUSE_IV = cp0_reg_Cause[23];
 
 // See Table 6.8 / 6.9, Reference III
 wire [31:0] ebase  = SR_BEV ? 32'hbfc00200 : {cp0_reg_EBase[31:12], 12'b0};
 assign exc_handler = ebase + 32'h180;
 assign int_handler = CAUSE_IV ? ebase + 32'h200 : ebase + 32'h180;
 assign tlb_refill_handler = SR_EXL ? ebase + 32'h180 : ebase;
+
+assign kseg0cached = cp0_reg_Conf0[2:0] == 3'h3;
 
 // TLB related
 wire [`TLB_IDX_BITS-1:0] nRandom = cp0_reg_Random[`TLB_IDX_BITS-1:0] + 1'b1;
@@ -203,6 +207,7 @@ always_ff @(posedge clk) begin
             endcase
         end
         else begin
+        /*
             if (tlbr) begin
                 cp0_reg_EntryHi  <= entryhi_r;
                 cp0_reg_EntryLo0 <= entrylo0_r;
@@ -215,11 +220,12 @@ always_ff @(posedge clk) begin
             if (tlbwr) begin
                 cp0_reg_Random <= nRandom < cp0_reg_Wired ? cp0_reg_Wired : nRandom;
             end
+            */
             if (en_exp_i) begin
                 if (ewr_excCode == cERET) begin
                     cp0_reg_Status[1] <= 1'b0;
                 end else begin
-                    case (ewr_excCode) begin
+                    case (ewr_excCode)
                         cAdEL, cAdES: begin
                             cp0_reg_BadVAddr <= ewr_badVAddr;
                         end
@@ -229,7 +235,7 @@ always_ff @(posedge clk) begin
                             cp0_reg_Context[22:4] <= ewr_badVAddr[31:13]; // P. 99, Vol. III
                             cp0_reg_EntryHi[31:13] <= ewr_badVAddr[31:13]; // P. 117, Vol. III
                         end
-                    end
+                    endcase
 
                     cp0_reg_Cause[6:2]     <= ewr_excCode;
                     cp0_reg_Status[1]      <= 1'b1; 

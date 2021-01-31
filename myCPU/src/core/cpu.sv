@@ -2,7 +2,6 @@
 module CPU (
            input clk,
            input reset,
-           input [5:0] irq,
 
            output [31:0] inst_sram_addr,
            output inst_sram_readen,
@@ -24,8 +23,8 @@ module CPU (
 
            output cp0_we,
            output cp0_number_t cp0_number,
-           output cp0_wdata,
-           input cp0_rdata,
+           output [31:0] cp0_wdata,
+           input [31:0] cp0_rdata,
 
            input [31:0] cp0_epc,
            input [31:0] cp0_exc_handler,
@@ -36,7 +35,9 @@ module CPU (
            output cp0_ewr_bd,
            output ExcCode_t cp0_ewr_excCode,
            output [31:0] cp0_ewr_epc,
-           output [31:0] cp0_ewr_badVAddr 
+           output [31:0] cp0_ewr_badVAddr,
+
+           input cp0_interrupt_pending
        );
 
 wire D_data_waiting;
@@ -119,7 +120,7 @@ InstructionMemory F_im (
                   );
 
 assign F_exception = F_im.adel;
-ExcCode_t F_excCode = F_im.adel ? cAdEL : 'bx;
+ExcCode_t F_excCode = F_im.adel ? cAdEL : cNone;
 wire F_insert_bubble = F_im.bubble;
 wire [31:0] F_badVAddr = F_im.adel ? F_im.outputPC : 'bx;
 
@@ -176,7 +177,7 @@ end
 
 ExcCode_t D_excCode;
 always_comb begin
-    D_excCode = 'bx;
+    D_excCode = cNone;
     D_exception = 0;
     if (D_last_bubble) begin
         D_exception = 0;
@@ -413,7 +414,7 @@ ForwardController E_regRead2_forward (
 
 ExcCode_t E_excCode;
 always_comb begin
-    E_excCode = 'bx;
+    E_excCode = cNone;
     E_exception = 0;
     E_badVAddr_next = E_badVAddr;
     if (E_bubble) begin
@@ -598,12 +599,12 @@ assign M_exception = !M_bubble && M_last_exception;
 assign exceptionJump = M_exception;
 
 always_comb begin
-    case (M_last_excCode) begin
+    case (M_last_excCode)
         cERET:        exceptionJumpAddr = cp0_epc;
         cInt:         exceptionJumpAddr = cp0_int_handler;
         cTLBL, cTLBS: exceptionJumpAddr = cp0_tlb_refill_handler;
         default:      exceptionJumpAddr = cp0_exc_handler;
-    end
+    endcase
 end
 
 assign cp0_en_exp = M_exception;

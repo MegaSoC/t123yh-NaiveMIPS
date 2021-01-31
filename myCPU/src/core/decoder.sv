@@ -163,12 +163,12 @@ always_comb begin
                         mfc0: begin
                             controls.destinationRegister = rti;
                             controls.grfWriteSource = `grfWriteCP0;
-                            controls.numberCP0 = {rdi, sel};
+                            controls.numberCP0 = cp0_number_t'({rdi, sel});
                         end
                         mtc0: begin
                             controls.regRead1 = rti;
                             controls.writeCP0 = 1;
-                            controls.numberCP0 = {rdi, sel};
+                            controls.numberCP0 = cp0_number_t'({rdi, sel});
                         end
                     endcase
                 end
