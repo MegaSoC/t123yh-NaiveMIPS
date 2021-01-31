@@ -1,5 +1,7 @@
 `timescale 1ns / 1ps
 
+`include "../global.svh"
+
 `ifndef _NANOMIPS_CONSTANTS_SVH
 `define _NANOMIPS_CONSTANTS_SVH
 
@@ -62,15 +64,6 @@
 `define ctrlSyscall 3
 `define ctrlBreak 4
 
-`define causeInt 0
-`define causeERET 16
-`define causeAdEL 4
-`define causeAdES 5
-`define causeRI 10
-`define causeOv 12
-`define causeSyscall 8
-`define causeBreak 9
-
 typedef struct packed {
     bit [4:0] regRead1;
     bit [4:0] regRead2;
@@ -99,7 +92,7 @@ typedef struct packed {
 
     bit [2:0] generateException;
     bit writeCP0;
-    bit [4:0] numberCP0;
+    cp0_number_t numberCP0;
 } ControlSignals;
 
 const ControlSignals kControlNop = '{
@@ -130,7 +123,7 @@ const ControlSignals kControlNop = '{
 
     generateException: `ctrlNoException, 
     writeCP0: 0, 
-    numberCP0: 0
+    numberCP0: 'bx
 };
 
 `endif

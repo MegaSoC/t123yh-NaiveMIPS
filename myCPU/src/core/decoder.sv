@@ -14,6 +14,7 @@ wire [5:0] funct = instruction[5:0];
 wire [4:0] rti = instruction[20:16];
 wire [4:0] rsi = instruction[25:21];
 wire [4:0] rdi = instruction[15:11];
+wire [2:0] sel = instruction[2:0]; // for mfc0, mtc0
 
 wire [25:0] bigImm = instruction[25:0];
 wire [15:0] imm = instruction[15:0];
@@ -162,12 +163,12 @@ always_comb begin
                         mfc0: begin
                             controls.destinationRegister = rti;
                             controls.grfWriteSource = `grfWriteCP0;
-                            controls.numberCP0 = rdi;
+                            controls.numberCP0 = {rdi, sel};
                         end
                         mtc0: begin
                             controls.regRead1 = rti;
                             controls.writeCP0 = 1;
-                            controls.numberCP0 = rdi;
+                            controls.numberCP0 = {rdi, sel};
                         end
                     endcase
                 end

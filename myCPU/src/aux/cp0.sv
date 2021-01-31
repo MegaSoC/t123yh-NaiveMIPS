@@ -1,19 +1,19 @@
-module cp0(
+`include "../global.svh"
+
+module CP0 (
     input wire clk,
-    input wire rst,
+    input wire reset,
 
     input wire          we,
-    input wire [6:0]    addr,
+    input cp0_number_t  rw_number,
     input wire [31:0]   data_i,
     output reg  [31:0]  data_o,
 
-    input wire          clear_exl,
     input wire          en_exp_i,
-    input wire          exp_bd,
-    input wire [31:0]   exp_epc,
-    input wire [4:0]    exp_excCode,
-    input wire [31:0]   exp_badVAddr,
-    input wire          exp_badVAddr_we,
+    input wire          ewr_bd,
+    input wire [31:0]   ewr_epc,
+    input wire [31:0]   ewr_badVAddr,
+    input ExcCode_t     ewr_excCode,
 
     output wire [31:0]  epc,
     output wire [31:0]  exc_handler,
@@ -23,6 +23,16 @@ module cp0(
     input wire [4:0]    hardware_int, // must be synced to clk before passing in!
     output wire         interrupt_pending
 );
+
+reg [4:0] hardware_int_sample;
+
+always_ff @(posedge Clk) begin
+    if (reset) begin
+        hardware_int_sample <= 5'b0;
+    end else begin
+        hardware_int_sample <= hardware_int[4:0];
+    end
+end
 
 reg [31:0] cp0_reg_Index    ;   // 0
 reg [31:0] cp0_reg_Random   ;   // 1
@@ -44,14 +54,11 @@ reg [31:0] cp0_reg_Conf1    ;   // 16.1
 reg [31:0] cp0_reg_TagLo0   ;   // 28.0
 reg [31:0] cp0_reg_TagHi0   ;   // 29.0
 
-wire [7:0] raddr = addr;
-wire [7:0] waddr = addr;
-
 reg timer_int;
-wire [7:0] Cause_IP = {timer_int, hardware_int, cp0_reg_Cause[9:8]};
+wire [7:0] Cause_IP = {timer_int, hardware_int_sample, cp0_reg_Cause[9:8]};
 
-wire allow_int = cp0_reg_Status[2:0] == 3'b001 & !en_exp_i;
-wire interrupt_flag = |(cp0_reg_Status[15:8] & Cause_IP);
+wire allow_int = cp0_reg_Status[2:0] == 3'b001;
+wire interrupt_flag = (|(cp0_reg_Status[15:8] & Cause_IP)) && allow_int;
 
 assign epc       = cp0_reg_EPC;
 
@@ -69,48 +76,57 @@ assign tlb_refill_handler = SR_EXL ? ebase + 32'h180 : ebase;
 // TLB related
 wire [`TLB_IDX_BITS-1:0] nRandom = cp0_reg_Random[`TLB_IDX_BITS-1:0] + 1'b1;
 wire [31:0] cp0_reg_CauseR = { cp0_reg_Cause[31:16], Cause_IP, cp0_reg_Cause[7:0] };
+
+const bit [31:0] INIT_Random   = 32'd31;
+const bit [31:0] INIT_PageMask = 32'd0;
+const bit [31:0] INIT_PRId     = 32'h00018003;
+const bit [31:0] INIT_EBase    = 32'h80000000;
+const bit [31:0] INIT_Status   = 32'h00400000;
+const bit [31:0] INIT_Conf0    = {1'b1,3'b0,3'b0,9'b0,1'b0,2'b0,3'b0,3'b1,3'b0,1'b0,3'd3};
+const bit [31:0] INIT_Conf1    = {1'b0,6'd31,3'd0,3'd5,3'd1,3'd0,3'd5,3'd1,7'd0};
+
 // read
-assign data_o = ({32{raddr == `CP0_Index    }} & cp0_reg_Index    ) |
-                ({32{raddr == `CP0_Random   }} & cp0_reg_Random   ) |
-                ({32{raddr == `CP0_EntryLo0 }} & cp0_reg_EntryLo0 ) |
-                ({32{raddr == `CP0_EntryLo1 }} & cp0_reg_EntryLo1 ) |
-                ({32{raddr == `CP0_Context  }} & cp0_reg_Context  ) |
-                ({32{raddr == `CP0_PageMask }} & cp0_reg_PageMask ) |
-                ({32{raddr == `CP0_Wired    }} & cp0_reg_Wired    ) |
-                ({32{raddr == `CP0_BadVAddr }} & cp0_reg_BadVAddr ) |
-                ({32{raddr == `CP0_Count    }} & cp0_reg_Count    ) |
-                ({32{raddr == `CP0_EntryHi  }} & cp0_reg_EntryHi  ) |
-                ({32{raddr == `CP0_Compare  }} & cp0_reg_Compare  ) |
-                ({32{raddr == `CP0_Status   }} & cp0_reg_Status   ) |
-                ({32{raddr == `CP0_Cause    }} & cp0_reg_CauseR   ) |
-                ({32{raddr == `CP0_EPC      }} & cp0_reg_EPC      ) |
-                ({32{raddr == `CP0_PRId     }} & `INIT_PRID       ) |
-                ({32{raddr == `CP0_EBase    }} & cp0_reg_EBase    ) |
-                ({32{raddr == `CP0_Conf0    }} & cp0_reg_Conf0    ) | 
-                ({32{raddr == `CP0_Conf1    }} & cp0_reg_Conf1    ) |  
-                ({32{raddr == `CP0_TagLo0	}} & cp0_reg_TagLo0   ) |
-                ({32{raddr == `CP0_TagHi0   }} & cp0_reg_TagHi0   ) ;
+assign data_o = ({32{rw_number == cp0_nIndex    }} & cp0_reg_Index    ) |
+                ({32{rw_number == cp0_nRandom   }} & cp0_reg_Random   ) |
+                ({32{rw_number == cp0_nEntryLo0 }} & cp0_reg_EntryLo0 ) |
+                ({32{rw_number == cp0_nEntryLo1 }} & cp0_reg_EntryLo1 ) |
+                ({32{rw_number == cp0_nContext  }} & cp0_reg_Context  ) |
+                ({32{rw_number == cp0_nPageMask }} & cp0_reg_PageMask ) |
+                ({32{rw_number == cp0_nWired    }} & cp0_reg_Wired    ) |
+                ({32{rw_number == cp0_nBadVAddr }} & cp0_reg_BadVAddr ) |
+                ({32{rw_number == cp0_nCount    }} & cp0_reg_Count    ) |
+                ({32{rw_number == cp0_nEntryHi  }} & cp0_reg_EntryHi  ) |
+                ({32{rw_number == cp0_nCompare  }} & cp0_reg_Compare  ) |
+                ({32{rw_number == cp0_nStatus   }} & cp0_reg_Status   ) |
+                ({32{rw_number == cp0_nCause    }} & cp0_reg_CauseR   ) |
+                ({32{rw_number == cp0_nEPC      }} & cp0_reg_EPC      ) |
+                ({32{rw_number == cp0_nPRId     }} & INIT_PRId        ) |
+                ({32{rw_number == cp0_nEBase    }} & cp0_reg_EBase    ) |
+                ({32{rw_number == cp0_nConf0    }} & cp0_reg_Conf0    ) | 
+                ({32{rw_number == cp0_nConf1    }} & cp0_reg_Conf1    ) |  
+                ({32{rw_number == cp0_nTagLo0	}} & cp0_reg_TagLo0   ) |
+                ({32{rw_number == cp0_nTagHi0   }} & cp0_reg_TagHi0   ) ;
 
 reg count_add;
 always_ff @(posedge clk) begin
-    if (rst) begin
+    if (reset) begin
         cp0_reg_Index    <= 32'b0;
-        cp0_reg_Random   <= `INIT_Random;
+        cp0_reg_Random   <= INIT_Random;
         cp0_reg_EntryLo0 <= 32'b0;
         cp0_reg_EntryLo1 <= 32'b0;
         cp0_reg_Context  <= 32'b0;
-        cp0_reg_PageMask <= `INIT_PAGEMASKK;
+        cp0_reg_PageMask <= INIT_PageMask;
         cp0_reg_Wired    <= 32'b0;
         cp0_reg_BadVAddr <= 32'b0;
         cp0_reg_Count    <= 32'b0;
         cp0_reg_EntryHi  <= 32'b0;
         cp0_reg_Compare  <= 32'b0;
-        cp0_reg_Status   <= `INIT_STATUS;
+        cp0_reg_Status   <= INIT_Status;
         cp0_reg_Cause    <= 32'b0;
         cp0_reg_EPC      <= 32'b0;
-        cp0_reg_EBase    <= `INIT_EBASE;
-        cp0_reg_Conf0    <= `INIT_CONF0;
-        cp0_reg_Conf1    <= `INIT_CONF1;
+        cp0_reg_EBase    <= INIT_EBase;
+        cp0_reg_Conf0    <= INIT_Conf0;
+        cp0_reg_Conf1    <= INIT_Conf1;
         cp0_reg_TagLo0   <= 32'b0;
         cp0_reg_TagHi0   <= 32'b0;
         count_add        <= 1'b0;
@@ -118,74 +134,71 @@ always_ff @(posedge clk) begin
     end
     else begin
         count_add     <= ~count_add;
-        if (!(we && addr == `CP0_Count)) begin
+        if (!(we && rw_number == cp0_nCount)) begin
             cp0_reg_Count <= cp0_reg_Count + {31'd0, count_add};
         end
         if (cp0_reg_Compare != 32'b0 && cp0_reg_Compare == cp0_reg_Count) begin
             timer_int <= 1'b1;
-        end else if (we && addr == `CP0_Compare) begin
+        end else if (we && rw_number == cp0_nCompare) begin
             timer_int <= 1'b0;
         end
 
         if (we) begin
-            case(waddr)
-                `CP0_Index: begin
+            case (rw_number)
+                cp0_nIndex: begin
                     cp0_reg_Index[`TLB_IDX_BITS-1:0] <= data_i[`TLB_IDX_BITS-1:0];
                 end
-                `CP0_EntryLo0: begin
+                cp0_nEntryLo0: begin
                     cp0_reg_EntryLo0[25:0]           <= data_i[25:0]; 
                 end
-                `CP0_EntryLo1: begin
+                cp0_nEntryLo1: begin
                     cp0_reg_EntryLo1[25:0]           <= data_i[25:0]; 
                 end
-                `CP0_Context: begin
+                cp0_nContext: begin
                     cp0_reg_Context[31:23]           <= data_i[31:23];
                 end
-                `CP0_PageMask: begin
+                cp0_nPageMask: begin
                     cp0_reg_PageMask[28:13]          <= data_i[28:13]; 
                 end
-                `CP0_Wired: begin
+                cp0_nWired: begin
                     cp0_reg_Wired[`TLB_IDX_BITS-1:0] <= data_i[`TLB_IDX_BITS-1:0]; 
-                    cp0_reg_Random[`TLB_IDX_BITS-1:0] <= `INIT_Random;
+                    cp0_reg_Random[`TLB_IDX_BITS-1:0]<= INIT_Random;
                 end
-                `CP0_Count: begin
+                cp0_nCount: begin
                     cp0_reg_Count                    <= data_i;
                 end
-                `CP0_EntryHi: begin
+                cp0_nEntryHi: begin
                     cp0_reg_EntryHi[31:13]           <= data_i[31:13];
                     cp0_reg_EntryHi[7:0]             <= data_i[7:0];
                 end
-                `CP0_Compare: begin
+                cp0_nCompare: begin
                     cp0_reg_Compare                  <= data_i;
                 end
-                `CP0_Status: begin
+                cp0_nStatus: begin
                     cp0_reg_Status[28]               <= data_i[28];
                     cp0_reg_Status[22]               <= data_i[22];
                     cp0_reg_Status[15:8]             <= data_i[15:8];
                     cp0_reg_Status[4]                <= data_i[4];
                     cp0_reg_Status[1:0]              <= data_i[1:0];
                 end
-                `CP0_Cause: begin
+                cp0_nCause: begin
                     cp0_reg_Cause[23]                <= data_i[23];
                     cp0_reg_Cause[9:8]               <= data_i[9:8];
                 end
-                `CP0_EPC: begin
+                cp0_nEPC: begin
                     cp0_reg_EPC                      <= data_i;
                 end
-                `CP0_EBase: begin
+                cp0_nEBase: begin
                     cp0_reg_EBase[29:12]             <= data_i[29:12];
                 end
-                `CP0_Conf0: begin
+                cp0_nConf0: begin
                     cp0_reg_Conf0[2:0]               <= data_i[2:0];
                 end
-                `CP0_TagLo0:begin
+                cp0_nTagLo0:begin
                     cp0_reg_TagLo0                   <= data_i;
                 end
-                22 : begin
-                    dcache_close <= 1;
-                end
                 default: begin
-                    $display("unkown cp0 register number %d", wr_addr);
+                    $display("unkown cp0 register number %d", rw_number);
                 end
             endcase
         end
@@ -203,22 +216,30 @@ always_ff @(posedge clk) begin
                 cp0_reg_Random <= nRandom < cp0_reg_Wired ? cp0_reg_Wired : nRandom;
             end
             if (en_exp_i) begin
-                if (exp_badVAddr_we) begin
-                    cp0_reg_BadVAddr      <= exp_badVAddr;
-                    cp0_reg_Context[22:4] <= exp_badVAddr[31:13];
-                    cp0_reg_EntryHi[31:13] <= exp_badVAddr[31:13]; 
-                end
-                cp0_reg_Cause[6:2]     <= exp_excCode;
-                cp0_reg_Status[1]      <= 1'b1; 
+                if (ewr_excCode == cERET) begin
+                    cp0_reg_Status[1] <= 1'b0;
+                end else begin
+                    case (ewr_excCode) begin
+                        cAdEL, cAdES: begin
+                            cp0_reg_BadVAddr <= ewr_badVAddr;
+                        end
 
-                // These registers are not updated when EXL is 1. See Table 9.25, P.126, Reference III
-                if (!SR_EXL) begin
-                    cp0_reg_Cause[31]      <= exp_bd; 
-                    cp0_reg_EPC            <= exp_epc;
+                        cTLBL, cTLBS, cTLBMod: begin
+                            cp0_reg_BadVAddr <= ewr_badVAddr;
+                            cp0_reg_Context[22:4] <= ewr_badVAddr[31:13]; // P. 99, Vol. III
+                            cp0_reg_EntryHi[31:13] <= ewr_badVAddr[31:13]; // P. 117, Vol. III
+                        end
+                    end
+
+                    cp0_reg_Cause[6:2]     <= ewr_excCode;
+                    cp0_reg_Status[1]      <= 1'b1; 
+
+                    if (!SR_EXL) begin
+                        // These registers are only updated when not in EXL. See Table 9.25, P. 126, Vol. III.
+                        cp0_reg_Cause[31]      <= ewr_bd; 
+                        cp0_reg_EPC            <= ewr_epc;
+                    end
                 end
-            end
-            else if (clear_exl) begin
-                cp0_reg_Status[1] <= 1'b0;
             end
         end
     end

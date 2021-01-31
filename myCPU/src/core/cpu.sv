@@ -20,7 +20,23 @@ module CPU (
            output [31:0] debug_wb_pc,
            output [3:0] debug_wb_rf_wen,
            output [4:0] debug_wb_rf_wnum,
-           output [31:0] debug_wb_rf_wdata
+           output [31:0] debug_wb_rf_wdata,
+
+           output cp0_we,
+           output cp0_number_t cp0_number,
+           output cp0_wdata,
+           input cp0_rdata,
+
+           input [31:0] cp0_epc,
+           input [31:0] cp0_exc_handler,
+           input [31:0] cp0_int_handler,
+           input [31:0] cp0_tlb_refill_handler,
+
+           output cp0_en_exp,
+           output cp0_ewr_bd,
+           output ExcCode_t cp0_ewr_excCode,
+           output [31:0] cp0_ewr_epc,
+           output [31:0] cp0_ewr_badVAddr 
        );
 
 wire D_data_waiting;
@@ -43,11 +59,8 @@ end
 
 logic [4:0] exceptionLevel;
 logic F_exception;
-reg D_last_exception;
 logic D_exception;
-reg E_last_exception;
 logic E_exception;
-reg M_last_exception;
 logic M_exception;
 
 always_comb begin
@@ -66,12 +79,8 @@ always_comb begin
     end
 end
 
-ExceptionController cp0(
-        .clk(clk),
-        .reset(reset),
-        .externalInterrupt(irq),
-        .hasExceptionInPipeline(| exceptionLevel)
-    );
+logic exceptionJump;
+logic [31:0] exceptionJumpAddr;
 
 // Forwarding logic:
 // If forward source is non-zero, it means that a value to be written is already in the pipeline
@@ -110,7 +119,7 @@ InstructionMemory F_im (
                   );
 
 assign F_exception = F_im.adel;
-wire [4:0] F_cause = F_im.adel ? `causeAdEL : 'bx;
+ExcCode_t F_excCode = F_im.adel ? cAdEL : 'bx;
 wire F_insert_bubble = F_im.bubble;
 wire [31:0] F_badVAddr = F_im.adel ? F_im.outputPC : 'bx;
 
@@ -127,8 +136,9 @@ wire D_insert_bubble = D_last_bubble || D_data_waiting;
 ControlSignals D_ctrl;
 reg [31:0] D_pc;
 reg D_isDelaySlot;
-reg [4:0] D_last_cause;
+ExcCode_t D_last_excCode;
 reg [31:0] D_badVAddr;
+reg D_last_exception;
 
 always @(posedge clk) begin
     if (reset) begin
@@ -140,20 +150,20 @@ always @(posedge clk) begin
         D_ctrl <= kControlNop;
     end
     else begin
-        if (cp0.interruptNow) begin
+        if (0) begin
             // TODO: verify interrupt delay slot operation
             D_badVAddr <= 0;
             D_isDelaySlot <= F_im.isDelaySlot;
             D_pc <= F_im.outputPC;
             D_last_exception <= 1;
-            D_last_cause <= `causeInt;
+            D_last_excCode <= cInt;
             D_last_bubble <= exceptionLevel[m_D];
         end
         else if (!D_stall) begin
             D_badVAddr <= F_badVAddr;
             D_isDelaySlot <= F_im.isDelaySlot;
             D_last_exception <= F_exception;
-            D_last_cause <= F_cause;
+            D_last_excCode <= F_excCode;
             D_pc <= F_im.outputPC;
             D_last_bubble <= F_insert_bubble || exceptionLevel[m_D];
             D_ctrl <= (F_insert_bubble || exceptionLevel[m_D] || F_exception) ? kControlNop : F_dec.controls;
@@ -164,33 +174,33 @@ always @(posedge clk) begin
     end
 end
 
-reg [4:0] D_cause;
+ExcCode_t D_excCode;
 always_comb begin
-    D_cause = 'bx;
+    D_excCode = 'bx;
     D_exception = 0;
     if (D_last_bubble) begin
         D_exception = 0;
     end
     else if (D_last_exception) begin
-        D_cause = D_last_cause;
+        D_excCode = D_last_excCode;
         D_exception = 1;
     end
     else begin
         case (D_ctrl.generateException)
             `ctrlUnknownInstruction: begin
-                D_cause = `causeRI;
+                D_excCode = cRI;
                 D_exception = 1;
             end
             `ctrlERET: begin
-                D_cause = `causeERET;
+                D_excCode = cERET;
                 D_exception = 1;
             end
             `ctrlSyscall: begin
-                D_cause = `causeSyscall;
+                D_excCode = cSys;
                 D_exception = 1;
             end
             `ctrlBreak: begin
-                D_cause = `causeBreak;
+                D_excCode = cBp;
                 D_exception = 1;
             end
         endcase
@@ -247,9 +257,9 @@ Comparator cmp(
 always_comb begin
     F_jump = 0;
     F_jumpAddr = 0;
-    if (cp0.jump) begin
+    if (exceptionJump) begin
         F_jump = 1;
-        F_jumpAddr = cp0.jumpAddress;
+        F_jumpAddr = exceptionJumpAddr;
     end
     else if (!D_data_waiting) begin
         if (D_ctrl.branch) begin
@@ -304,11 +314,12 @@ reg E_aluOverflow;
 reg E_regWriteDataValid;
 reg [31:0] E_regWriteData;
 
-reg [4:0] E_last_cause;
+ExcCode_t E_last_excCode;
 reg [31:0] E_badVAddr;
 logic [31:0] E_badVAddr_next;
 
 reg E_isDelaySlot;
+reg E_last_exception;
 
 assign forwardValidE = E_regWriteDataValid;
 assign forwardAddressE = E_ctrl.destinationRegister;
@@ -355,7 +366,7 @@ always @(posedge clk) begin
     else begin
         if (!E_stall) begin
             E_last_exception <= D_exception;
-            E_last_cause <= D_cause;
+            E_last_excCode <= D_excCode;
             E_bubble <= D_insert_bubble || exceptionLevel[m_E];
             E_pc <= D_real_pc;
             E_regRead1 <= D_regRead1_forward.value;
@@ -400,30 +411,30 @@ ForwardController E_regRead2_forward (
                       .src2Reg(5'b0)
                   );
 
-reg [4:0] E_cause;
+ExcCode_t E_excCode;
 always_comb begin
-    E_cause = 'bx;
+    E_excCode = 'bx;
     E_exception = 0;
     E_badVAddr_next = E_badVAddr;
     if (E_bubble) begin
         E_exception = 0;
     end
     else if (E_last_exception) begin
-        E_cause = E_last_cause;
+        E_excCode = E_last_excCode;
         E_exception = 1;
     end
     else if (E_ctrl.checkOverflow && E_aluOverflow) begin
-        E_cause = `causeOv;
+        E_excCode = cOv;
         E_exception = 1;
     end
     else if (E_dm.exception) begin
         E_exception = 1;
         if (E_ctrl.memLoad) begin
-            E_cause = `causeAdEL;
+            E_excCode = cAdEL;
             E_badVAddr_next = E_memAddress;
         end
         else if (E_ctrl.memStore) begin
-            E_cause = `causeAdES;
+            E_excCode = cAdES;
             E_badVAddr_next = E_memAddress;
         end
     end
@@ -482,9 +493,9 @@ DataMemoryReader E_reader(
         .extendCtrl(E_ctrl.memReadSignExtend)
 );
 
-assign cp0.writeEnable = E_ctrl.writeCP0;
-assign cp0.number = E_ctrl.numberCP0;
-assign cp0.writeData = E_regRead1_forward.value;
+assign cp0_we = E_ctrl.writeCP0;
+assign cp0_number = E_ctrl.numberCP0;
+assign cp0_wdata = E_regRead1_forward.value;
 
 assign E_data_waiting = E_source_waiting || E_mul_collision || E_memory_waiting;
 reg [31:0] E_real_pc;
@@ -505,13 +516,14 @@ reg [31:0] M_pc;
 reg [31:0] M_mulOutput;
 reg [31:0] M_memData;
 reg [31:0] M_lastBadVAddr;
-reg [4:0] M_last_cause;
+ExcCode_t M_last_excCode;
 reg M_lastWriteDataValid;
 reg [31:0] M_lastWriteData;
 reg [31:0] M_cp0Value;
 
 logic M_regWriteDataValid;
 logic [31:0] M_regWriteData;
+reg M_last_exception;
 
 reg M_isDelaySlot;
 
@@ -532,7 +544,7 @@ always @(posedge clk) begin
     else begin
         M_bubble <= E_insert_bubble || exceptionLevel[m_M];
         M_last_exception <= E_exception;
-        M_last_cause <= E_cause;
+        M_last_excCode <= E_excCode;
         M_pc <= E_real_pc;
         M_lastBadVAddr <= E_badVAddr_next;
         M_memData <= E_reader.readData;
@@ -541,12 +553,12 @@ always @(posedge clk) begin
         M_lastWriteData <= E_regWriteData;
         M_isDelaySlot <= E_isDelaySlot;
         M_ctrl <= (E_insert_bubble || exceptionLevel[m_M] || E_exception) ? kControlNop : E_ctrl;
-        M_cp0Value <= cp0.readData;
+        M_cp0Value <= cp0_rdata;
         if (E_exception) begin
-            if (E_cause == 16) begin
+            if (E_excCode == cERET) begin
                 $display("Exception returned at %h", E_pc);
             end else begin
-                $display("Exception occurred at %h, caused by %d", E_pc, E_cause);
+                $display("Exception occurred at %h, excCoded by %d", E_pc, E_excCode);
             end
         end
     end
@@ -583,11 +595,22 @@ assign grfWriteAddress = M_ctrl.destinationRegister;
 assign grfWriteData = M_regWriteData;
 
 assign M_exception = !M_bubble && M_last_exception;
-assign cp0.isException = M_last_exception;
-assign cp0.exceptionPC = M_pc;
-assign cp0.exceptionCause = M_last_cause;
-assign cp0.isBD = M_isDelaySlot;
-assign cp0.exceptionBadVAddr = M_lastBadVAddr;
+assign exceptionJump = M_exception;
+
+always_comb begin
+    case (M_last_excCode) begin
+        cERET:        exceptionJumpAddr = cp0_epc;
+        cInt:         exceptionJumpAddr = cp0_int_handler;
+        cTLBL, cTLBS: exceptionJumpAddr = cp0_tlb_refill_handler;
+        default:      exceptionJumpAddr = cp0_exc_handler;
+    end
+end
+
+assign cp0_en_exp = M_exception;
+assign cp0_ewr_epc = M_isDelaySlot ? M_pc - 4 : M_pc;
+assign cp0_ewr_bd = M_isDelaySlot;
+assign cp0_ewr_badVAddr = M_lastBadVAddr;
+assign cp0_ewr_excCode = M_last_excCode;
 
 assign debug_wb_pc = M_pc;
 assign debug_wb_rf_wen = grfWriteAddress != 0 ? 4'b1111 : 0;
