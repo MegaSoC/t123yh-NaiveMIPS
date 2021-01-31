@@ -120,7 +120,8 @@ InstructionMemory F_im (
                   );
 
 assign F_exception = F_im.adel;
-ExcCode_t F_excCode = F_im.adel ? cAdEL : cNone;
+ExcCode_t F_excCode;
+assign F_excCode = F_im.adel ? cAdEL : cNone;
 wire F_insert_bubble = F_im.bubble;
 wire [31:0] F_badVAddr = F_im.adel ? F_im.outputPC : 'bx;
 
