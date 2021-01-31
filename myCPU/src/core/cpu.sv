@@ -556,13 +556,15 @@ always @(posedge clk) begin
         M_isDelaySlot <= E_isDelaySlot;
         M_ctrl <= (E_insert_bubble || exceptionLevel[m_M] || E_exception) ? kControlNop : E_ctrl;
         M_cp0Value <= cp0_rdata;
+`ifndef SYNTHESIS
         if (E_exception) begin
             if (E_excCode == cERET) begin
                 $display("Exception returned at %h", E_pc);
             end else begin
-                $display("Exception occurred at %h, excCoded by %d", E_pc, E_excCode);
+                $display("Exception occurred at %h, caused by %0s", E_pc, E_excCode.name());
             end
         end
+`endif
     end
 end
 
