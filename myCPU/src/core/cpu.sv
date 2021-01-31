@@ -172,8 +172,8 @@ always @(posedge clk) begin
             D_last_bubble <= F_insert_bubble || exceptionLevel[m_D];
             D_ctrl <= (F_insert_bubble || exceptionLevel[m_D] || F_exception) ? kControlNop : F_dec.controls;
         end else begin
-            D_last_bubble <= D_last_bubble || exceptionLevel[m_D];
-            D_ctrl <= (D_last_bubble || exceptionLevel[m_D]) ? kControlNop : D_ctrl;
+            D_last_bubble <= D_last_bubble || exceptionLevel[m_E];
+            D_ctrl <= (D_last_bubble || exceptionLevel[m_E]) ? kControlNop : D_ctrl;
         end
     end
 end
@@ -383,10 +383,10 @@ always @(posedge clk) begin
             E_aluOverflow <= D_alu.overflow;
         end
         else begin
-            E_bubble <= E_bubble || exceptionLevel[m_E];
+            E_bubble <= E_bubble || exceptionLevel[m_M];
+            E_ctrl <= (E_bubble || exceptionLevel[m_M]) ? kControlNop : E_ctrl;
             E_regRead1 <= E_regRead1_forward.value;
             E_regRead2 <= E_regRead2_forward.value;
-            E_ctrl <= (E_bubble || exceptionLevel[m_E]) ? kControlNop : E_ctrl;
         end
     end
 end
