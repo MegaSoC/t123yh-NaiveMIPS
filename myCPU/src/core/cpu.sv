@@ -152,14 +152,16 @@ always @(posedge clk) begin
         D_ctrl <= kControlNop;
     end
     else begin
-        if (0) begin
+        if (cp0_interrupt_pending) begin
             // TODO: verify interrupt delay slot operation
-            D_badVAddr <= 0;
+            D_badVAddr <= 'bx;
             D_isDelaySlot <= F_im.isDelaySlot;
-            D_pc <= F_im.outputPC;
             D_last_exception <= 1;
             D_last_excCode <= cInt;
+            D_pc <= F_im.outputPC;
+            // ignore exception if an exception is already in pipeline
             D_last_bubble <= exceptionLevel[m_D];
+            D_ctrl <= kControlNop;
         end
         else if (!D_stall) begin
             D_badVAddr <= F_badVAddr;

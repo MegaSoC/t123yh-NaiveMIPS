@@ -60,7 +60,7 @@ reg timer_int;
 wire [7:0] Cause_IP = {timer_int, hardware_int_sample, cp0_reg_Cause[9:8]};
 
 wire allow_int = cp0_reg_Status[2:0] == 3'b001;
-wire interrupt_flag = (|(cp0_reg_Status[15:8] & Cause_IP)) && allow_int;
+assign interrupt_pending = (|(cp0_reg_Status[15:8] & Cause_IP)) && allow_int;
 
 assign epc       = cp0_reg_EPC;
 
