@@ -78,11 +78,15 @@ module mycpu_top(
 
     word w_d_outdata, w_i_inst;
     logic w_i_valid, w_d_valid;
+
+    wire cp0_we, cp0_en_exp, cp0_ewr_bd, cp0_interrupt_pending, cp0_kseg0_cached;
+    wire [31:0] cp0_rdata, cp0_wdata, cp0_ewr_epc, cp0_ewr_badVAddr, cp0_epc_o, cp0_exc_handler, cp0_int_handler, cp0_tlb_refill_handler;
+    ExcCode_t cp0_ewr_excCode;
+    cp0_number_t cp0_rw_number;
     
     CPU core(
         .clk(aclk),
         .reset(global_reset),
-        .irq(ext_int),
         
         .inst_sram_rdata(w_i_inst),
         .inst_sram_valid(w_i_valid),
@@ -100,9 +104,50 @@ module mycpu_top(
         .debug_wb_pc(debug_wb_pc),
         .debug_wb_rf_wdata(debug_wb_rf_wdata),
         .debug_wb_rf_wnum(debug_wb_rf_wnum),
-        .debug_wb_rf_wen(debug_wb_rf_wen)
+        .debug_wb_rf_wen(debug_wb_rf_wen),
+
+        .cp0_we(cp0_we),
+        .cp0_number(cp0_rw_number),
+        .cp0_wdata(cp0_wdata),
+        .cp0_rdata(cp0_rdata),
+        .cp0_epc(cp0_epc_o),
+        .cp0_exc_handler(cp0_exc_handler),
+        .cp0_int_handler(cp0_int_handler),
+        .cp0_tlb_refill_handler(cp0_tlb_refill_handler),
+        .cp0_en_exp(cp0_en_exp),
+        .cp0_ewr_bd(cp0_ewr_bd),
+        .cp0_ewr_excCode(cp0_ewr_excCode),
+        .cp0_ewr_epc(cp0_ewr_epc),
+        .cp0_ewr_badVAddr(cp0_ewr_badVAddr),
+        .cp0_interrupt_pending(cp0_interrupt_pending)
     );
+
+    CP0 cp0(
+        .clk(aclk),
+        .reset(global_reset),
+
+        .we(cp0_we),
+        .rw_number(cp0_rw_number),
+        .data_i(cp0_wdata),
+        .data_o(cp0_rdata),
+
+        .en_exp_i(cp0_en_exp),
+        .ewr_bd(cp0_ewr_bd),
+        .ewr_epc(cp0_ewr_epc),
+        .ewr_badVAddr(cp0_ewr_badVAddr),
+        .ewr_excCode(cp0_ewr_excCode),
+        
+        .epc(cp0_epc_o),
+        .exc_handler(cp0_exc_handler),
+        .int_handler(cp0_int_handler),
+        .tlb_refill_handler(cp0_tlb_refill_handler),
     
+        .hardware_int(ext_int[4:0]),
+        .interrupt_pending(cp0_interrupt_pending),
+
+        .kseg0_cached(cp0_kseg0_cached)
+    );
+
     reg [31:0] i_paddr;
     reg cache_valid2;
     reg i_cached;
