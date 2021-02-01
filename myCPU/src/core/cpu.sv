@@ -424,6 +424,10 @@ always_comb begin
         E_excCode = cOv;
         E_exception = 1;
     end
+    else if (E_ctrl.trap && E_aluOutput) begin
+        E_excCode = cTr;
+        E_exception = 1;
+    end
     else if (E_dm.exception) begin
         E_exception = 1;
         if (E_ctrl.memLoad) begin

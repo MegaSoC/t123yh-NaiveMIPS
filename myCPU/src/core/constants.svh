@@ -17,6 +17,10 @@
 `define aluArithmeticShiftRight 9
 `define aluSLT 10
 `define aluSLTU 11
+`define aluSEQ 12
+`define aluSNE 13
+`define aluSGE 14
+`define aluSGEU 15
 
 `define cmpEqual 1
 `define cmpNotEqual 2
@@ -89,6 +93,7 @@ typedef struct packed {
     bit aluSrc;
     bit [3:0] aluCtrl;
     bit checkOverflow;
+    bit trap;
 
     bit [2:0] generateException;
     bit writeCP0;
@@ -120,6 +125,7 @@ const ControlSignals kControlNop = '{
     aluSrc: 0, 
     aluCtrl: `aluDisabled, 
     checkOverflow: 0, 
+    trap: 0,
 
     generateException: `ctrlNoException, 
     writeCP0: 0, 

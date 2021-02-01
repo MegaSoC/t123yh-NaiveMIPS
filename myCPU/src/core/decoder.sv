@@ -94,6 +94,20 @@ const bit [5:0] jr = 6'b001000;
 const bit [5:0] syscall = 6'b001100;
 const bit [5:0] _break = 6'b001101;
 
+const bit [5:0] teq = 6'b110100;
+const bit [5:0] tge = 6'b110000;
+const bit [5:0] tgeu = 6'b110001;
+const bit [5:0] tlt = 6'b110010;
+const bit [5:0] tltu = 6'b110011;
+const bit [5:0] tne  = 6'b110110;
+
+const bit [4:0] teqi = 5'b01100;
+const bit [4:0] tgei = 5'b01000;
+const bit [4:0] tgeiu = 5'b01001;
+const bit [4:0] tlti = 5'b01010;
+const bit [4:0] tltiu = 5'b01011;
+const bit [4:0] tnei = 5'b01110;
+
 const bit debug = 1;
 
 `define simpleALU \
@@ -125,6 +139,18 @@ const bit debug = 1;
     controls.regRead1 = rsi; \
     controls.branch = 1; \
     controls.immediate = signExtendedImmediate;
+
+`define simpleTrap \
+    controls.trap = 1; \
+    controls.regRead1 = rsi; \
+    controls.regRead2 = rti; \
+    controls.aluSrc = 0;
+
+`define simpleTrapImmediate \
+    controls.trap = 1; \
+    controls.regRead1 = rsi; \
+    controls.immediate = signExtendedImmediate; \
+    controls.aluSrc = 1;
 
 `define simpleMemoryLoad \
     controls.regRead1 = rsi; \
@@ -219,6 +245,36 @@ always_comb begin
                 bgez: begin
                     `simpleBranch
                     controls.cmpCtrl = `cmpGreaterThanOrEqualToZero;
+                end
+
+                teqi: begin
+                    `simpleTrapImmediate
+                    controls.aluCtrl = `aluSEQ;
+                end
+
+                tnei: begin
+                    `simpleTrapImmediate
+                    controls.aluCtrl = `aluSNE;
+                end
+
+                tgei: begin
+                    `simpleTrapImmediate
+                    controls.aluCtrl = `aluSGE;
+                end
+
+                tgeiu: begin
+                    `simpleTrapImmediate
+                    controls.aluCtrl = `aluSGEU;
+                end
+
+                tlti: begin
+                    `simpleTrapImmediate
+                    controls.aluCtrl = `aluSLT;
+                end
+
+                tltiu: begin
+                    `simpleTrapImmediate
+                    controls.aluCtrl = `aluSLTU;
                 end
 
                 default: begin
@@ -363,6 +419,36 @@ always_comb begin
                 mtlo: begin
                     controls.regRead1 = rsi;
                     controls.mulCtrl = `mtSetLO;
+                end
+
+                teq: begin
+                    `simpleTrap
+                    controls.aluCtrl = `aluSEQ;
+                end
+
+                tge: begin
+                    `simpleTrap
+                    controls.aluCtrl = `aluSGE;
+                end
+
+                tgeu: begin
+                    `simpleTrap
+                    controls.aluCtrl = `aluSGEU;
+                end
+
+                tlt: begin
+                    `simpleTrap
+                    controls.aluCtrl = `aluSLT;
+                end
+
+                tltu: begin
+                    `simpleTrap
+                    controls.aluCtrl = `aluSLTU;
+                end
+
+                tne: begin
+                    `simpleTrap
+                    controls.aluCtrl = `aluSNE;
                 end
 
                 default: begin

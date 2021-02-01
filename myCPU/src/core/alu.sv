@@ -46,13 +46,18 @@ always @(*) begin
         `aluArithmeticShiftRight:
             out = $signed(A) >>> B[4:0];
         
-        `aluSLT: begin
-            out = ($signed(A) < $signed(B)) ? 32'b1 : 32'b0;
-        end
-
-        `aluSLTU: begin
+        `aluSLT: 
+            out = ($signed(A) < $signed(B)) ? 32'sb1 : 32'sb0;
+        `aluSLTU: 
             out = (A < B) ? 32'b1 : 32'b0;
-        end
+        `aluSEQ: 
+            out = (A == B) ? 32'b1 : 32'b0;
+        `aluSNE: 
+            out = (A != B) ? 32'b1 : 32'b0;
+        `aluSGE:
+            out = ($signed(A) > $signed(B)) ? 32'sb1 : 32'sb0;
+        `aluSGEU: 
+            out = (A > B) ? 32'b1 : 32'b0;
     endcase
 end
 
