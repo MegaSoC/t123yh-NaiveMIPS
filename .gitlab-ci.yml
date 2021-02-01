@@ -1,0 +1,12 @@
+stages:
+  - func_test
+  - perf_test
+
+func_test_all:
+  image: vivado:2019.2
+  stage: func_test
+  script:
+    - export SIMULATION=sim_1
+    - /opt/Xilinx/Vivado/2019.2/bin/vivado -mode batch -source scripts/run_simulation.tcl loooongson/soc_axi_func_extended/run_vivado/mycpu_prj1/mycpu.xpr
+    - grep '\-\-\-\-PASS!!!' loooongson/soc_axi_func_extended/run_vivado/mycpu_prj1/mycpu.sim/sim_1/behav/xsim/simulate.log
+  
