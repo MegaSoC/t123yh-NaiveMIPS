@@ -152,18 +152,7 @@ always @(posedge clk) begin
         D_ctrl <= kControlNop;
     end
     else begin
-        if (cp0_interrupt_pending) begin
-            // TODO: verify interrupt delay slot operation
-            D_badVAddr <= 'bx;
-            D_isDelaySlot <= F_im.isDelaySlot;
-            D_last_exception <= 1;
-            D_last_excCode <= cInt;
-            D_pc <= F_im.outputPC;
-            // ignore exception if an exception is already in pipeline
-            D_last_bubble <= exceptionLevel[m_D];
-            D_ctrl <= kControlNop;
-        end
-        else if (!D_stall) begin
+        if (!D_stall) begin
             D_badVAddr <= F_badVAddr;
             D_isDelaySlot <= F_im.isDelaySlot;
             D_last_exception <= F_exception;
@@ -187,6 +176,10 @@ always_comb begin
     end
     else if (D_last_exception) begin
         D_excCode = D_last_excCode;
+        D_exception = 1;
+    end
+    else if (cp0_interrupt_pending) begin
+        D_excCode = cInt;
         D_exception = 1;
     end
     else begin
