@@ -86,6 +86,7 @@ typedef struct packed {
     bit memReadSignExtend;
 
     bit branch;
+    bit branchLikely;
     bit [3:0] cmpCtrl;
     bit absJump;
     bit absJumpLoc; // 1 = immediate; 0 = register
@@ -118,6 +119,7 @@ const ControlSignals kControlNop = '{
     memReadSignExtend: 0, 
 
     branch: 0, 
+    branchLikely: 0,
     cmpCtrl: 'bx, 
     absJump: 0, 
     absJumpLoc: 'bx,

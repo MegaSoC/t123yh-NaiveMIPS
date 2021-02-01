@@ -142,6 +142,9 @@ ExcCode_t D_last_excCode;
 reg [31:0] D_badVAddr;
 reg D_last_exception;
 
+reg D_last_likely_failed;
+logic D_last_likely_failed_next;
+
 always @(posedge clk) begin
     if (reset) begin
         D_last_bubble <= 1;
@@ -150,6 +153,7 @@ always @(posedge clk) begin
         D_isDelaySlot <= 0;
         D_badVAddr <= 0;
         D_ctrl <= kControlNop;
+        D_last_likely_failed <= 0;
     end
     else begin
         if (!D_stall) begin
@@ -158,8 +162,9 @@ always @(posedge clk) begin
             D_last_exception <= F_exception;
             D_last_excCode <= F_excCode;
             D_pc <= F_im.outputPC;
-            D_last_bubble <= F_insert_bubble || exceptionLevel[m_D];
-            D_ctrl <= (F_insert_bubble || exceptionLevel[m_D] || F_exception) ? kControlNop : F_dec.controls;
+            D_last_bubble <= F_insert_bubble || exceptionLevel[m_D] || D_last_likely_failed_next;
+            D_ctrl <= (F_insert_bubble || exceptionLevel[m_D] || D_last_likely_failed_next || F_exception) ? kControlNop : F_dec.controls;
+            D_last_likely_failed <= F_insert_bubble ? D_last_likely_failed_next : 0;
         end else begin
             D_last_bubble <= D_last_bubble || exceptionLevel[m_E];
             D_ctrl <= (D_last_bubble || exceptionLevel[m_E]) ? kControlNop : D_ctrl;
@@ -252,6 +257,7 @@ Comparator cmp(
                .ctrl(D_ctrl.cmpCtrl)
            );
 always_comb begin
+    D_last_likely_failed_next = D_last_likely_failed;
     F_jump = 0;
     F_jumpAddr = 0;
     if (exceptionJump) begin
@@ -264,6 +270,8 @@ always_comb begin
             if (cmp.action) begin
                 F_jumpAddr = D_pc + 4 + (D_ctrl.immediate << 2);
             end else begin
+                if (D_ctrl.branchLikely)
+                    D_last_likely_failed_next = 1;
                 F_jumpAddr = D_pc + 8;
             end
         end

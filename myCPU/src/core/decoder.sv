@@ -1,11 +1,13 @@
 `include "constants.svh"
 
-module Decoder (
-           input [31:0] instruction,
-           input reset,
-           input bubble,
+module Decoder #(
+            parameter IMPLEMENT_LIKELY = 1
+        )(
+            input [31:0] instruction,
+            input reset,
+            input bubble,
 
-           output ControlSignals controls
+            output ControlSignals controls
        );
 
 wire [5:0] opcode = instruction[31:26];
@@ -32,9 +34,13 @@ const bit [5:0] xori = 6'b001110;
 const bit [5:0] lw = 6'b100011;
 const bit [5:0] sw = 6'b101011;
 const bit [5:0] beq = 6'b000100;
+const bit [5:0] beql = 5'b010100;
 const bit [5:0] bne = 6'b000101;
+const bit [5:0] bnel = 5'b010101;
 const bit [5:0] blez = 6'b000110;
+const bit [5:0] blezl = 6'b010110;
 const bit [5:0] bgtz = 6'b000111;
+const bit [5:0] bgtzl = 6'b010111;
 const bit [5:0] lui = 6'b001111;
 const bit [5:0] jal = 6'b000011;
 const bit [5:0] addiu = 6'b001001;
@@ -77,10 +83,14 @@ const bit [5:0] madd = 6'b000000;
 const bit [5:0] maddu = 6'b000001;
 const bit [5:0] eret = 6'b011000;
 
-const bit [4:0] bltz = 5'b00000;
-const bit [4:0] bgez = 5'b00001;
-const bit [4:0] bltzal = 5'b10000;
-const bit [4:0] bgezal = 5'b10001;
+const bit [4:0] bltz    = 5'b00000;
+const bit [4:0] bltzl   = 5'b00010;
+const bit [4:0] bgez    = 5'b00001;
+const bit [4:0] bgezl   = 5'b00011;
+const bit [4:0] bltzal  = 5'b10000;
+const bit [4:0] bltzall = 5'b10010;
+const bit [4:0] bgezal  = 5'b10001;
+const bit [4:0] bgezall = 5'b10011;
 
 const bit [4:0] mfc0 = 5'b00000;
 const bit [4:0] mtc0 = 5'b00100;
@@ -245,6 +255,28 @@ always_comb begin
                 bgez: begin
                     `simpleBranch
                     controls.cmpCtrl = `cmpGreaterThanOrEqualToZero;
+                end
+                bltzall: begin
+                    `simpleBranch
+                    `simpleLink
+                    controls.cmpCtrl = `cmpLessThanZero;
+                    controls.branchLikely = 1;
+                end
+                bgezall: begin
+                    `simpleBranch
+                    `simpleLink
+                    controls.cmpCtrl = `cmpGreaterThanOrEqualToZero;
+                    controls.branchLikely = 1;
+                end
+                bltzl: begin
+                    `simpleBranch
+                    controls.cmpCtrl = `cmpLessThanZero;
+                    controls.branchLikely = 1;
+                end
+                bgezl: begin
+                    `simpleBranch
+                    controls.cmpCtrl = `cmpGreaterThanOrEqualToZero;
+                    controls.branchLikely = 1;
                 end
 
                 teqi: begin
@@ -566,6 +598,31 @@ always_comb begin
             controls.cmpCtrl = `cmpGreaterThanZero;
         end 
 
+        beql: begin
+            `simpleBranch
+            controls.regRead2 = rti;
+            controls.cmpCtrl = `cmpEqual;
+            controls.branchLikely = 1;
+        end
+
+        bnel: begin
+            `simpleBranch
+            controls.regRead2 = rti;
+            controls.cmpCtrl = `cmpNotEqual;
+            controls.branchLikely = 1;
+        end
+
+        blezl: begin
+            `simpleBranch
+            controls.cmpCtrl = `cmpLessThanOrEqualToZero;
+            controls.branchLikely = 1;
+        end
+
+        bgtzl: begin
+            `simpleBranch
+            controls.cmpCtrl = `cmpGreaterThanZero;
+            controls.branchLikely = 1;
+        end 
 
         lui: begin
             controls.regRead1 = rsi;
@@ -594,6 +651,9 @@ always_comb begin
         end
     endcase
     controls.mulEnable = controls.mulCtrl != `mtDisabled;
+    if (!IMPLEMENT_LIKELY && controls.branchLikely) begin
+        controls.generateException = `ctrlUnknownInstruction;
+    end
 end
 
 endmodule
