@@ -71,7 +71,6 @@ wire [31:0] signExtendedImmediate = $signed(imm);
     controls.memLoad = 1; \
     controls.grfWriteSource = `grfWriteMem; \
     controls.destinationRegister = rti; \
-    controls.checkOverflow = 1; \
     controls.immediate = signExtendedImmediate; \
     controls.calculateAddress = 1;
 
@@ -79,7 +78,6 @@ wire [31:0] signExtendedImmediate = $signed(imm);
     controls.regRead1 = rsi; \
     controls.regRead2 = rti; \
     controls.memStore = 1; \
-    controls.checkOverflow = 1; \
     controls.immediate = signExtendedImmediate; \
     controls.calculateAddress = 1;
 
