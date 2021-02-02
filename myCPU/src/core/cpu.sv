@@ -225,7 +225,7 @@ GeneralRegisterFile D_grf(
 ForwardController D_regRead1_forward (
                       .request(D_ctrl.regRead1),
                       .original(D_grf.readOutput1),
-                      .enabled(D_ctrl.aluCtrl != `aluDisabled || D_ctrl.absJump || D_ctrl.branch || D_ctrl.calculateAddress),
+                      .enabled(D_ctrl.aluCtrl != `aluDisabled || D_ctrl.absJump || D_ctrl.branch || D_ctrl.calculateAddress || D_ctrl.bitCounterEnable),
 
                       .src1Valid(forwardValidE),
                       .src1Reg(forwardAddressE),
@@ -506,6 +506,11 @@ assign cp0_we = E_ctrl.writeCP0;
 assign cp0_number = E_ctrl.numberCP0;
 assign cp0_wdata = E_regRead1_forward.value;
 
+count_bit E_bitCounter(
+    .bit_val(E_ctrl.bitCounterType),
+    .val(E_regRead1) // forwarding is done in D to reduce delay
+);
+
 assign E_data_waiting = E_source_waiting || E_mul_collision || E_memory_waiting;
 reg [31:0] E_real_pc;
 
@@ -529,6 +534,7 @@ ExcCode_t M_last_excCode;
 reg M_lastWriteDataValid;
 reg [31:0] M_lastWriteData;
 reg [31:0] M_cp0Value;
+reg [31:0] M_bitCount;
 
 logic M_regWriteDataValid;
 logic [31:0] M_regWriteData;
@@ -549,6 +555,7 @@ always @(posedge clk) begin
         M_ctrl <= kControlNop;
         M_memData <= 0;
         M_cp0Value <= 0;
+        M_bitCount <= 0;
     end
     else begin
         M_bubble <= E_insert_bubble || exceptionLevel[m_M];
@@ -563,6 +570,7 @@ always @(posedge clk) begin
         M_isDelaySlot <= E_isDelaySlot;
         M_ctrl <= (E_insert_bubble || exceptionLevel[m_M] || E_exception) ? kControlNop : E_ctrl;
         M_cp0Value <= cp0_rdata;
+        M_bitCount <= E_bitCounter.count;
 `ifndef SYNTHESIS
         if (E_exception) begin
             if (E_excCode == cERET) begin
@@ -597,6 +605,10 @@ always_comb begin
             end
             `grfWriteCP0: begin
                 M_regWriteData = M_cp0Value;
+                M_regWriteDataValid = 1;
+            end
+            `grfWriteBitCounter: begin
+                M_regWriteData = M_bitCount;
                 M_regWriteDataValid = 1;
             end
         endcase

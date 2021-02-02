@@ -78,9 +78,13 @@ const bit [5:0] mfhi = 6'b010000;
 const bit [5:0] mflo = 6'b010010;
 const bit [5:0] mthi = 6'b010001;
 const bit [5:0] mtlo = 6'b010011;
+
 const bit [5:0] msub = 6'b000100;
 const bit [5:0] madd = 6'b000000;
 const bit [5:0] maddu = 6'b000001;
+const bit [5:0] clo = 6'b100001;
+const bit [5:0] clz = 6'b100000;
+
 const bit [5:0] eret = 6'b011000;
 
 const bit [4:0] bltz    = 5'b00000;
@@ -187,6 +191,12 @@ const bit debug = 1;
     controls.grfWriteSource = `grfWritePC; \
     controls.destinationRegister = reg_ra;
 
+`define simpleBitCount \
+    controls.grfWriteSource = `grfWriteBitCounter; \
+    controls.destinationRegister = rdi; \
+    controls.bitCounterEnable = 1; \
+    controls.regRead1 = rsi; 
+
 always_comb begin
     controls = kControlNop;
 
@@ -230,6 +240,17 @@ always_comb begin
                     `simpleMUL
                     controls.mulCtrl = `mtMADDU;
                 end
+
+                clo: begin
+                    `simpleBitCount
+                    controls.bitCounterType = 1;
+                end
+
+                clz: begin
+                    `simpleBitCount
+                    controls.bitCounterType = 0;
+                end
+
                 default: begin
                     controls.generateException = `ctrlUnknownInstruction;
                 end

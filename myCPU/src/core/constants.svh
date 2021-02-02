@@ -42,6 +42,7 @@
 `define grfWritePC 3
 `define grfWriteMul 4
 `define grfWriteCP0 5
+`define grfWriteBitCounter 6
 
 `define absJumpImmediate 1
 `define absJumpRegister 0
@@ -99,6 +100,9 @@ typedef struct packed {
     bit [2:0] generateException;
     bit writeCP0;
     cp0_number_t numberCP0;
+
+    bit bitCounterEnable;
+    bit bitCounterType;
 } ControlSignals;
 
 const ControlSignals kControlNop = '{
@@ -131,7 +135,10 @@ const ControlSignals kControlNop = '{
 
     generateException: `ctrlNoException, 
     writeCP0: 0, 
-    numberCP0: cp0_nX
+    numberCP0: cp0_nX,
+    
+    bitCounterEnable: 0,
+    bitCounterType: 'bx
 };
 
 `endif
