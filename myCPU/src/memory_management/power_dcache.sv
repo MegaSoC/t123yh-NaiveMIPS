@@ -474,7 +474,7 @@ for(genvar i = 0; i < SET_ASSOC; ++i) begin : iswayhit
 	assign w_way_hita[i] = w_tag_res[i].tag == w_phy_tag && w_tag_res[i].valid; 
 	assign w_whichway_hita[i+1] = w_whichway_hita[i] | (w_way_hita[i]?i:0);
 end
-assign w_pipe_hit = |w_way_hita && (r_state == IDLE || r_state == IDLE_RECEIVING) && w_tag_num;
+assign w_pipe_hit = |w_way_hita && (r_state == IDLE || r_state == IDLE_RECEIVING);
 assign w_hit_way = w_whichway_hita[SET_ASSOC];
 
 assign w_data_indexa = w_state == WRITE_WAITING ? r_rbuffer_index1 : get_index(i_va);   
@@ -694,7 +694,7 @@ for(genvar i = 0; i < WBUFFER_NUM; i++)begin: hit
 		&& r_wbuffer_tag[i].valid && r_wbuffer_v[i] && !(w_memwrite_start&&i==w_key);
     assign w_wbuffer_hitidx[i+1] = w_wbuffer_hitidx[i] | (w_wbuffer_hits[i] ? i : 0);
 end
-assign w_wbuffer_hit = |w_wbuffer_hits && w_tag_num && (r_state == IDLE || r_state == IDLE_RECEIVING);
+assign w_wbuffer_hit = |w_wbuffer_hits && (r_state == IDLE || r_state == IDLE_RECEIVING);
 assign w_wbuffer_hitindex = w_wbuffer_hitidx[WBUFFER_NUM];
 always_ff @(posedge i_clk) begin
 	if(i_rst)begin
