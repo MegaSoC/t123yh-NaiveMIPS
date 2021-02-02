@@ -634,6 +634,21 @@ always_comb begin
             controls.immediate = bigImm;
         end
 
+        6'b110000: // ll
+        begin
+            `simpleMemoryLoad
+            controls.memWidthCtrl = `memWidth4;
+            controls.setLLbit = 1;
+        end
+        6'b111000: // sc
+        begin
+            `simpleMemoryStore
+            controls.memWidthCtrl = `memWidth4;
+            controls.checkLLbit = 1;
+            controls.destinationRegister = rti;
+            controls.grfWriteSource = `grfWriteLLbit;
+        end
+
         default: begin
             controls.generateException = `ctrlUnknownInstruction;
         end

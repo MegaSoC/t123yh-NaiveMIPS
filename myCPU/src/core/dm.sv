@@ -8,6 +8,7 @@ module DataMemory(
            input [1:0] widthCtrl,
            input [31:0] address,
            input [31:0] writeDataIn,
+           input LLbit,
            output logic writeEnableOut,
            output logic readEnableOut,
            output logic exception,
@@ -31,7 +32,7 @@ always_comb begin
                 end
             end
         end
-        if (!exception) begin
+        if (!exception && LLbit) begin
             writeEnableOut = writeEnable;
             readEnableOut = readEnable;
         end

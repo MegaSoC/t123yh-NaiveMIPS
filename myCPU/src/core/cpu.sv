@@ -323,6 +323,9 @@ ExcCode_t E_last_excCode;
 reg [31:0] E_badVAddr;
 logic [31:0] E_badVAddr_next;
 
+reg E_LLbit;
+logic E_LLbit_next;
+
 reg E_isDelaySlot;
 reg E_last_exception;
 
@@ -351,6 +354,10 @@ always_comb begin
             E_regWriteData = E_aluOutput;
             E_regWriteDataValid = 1;
         end
+        `grfWriteLLbit: begin
+            E_regWriteData = {31'b0, E_LLbit};
+            E_regWriteDataValid = 1;
+        end
     endcase
 end
 
@@ -367,6 +374,7 @@ always @(posedge clk) begin
         E_memAddress <= 0;
         E_aluOutput <= 0;
         E_aluOverflow <= 0;
+        E_LLbit <= 0;
     end
     else begin
         if (!E_stall) begin
@@ -382,6 +390,7 @@ always @(posedge clk) begin
             E_memAddress <= D_memAddress;
             E_aluOutput <= D_alu.out;
             E_aluOverflow <= D_alu.overflow;
+            E_LLbit <= E_LLbit_next;
         end
         else begin
             E_bubble <= E_bubble || exceptionLevel[m_M];
@@ -485,6 +494,7 @@ DataMemory E_dm(
                .address(E_memAddress),
                .writeDataIn(E_regRead2_forward.value), // register@regRead2
                .widthCtrl(E_ctrl.memWidthCtrl),
+               .LLbit(!E_ctrl.checkLLbit || E_LLbit),
 
                .writeEnableOut(data_sram_write),
                .readEnableOut(data_sram_read),
@@ -501,6 +511,16 @@ DataMemoryReader E_reader(
         .widthCtrl(E_ctrl.memWidthCtrl),
         .extendCtrl(E_ctrl.memReadSignExtend)
 );
+
+always_comb begin
+    if (E_dm.readEnableOut && E_ctrl.setLLbit) begin
+        E_LLbit_next = 1;
+    end else if (E_last_exception && E_last_excCode == cERET) begin
+        E_LLbit_next = 0;
+    end else begin
+        E_LLbit_next = E_LLbit;
+    end
+end
 
 assign cp0_we = E_ctrl.writeCP0;
 assign cp0_number = E_ctrl.numberCP0;

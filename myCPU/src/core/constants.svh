@@ -43,6 +43,7 @@
 `define grfWriteMul 4
 `define grfWriteCP0 5
 `define grfWriteBitCounter 6
+`define grfWriteLLbit 7
 
 `define absJumpImmediate 1
 `define absJumpRegister 0
@@ -104,6 +105,9 @@ typedef struct packed {
 
     bit bitCounterEnable;
     bit bitCounterType;
+
+    bit setLLbit;
+    bit checkLLbit;
 } ControlSignals;
 
 const ControlSignals kControlNop = '{
@@ -139,7 +143,10 @@ const ControlSignals kControlNop = '{
     numberCP0: cp0_nX,
     
     bitCounterEnable: 0,
-    bitCounterType: 'bx
+    bitCounterType: 'bx,
+
+    setLLbit: 0,
+    checkLLbit: 0
 };
 
 `endif
