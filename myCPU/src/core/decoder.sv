@@ -149,6 +149,11 @@ always_comb begin
                     `simpleMUL
                     controls.mulCtrl = `mtMADDU;
                 end
+                6'b000101: // msubu
+                begin
+                    `simpleMUL
+                    controls.mulCtrl = `mtMSUBU;
+                end
 
                 6'b100001: // clo
                 begin

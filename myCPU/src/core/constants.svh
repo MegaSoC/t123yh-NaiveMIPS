@@ -62,6 +62,7 @@
 `define mtMSUB 7
 `define mtMADD 8
 `define mtMADDU 9
+`define mtMSUBU 10
 
 `define ctrlNoException 0
 `define ctrlUnknownInstruction 1

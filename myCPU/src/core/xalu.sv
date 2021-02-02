@@ -23,13 +23,13 @@ always_comb begin
     ready = 0;
     sign = 'bx;
     case (ctrl_reg)
-        `mtMultiply, `mtMultiplyUnsigned,`mtMSUB, `mtMADD, `mtMADDU:
+        `mtMultiply, `mtMultiplyUnsigned,`mtMSUB, `mtMADD, `mtMADDU, `mtMSUBU:
             ready = !mult.busy;
         `mtDivide, `mtDivideUnsigned:
             ready = !div.busy;
     endcase
     case (ctrl_reg)
-        `mtDivideUnsigned, `mtMultiplyUnsigned, `mtMADDU:
+        `mtDivideUnsigned, `mtMultiplyUnsigned, `mtMADDU, `mtMSUBU:
             sign = 0;
         `mtDivide, `mtMultiply, `mtMSUB, `mtMADD:
             sign = 1;
@@ -69,7 +69,7 @@ always @(posedge clk) begin
             case (ctrl_reg)
                 `mtMultiply, `mtMultiplyUnsigned:
                     {HI, LO} <= mult.result;
-                `mtMSUB:
+                `mtMSUB, `mtMSUBU:
                     {HI, LO} <= {HI, LO} - mult.result;
                 `mtMADD, `mtMADDU:
                     {HI, LO} <= {HI, LO} + mult.result;
