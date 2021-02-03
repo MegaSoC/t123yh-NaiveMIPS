@@ -497,26 +497,21 @@ XALU E_mul(
 
 wire [31:0] E_mul_value = E_ctrl.mulOutputSel ? E_mul.HI : E_mul.LO;
 
-DataMemory E_dm(
-               .clk(clk),
-               .reset(reset),
-               .dataValid(1),
-               .writeEnable(E_ctrl.memStore),
-               .readEnable(E_ctrl.memLoad),
+DataMemoryWriteShifter E_dm_w(
                .address(E_memAddress),
                .writeDataIn(E_regRead2_forward.value), // register@regRead2
                .widthCtrl(E_ctrl.memWidthCtrl),
-               .LLbit(!E_ctrl.checkLLbit || E_LLbit),
-
-               .writeEnableOut(data_sram_write),
-               .readEnableOut(data_sram_read),
                .writeDataOut(data_sram_wdata)
            );
+
+wire E_memEnable = !E_ctrl.checkLLbit || E_LLbit;
+assign data_sram_write = E_ctrl.memStore && E_memEnable;
+assign data_sram_read = E_ctrl.memLoad;
 assign data_sram_size = E_ctrl.memWidthCtrl;
 
-wire E_memory_waiting = (E_dm.writeEnableOut || E_dm.readEnableOut) && !data_sram_valid;
+wire E_memory_waiting = (data_sram_write || data_sram_read) && !data_sram_valid;
 
-DataMemoryReader E_reader(
+DataMemoryReadShifter E_dm_r(
         .data_sram_rdata(data_sram_rdata),
         .readEnable(E_ctrl.memLoad),
         .address(E_memAddress),
@@ -525,7 +520,7 @@ DataMemoryReader E_reader(
 );
 
 always_comb begin
-    if (E_dm.readEnableOut && E_ctrl.setLLbit) begin
+    if (data_sram_read && E_ctrl.setLLbit) begin
         E_LLbit_next = 1;
     end else if (E_last_exception && E_last_excCode == cERET) begin
         E_LLbit_next = 0;
@@ -595,7 +590,7 @@ always @(posedge clk) begin
         M_last_excCode <= E_excCode;
         M_pc <= E_real_pc;
         M_lastBadVAddr <= E_badVAddr_next;
-        M_memData <= E_reader.readData;
+        M_memData <= E_dm_r.readData;
         M_mulOutput <= E_mul_value;
         M_lastWriteDataValid <= E_regWriteDataValid;
         M_lastWriteData <= E_regWriteData;
