@@ -87,6 +87,8 @@ typedef struct packed {
     bit calculateAddress;
     bit [1:0] memWidthCtrl;
     bit memReadSignExtend;
+    bit memUnaligned;
+    bit memLeftPart;
 
     bit branch;
     bit branchLikely;
@@ -126,6 +128,8 @@ const ControlSignals kControlNop = '{
     calculateAddress: 0,
     memWidthCtrl: 0, 
     memReadSignExtend: 0, 
+    memUnaligned: 0,
+    memLeftPart: 0,
 
     branch: 0, 
     branchLikely: 0,

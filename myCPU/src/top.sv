@@ -79,6 +79,7 @@ module mycpu_top(
     word w_d_outdata, w_i_inst;
     logic w_i_valid, w_d_valid;
 
+    wire [3:0] w_data_sram_byteen;
     wire cp0_we, cp0_en_exp, cp0_ewr_bd, cp0_interrupt_pending, cp0_kseg0_cached;
     wire [31:0] cp0_rdata, cp0_wdata, cp0_ewr_epc, cp0_ewr_badVAddr, cp0_epc_o, cp0_exc_handler, cp0_int_handler, cp0_tlb_refill_handler;
     ExcCode_t cp0_ewr_excCode;
@@ -100,6 +101,7 @@ module mycpu_top(
         .data_sram_write(w_data_sram_write),
         .data_sram_wdata(w_data_sram_wdata),
         .data_sram_size(w_data_sram_size),
+        .data_sram_byteen(w_data_sram_byteen),
         
         .debug_wb_pc(debug_wb_pc),
         .debug_wb_rf_wdata(debug_wb_rf_wdata),
@@ -206,6 +208,7 @@ module mycpu_top(
                   .i_d_write(w_data_sram_write),
                   .i_d_size(w_data_sram_size),
                   .i_d_indata(w_data_sram_wdata),
+                  .i_d_byteen(w_data_sram_byteen),
                   .o_d_valid(w_d_valid),
                   .o_d_outdata(w_d_outdata),
                   

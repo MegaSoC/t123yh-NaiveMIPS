@@ -15,6 +15,7 @@ module CPU (
            output [2:0] data_sram_size,
            input [31:0] data_sram_rdata,
            input data_sram_valid,
+           output [3:0] data_sram_byteen,
 
            output [31:0] debug_wb_pc,
            output [3:0] debug_wb_rf_wen,
@@ -260,13 +261,15 @@ ArithmeticLogicUnit D_alu(
 logic D_memAddressError;
 always_comb begin
     D_memAddressError = 0;
-    if (D_ctrl.memWidthCtrl == `memWidth4) begin
-        if (D_memAddress[1:0] != 0) begin
-            D_memAddressError = 1;
-        end
-    end else if (D_ctrl.memWidthCtrl == `memWidth2) begin
-        if (D_memAddress[0] != 0) begin
-            D_memAddressError = 1;
+    if (!D_ctrl.memUnaligned) begin
+        if (D_ctrl.memWidthCtrl == `memWidth4) begin
+            if (D_memAddress[1:0] != 0) begin
+                D_memAddressError = 1;
+            end
+        end else if (D_ctrl.memWidthCtrl == `memWidth2) begin
+            if (D_memAddress[0] != 0) begin
+                D_memAddressError = 1;
+            end
         end
     end
 end
@@ -440,7 +443,7 @@ ForwardController E_regRead1_forward (
 ForwardController E_regRead2_forward (
                       .request(E_ctrl.regRead2),
                       .original(E_regRead2),
-                      .enabled(E_ctrl.mulCtrl != `mtDisabled || E_ctrl.memStore),
+                      .enabled(E_ctrl.mulCtrl != `mtDisabled || E_ctrl.memStore || E_ctrl.memUnaligned),
 
                       .src1Valid(forwardValidM),
                       .src1Reg(forwardAddressM),
@@ -498,11 +501,14 @@ XALU E_mul(
 wire [31:0] E_mul_value = E_ctrl.mulOutputSel ? E_mul.HI : E_mul.LO;
 
 DataMemoryWriteShifter E_dm_w(
-               .address(E_memAddress),
-               .writeDataIn(E_regRead2_forward.value), // register@regRead2
-               .widthCtrl(E_ctrl.memWidthCtrl),
-               .writeDataOut(data_sram_wdata)
-           );
+    .address(E_memAddress),
+    .writeDataIn(E_regRead2_forward.value), // register@regRead2
+    .widthCtrl(E_ctrl.memWidthCtrl),
+    .writeDataOut(data_sram_wdata),
+    .unaligned(E_ctrl.memUnaligned),
+    .leftPart(E_ctrl.memLeftPart),
+    .writeByteEn(data_sram_byteen)
+);
 
 wire E_memEnable = !E_ctrl.checkLLbit || E_LLbit;
 assign data_sram_write = E_ctrl.memStore && E_memEnable;
@@ -512,11 +518,13 @@ assign data_sram_size = E_ctrl.memWidthCtrl;
 wire E_memory_waiting = (data_sram_write || data_sram_read) && !data_sram_valid;
 
 DataMemoryReadShifter E_dm_r(
+        .originalData(E_regRead2_forward.value), // register@regRead2
         .data_sram_rdata(data_sram_rdata),
-        .readEnable(E_ctrl.memLoad),
         .address(E_memAddress),
         .widthCtrl(E_ctrl.memWidthCtrl),
-        .extendCtrl(E_ctrl.memReadSignExtend)
+        .extendCtrl(E_ctrl.memReadSignExtend),
+        .unaligned(E_ctrl.memUnaligned),
+        .leftPart(E_ctrl.memLeftPart)
 );
 
 always_comb begin

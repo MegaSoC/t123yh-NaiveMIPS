@@ -649,6 +649,33 @@ always_comb begin
             controls.grfWriteSource = `grfWriteLLbit;
         end
 
+        6'b100010: begin // lwl
+            `simpleMemoryLoad
+            controls.memWidthCtrl = `memWidth4;
+            controls.regRead2 = rti;
+            controls.memUnaligned = 1;
+            controls.memLeftPart = 1;
+        end
+        6'b100110: begin // lwr
+            `simpleMemoryLoad
+            controls.memWidthCtrl = `memWidth4;
+            controls.regRead2 = rti;
+            controls.memUnaligned = 1;
+            controls.memLeftPart = 0;
+        end
+        6'b101010: begin // swl
+            `simpleMemoryStore
+            controls.memWidthCtrl = `memWidth4;
+            controls.memUnaligned = 1;
+            controls.memLeftPart = 1;
+        end
+        6'b101110: begin // swr
+            `simpleMemoryStore
+            controls.memWidthCtrl = `memWidth4;
+            controls.memUnaligned = 1;
+            controls.memLeftPart = 0;
+        end
+
         default: begin
             controls.generateException = `ctrlUnknownInstruction;
         end
