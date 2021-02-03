@@ -472,7 +472,6 @@ always_comb begin
 end
 
 logic E_mul_collision, E_mulStart;
-wire E_source_waiting = E_regRead1_forward.stallExec || E_regRead2_forward.stallExec;
 
 always_comb begin
     E_mulStart = 0;
@@ -489,7 +488,7 @@ end
 
 XALU E_mul(
                .ctrl(E_ctrl.mulCtrl),
-               .start(!E_source_waiting && E_mulStart),
+               .start(E_mulStart),
                .reset(reset),
                .clk(clk),
                .A(E_regRead1_forward.value),
@@ -501,7 +500,7 @@ wire [31:0] E_mul_value = E_ctrl.mulOutputSel ? E_mul.HI : E_mul.LO;
 DataMemory E_dm(
                .clk(clk),
                .reset(reset),
-               .dataValid(!E_source_waiting),
+               .dataValid(1),
                .writeEnable(E_ctrl.memStore),
                .readEnable(E_ctrl.memLoad),
                .address(E_memAddress),
@@ -544,7 +543,7 @@ count_bit E_bitCounter(
     .val(E_regRead1) // forwarding is done in D to reduce delay
 );
 
-assign E_data_waiting = E_source_waiting || E_mul_collision || E_memory_waiting;
+assign E_data_waiting = E_mul_collision || E_memory_waiting;
 reg [31:0] E_real_pc;
 
 always_comb begin
