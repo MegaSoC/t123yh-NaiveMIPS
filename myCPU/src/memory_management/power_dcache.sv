@@ -224,9 +224,7 @@ tag w_tag_din;
 
 //pipe1-2 siganl
 index r_indexa;
-word r_pipe1_va, r_pipe1_va_end, r_pipe1_indata;
-logic r_tag_num;
-logic [3:0] r_pipe1_wena;
+word r_pipe1_va, r_pipe1_indata;
 logic [LINE_WORD_OFFSET - 1 : 0] r_start_offseta, r_end_offseta;
 
 //pipe 2 signal
@@ -443,28 +441,21 @@ end
 always_ff @(posedge i_clk) begin
 	if(i_rst || o_inn_stall)begin
 		r_pipe1_va <= '0;
-		r_tag_num <= '0;
 		r_indexa <= '0;
-		r_pipe1_va_end <= '0;
 		r_start_offseta <= '0;
 		r_end_offseta <= '0;
-		r_pipe1_wena <= '0;
 		r_pipe1_indata <= '0;
 	end
 	else begin
 		r_pipe1_va <= i_va;
-		r_tag_num <= i_valid;
 		r_indexa <= w_indexa;
-		r_pipe1_va_end <= w_va_end;
 		r_start_offseta <= w_start_offseta;
 		r_end_offseta <= w_end_offseta;
-		r_pipe1_wena <= i_wen;
 		r_pipe1_indata <= i_in_data;
 	end
 end
 
 //pipeline2 process
-//assign web_w = (|r_pipe1_wena) && (|w_way_hita) && !w_rbuffer_hita && (r_state == IDLE || r_state == IDLE_RECEIVING) && w_tag_num;
 assign web_w = (|i_wen) && w_pipe_hit; 
 assign w_phy_tag = get_tag(w_phy_addr);
 assign w_phy_addr = i_phy_addr;
