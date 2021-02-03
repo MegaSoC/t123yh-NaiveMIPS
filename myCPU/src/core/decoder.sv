@@ -1,7 +1,7 @@
 `include "constants.svh"
 
 module Decoder #(
-            parameter IMPLEMENT_LIKELY = 1
+            parameter IMPLEMENT_LIKELY = 0
         )(
             input [31:0] instruction,
             input reset,
