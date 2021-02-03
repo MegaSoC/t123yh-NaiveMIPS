@@ -140,6 +140,7 @@ reg [31:0] D_pc;
 reg D_isDelaySlot;
 ExcCode_t D_last_excCode;
 reg [31:0] D_badVAddr;
+logic [31:0] D_badVAddr_next;
 reg D_last_exception;
 
 reg D_last_likely_failed;
@@ -169,43 +170,6 @@ always @(posedge clk) begin
             D_last_bubble <= D_last_bubble || exceptionLevel[m_E];
             D_ctrl <= (D_last_bubble || exceptionLevel[m_E]) ? kControlNop : D_ctrl;
         end
-    end
-end
-
-ExcCode_t D_excCode;
-always_comb begin
-    D_excCode = cNone;
-    D_exception = 0;
-    if (D_last_bubble) begin
-        D_exception = 0;
-    end
-    else if (D_last_exception) begin
-        D_excCode = D_last_excCode;
-        D_exception = 1;
-    end
-    else if (cp0_interrupt_pending) begin
-        D_excCode = cInt;
-        D_exception = 1;
-    end
-    else begin
-        case (D_ctrl.generateException)
-            `ctrlUnknownInstruction: begin
-                D_excCode = cRI;
-                D_exception = 1;
-            end
-            `ctrlERET: begin
-                D_excCode = cERET;
-                D_exception = 1;
-            end
-            `ctrlSyscall: begin
-                D_excCode = cSys;
-                D_exception = 1;
-            end
-            `ctrlBreak: begin
-                D_excCode = cBp;
-                D_exception = 1;
-            end
-        endcase
     end
 end
 
@@ -292,6 +256,66 @@ ArithmeticLogicUnit D_alu(
                         .A(D_regRead1_forward.value),
                         .B(D_ctrl.aluSrc ? D_ctrl.immediate : D_regRead2_forward.value)
                     );
+
+logic D_memAddressError;
+always_comb begin
+    D_memAddressError = 0;
+    if (D_ctrl.memWidthCtrl == `memWidth4) begin
+        if (D_memAddress[1:0] != 0) begin
+            D_memAddressError = 1;
+        end
+    end else if (D_ctrl.memWidthCtrl == `memWidth2) begin
+        if (D_memAddress[0] != 0) begin
+            D_memAddressError = 1;
+        end
+    end
+end
+
+ExcCode_t D_excCode;
+always_comb begin
+    D_badVAddr_next = D_badVAddr;
+    D_excCode = cNone;
+    D_exception = 0;
+    if (D_last_bubble) begin
+        D_exception = 0;
+    end
+    else if (D_last_exception) begin
+        D_excCode = D_last_excCode;
+        D_exception = 1;
+    end
+    else if (cp0_interrupt_pending) begin
+        D_excCode = cInt;
+        D_exception = 1;
+    end else if (D_ctrl.memStore && D_memAddressError) begin
+        D_excCode = cAdES;
+        D_exception = 1;
+        D_badVAddr_next = D_memAddress;
+    end else if (D_ctrl.memLoad && D_memAddressError) begin
+        D_excCode = cAdEL;
+        D_exception = 1;
+        D_badVAddr_next = D_memAddress;
+    end else begin
+        case (D_ctrl.generateException)
+            `ctrlUnknownInstruction: begin
+                D_excCode = cRI;
+                D_exception = 1;
+            end
+            `ctrlERET: begin
+                D_excCode = cERET;
+                D_exception = 1;
+            end
+            `ctrlSyscall: begin
+                D_excCode = cSys;
+                D_exception = 1;
+            end
+            `ctrlBreak: begin
+                D_excCode = cBp;
+                D_exception = 1;
+            end
+        endcase
+    end
+end
+
 
 reg [31:0] D_real_pc;
 always_comb begin
@@ -385,7 +409,7 @@ always @(posedge clk) begin
             E_regRead1 <= D_regRead1_forward.value;
             E_regRead2 <= D_regRead2_forward.value;
             E_isDelaySlot <= D_isDelaySlot;
-            E_badVAddr <= D_badVAddr;
+            E_badVAddr <= D_badVAddr_next;
             E_ctrl <= (D_insert_bubble || exceptionLevel[m_E] || D_exception) ? kControlNop : D_ctrl;
             E_memAddress <= D_memAddress;
             E_aluOutput <= D_alu.out;
@@ -444,17 +468,6 @@ always_comb begin
     else if (E_ctrl.trap && E_aluOutput) begin
         E_excCode = cTr;
         E_exception = 1;
-    end
-    else if (E_dm.exception) begin
-        E_exception = 1;
-        if (E_ctrl.memLoad) begin
-            E_excCode = cAdEL;
-            E_badVAddr_next = E_memAddress;
-        end
-        else if (E_ctrl.memStore) begin
-            E_excCode = cAdES;
-            E_badVAddr_next = E_memAddress;
-        end
     end
 end
 

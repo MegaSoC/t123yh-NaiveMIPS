@@ -11,31 +11,15 @@ module DataMemory(
            input LLbit,
            output logic writeEnableOut,
            output logic readEnableOut,
-           output logic exception,
            output logic [31:0] writeDataOut
 );
 
 always_comb begin
-    exception = 0;
     readEnableOut = 0;
     writeEnableOut = 0;
     if (dataValid) begin
-        if (readEnable || writeEnable) begin
-            if (widthCtrl == `memWidth4) begin
-                if (address[1:0] != 0) begin
-                    exception = 1;
-                end
-            end
-            else if (widthCtrl == `memWidth2) begin
-                if (address[0] != 0) begin
-                    exception = 1;
-                end
-            end
-        end
-        if (!exception && LLbit) begin
-            writeEnableOut = writeEnable;
-            readEnableOut = readEnable;
-        end
+        writeEnableOut = writeEnable;
+        readEnableOut = readEnable;
     end
 end
 
