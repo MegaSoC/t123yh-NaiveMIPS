@@ -476,7 +476,7 @@ end
 
 XALU E_mul(
                .ctrl(E_ctrl.mulCtrl),
-               .start(!E_data_waiting && E_mulStart),
+               .start(!E_source_waiting && E_mulStart),
                .reset(reset),
                .clk(clk),
                .A(E_regRead1_forward.value),
