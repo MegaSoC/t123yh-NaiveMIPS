@@ -1,6 +1,8 @@
 `include "def.svh"
 
-module mycpu_top(
+module mycpu_top #(
+    parameter IMPLEMENT_LIKELY = 0
+) (
         input [5:0] ext_int, // ext_int[5] is ignored!
 
         input aclk,
@@ -85,7 +87,7 @@ module mycpu_top(
     ExcCode_t cp0_ewr_excCode;
     cp0_number_t cp0_rw_number;
     
-    CPU core(
+    CPU #(.IMPLEMENT_LIKELY(IMPLEMENT_LIKELY)) core(
         .clk(aclk),
         .reset(global_reset),
         

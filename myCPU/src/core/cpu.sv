@@ -1,5 +1,7 @@
 `include "constants.svh"
-module CPU (
+module CPU #(
+            parameter IMPLEMENT_LIKELY
+        ) (
            input clk,
            input reset,
 
@@ -126,7 +128,7 @@ assign F_excCode = F_im.adel ? cAdEL : cNone;
 wire F_insert_bubble = F_im.bubble;
 wire [31:0] F_badVAddr = F_im.adel ? F_im.outputPC : 'bx;
 
-Decoder F_dec (
+Decoder #(.IMPLEMENT_LIKELY(IMPLEMENT_LIKELY)) F_dec (
     .instruction(F_im.instruction),
     .reset(reset),
     .bubble(F_im.bubble)
