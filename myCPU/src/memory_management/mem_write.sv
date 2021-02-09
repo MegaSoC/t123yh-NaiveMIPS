@@ -229,7 +229,7 @@ assign axi_bus_req.awid = 4'b0;
 assign axi_bus_req.awaddr = w_out_req.addr;
 assign axi_bus_req.awlen = w_out_req.len;
 assign axi_bus_req.awsize = w_out_req.size;
-assign axi_bus_req.awburst = 2'b01;
+assign axi_bus_req.awburst = axi_bus_req.awlen == '0 ? 2'b11: 2'b01;
 assign axi_bus_req.awlock = '0;
 assign axi_bus_req.awprot = '0;
 assign axi_bus_req.awcache = '0;
