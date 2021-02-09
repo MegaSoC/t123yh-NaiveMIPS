@@ -166,7 +166,7 @@ assign o_instr_empty = r_icache_req_num == 0;
 assign o_data_empty = r_dcache_req_num == 0;
 
 assign axi_bus_req.arid = w_nowid;
-assign axi_bus_req.arburst = axi_bus_req.arlen == '0 ? 2'b11: 2'b10;
+assign axi_bus_req.arburst = axi_bus_req.arlen == '0 ? '0: 2'b10;
 assign axi_bus_req.arsize = w_dout.size;  //16 bytes = 4 words
 assign axi_bus_req.arlock =  2'b00  ;
 assign axi_bus_req.arcache = 4'b0000;
