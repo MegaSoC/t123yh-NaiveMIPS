@@ -109,6 +109,8 @@ module mycpu_top #(
         .debug_wb_rf_wdata(debug_wb_rf_wdata),
         .debug_wb_rf_wnum(debug_wb_rf_wnum),
         .debug_wb_rf_wen(debug_wb_rf_wen),
+        .debug_i_pc(debug_i_pc),
+        .debug_i_instr(debug_i_instr),
 
         .cp0_we(cp0_we),
         .cp0_number(cp0_rw_number),

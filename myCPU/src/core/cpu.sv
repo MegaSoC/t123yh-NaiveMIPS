@@ -23,7 +23,9 @@ module CPU #(
            output [3:0] debug_wb_rf_wen,
            output [4:0] debug_wb_rf_wnum,
            output [31:0] debug_wb_rf_wdata,
-
+           output [31:0] debug_i_pc,
+           output [31:0] debug_i_instr,
+           
            output cp0_we,
            output cp0_number_t cp0_number,
            output [31:0] cp0_wdata,
@@ -133,6 +135,9 @@ Decoder #(.IMPLEMENT_LIKELY(IMPLEMENT_LIKELY)) F_dec (
     .reset(reset),
     .bubble(F_im.bubble)
 );
+
+assign debug_i_pc = F_im.bubble ? 0 : F_im.outputPC;
+assign debug_i_instr = F_im.instruction;
 
 // ======== Decode Stage ========
 wire D_stall = stallLevel[m_D];
@@ -679,7 +684,7 @@ assign cp0_ewr_bd = M_isDelaySlot;
 assign cp0_ewr_badVAddr = M_lastBadVAddr;
 assign cp0_ewr_excCode = M_last_excCode;
 
-assign debug_wb_pc = M_pc;
+assign debug_wb_pc = M_bubble ? 0 : M_pc;
 assign debug_wb_rf_wen = grfWriteAddress != 0 ? 4'b1111 : 0;
 assign debug_wb_rf_wnum = grfWriteAddress;
 assign debug_wb_rf_wdata = grfWriteData;
