@@ -102,28 +102,24 @@ always_comb begin
     case (opcode)
         6'b010000: // cop0
         begin
-            case (funct)
-                6'b000000: begin
-                    case (rsi)
-                        5'b00000: // mfc0
-                        begin
-                            controls.destinationRegister = rti;
-                            controls.grfWriteSource = `grfWriteCP0;
-                            controls.numberCP0 = cp0_number_t'({rdi, sel});
-                        end
-                        5'b00100: // mtc0
-                        begin
-                            controls.regRead1 = rti;
-                            controls.writeCP0 = 1;
-                            controls.numberCP0 = cp0_number_t'({rdi, sel});
-                        end
-                    endcase
+            case ({rsi, funct})
+                // last 3 bits of mfc0 and mtc0 are sel
+                11'b00000000???: // mfc0
+                begin 
+                    controls.destinationRegister = rti;
+                    controls.grfWriteSource = `grfWriteCP0;
+                    controls.numberCP0 = cp0_number_t'({rdi, sel});
                 end
-                6'b011000: // eret
+                11'b00100000???: // mtc0
                 begin
+                    controls.regRead1 = rti;
+                    controls.writeCP0 = 1;
+                    controls.numberCP0 = cp0_number_t'({rdi, sel});
+                end
+                11'b10000011000: // eret
+                begin                           
                     controls.generateException = `ctrlERET;
                 end
-
                 default: begin
                     controls.generateException = `ctrlUnknownInstruction;
                 end
