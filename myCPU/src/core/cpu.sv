@@ -344,6 +344,7 @@ reg [31:0] E_regRead2;
 reg [31:0] E_memAddress;
 reg [31:0] E_aluOutput;
 reg E_aluOverflow;
+reg E_running;
 
 reg E_regWriteDataValid;
 reg [31:0] E_regWriteData;
@@ -404,6 +405,7 @@ always @(posedge clk) begin
         E_aluOutput <= 0;
         E_aluOverflow <= 0;
         E_LLbit <= 0;
+        E_running <= 0;
     end
     else begin
         if (!E_stall) begin
@@ -420,12 +422,14 @@ always @(posedge clk) begin
             E_aluOutput <= D_alu.out;
             E_aluOverflow <= D_alu.overflow;
             E_LLbit <= E_LLbit_next;
+            E_running <= 0;
         end
         else begin
             E_bubble <= E_bubble || exceptionLevel[m_M];
             E_ctrl <= (E_bubble || exceptionLevel[m_M]) ? kControlNop : E_ctrl;
             E_regRead1 <= E_regRead1_forward.value;
             E_regRead2 <= E_regRead2_forward.value;
+            E_running <= 1;
         end
     end
 end
@@ -481,6 +485,9 @@ logic E_mul_collision, E_mulStart;
 always_comb begin
     E_mulStart = 0;
     E_mul_collision = 0;
+    if (E_ctrl.mulEnable && E_ctrl.grfWriteSource == `grfWriteMul && !E_running) begin
+        E_mul_collision = 1;
+    end
     if (E_ctrl.mulEnable || E_ctrl.grfWriteSource == `grfWriteMul) begin
         if (E_mul.busy) begin
             E_mul_collision = 1;

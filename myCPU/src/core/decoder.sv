@@ -153,6 +153,15 @@ always_comb begin
                     controls.mulCtrl = `mtMSUBU;
                 end
 
+                6'b000010: // mul
+                begin
+                    `simpleMUL
+                    controls.mulCtrl = `mtMultiply;
+                    controls.mulOutputSel = 0;
+                    controls.destinationRegister = rdi;
+                    controls.grfWriteSource = `grfWriteMul;
+                end
+
                 6'b100001: // clo
                 begin
                     `simpleBitCount
