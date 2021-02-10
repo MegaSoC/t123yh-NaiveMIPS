@@ -102,7 +102,7 @@ always_comb begin
     case (opcode)
         6'b010000: // cop0
         begin
-            case ({rsi, funct})
+            casez ({rsi, funct})
                 // last 3 bits of mfc0 and mtc0 are sel
                 11'b00000000???: // mfc0
                 begin 
