@@ -75,7 +75,7 @@ assign exc_handler = ebase + 32'h180;
 assign int_handler = CAUSE_IV ? ebase + 32'h200 : ebase + 32'h180;
 assign tlb_refill_handler = SR_EXL ? ebase + 32'h180 : ebase;
 
-assign kseg0cached = cp0_reg_Conf0[2:0] == 3'h3;
+assign kseg0_cached = cp0_reg_Conf0[2:0] == 3'h3;
 
 // TLB related
 wire [`TLB_IDX_BITS-1:0] nRandom = cp0_reg_Random[`TLB_IDX_BITS-1:0] + 1'b1;
