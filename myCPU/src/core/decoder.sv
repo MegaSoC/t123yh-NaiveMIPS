@@ -681,6 +681,29 @@ always_comb begin
             controls.memLeftPart = 0;
         end
 
+        6'b101111: // cache
+        begin
+            controls.regRead1 = rsi;
+            controls.immediate = signExtendedImmediate;
+            controls.calculateAddress = 1;
+            case (rti)
+                5'b00000: // I: Index Invalidate
+                    controls.memICacheOp = CACHE_INDEX_WRITEBACK_INVALIDATE;
+                5'b00001: // D: Index Writeback Invalidate
+                    controls.memDCacheOp = CACHE_INDEX_WRITEBACK_INVALIDATE;
+                5'b01000: // I: Index Store Tag
+                    controls.memICacheOp = CACHE_INDEX_STORE_TAG;
+                5'b01001: // D: Index Store Tag
+                    controls.memDCacheOp = CACHE_INDEX_STORE_TAG;
+                5'b10000: // I: Hit Invalidate
+                    controls.memICacheOp = CACHE_HIT_INVALIDATE;
+                5'b10001: // D: Hit Invalidate
+                    controls.memDCacheOp = CACHE_HIT_INVALIDATE;
+                5'b10101: // D: Hit Writeback Invalidate
+                    controls.memDCacheOp = CACHE_HIT_WRITEBACK_INVALIDATE;
+            endcase
+        end
+
         default: begin
             controls.generateException = `ctrlUnknownInstruction;
         end

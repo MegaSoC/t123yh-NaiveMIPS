@@ -9,6 +9,7 @@ module CPU #(
            output inst_sram_readen,
            input [31:0] inst_sram_rdata,
            input inst_sram_valid,
+           output cache_op inst_cache_op,
 
            output reg [31:0] data_sram_vaddr,
            output data_sram_read,
@@ -18,6 +19,7 @@ module CPU #(
            input [31:0] data_sram_rdata,
            input data_sram_valid,
            output [3:0] data_sram_byteen,
+           output cache_op data_cache_op,
 
            output [31:0] debug_wb_pc,
            output [3:0] debug_wb_rf_wen,
@@ -528,8 +530,12 @@ wire E_memEnable = !E_ctrl.checkLLbit || E_LLbit;
 assign data_sram_write = E_ctrl.memStore && E_memEnable;
 assign data_sram_read = E_ctrl.memLoad;
 assign data_sram_size = E_ctrl.memWidthCtrl;
+assign data_cache_op = E_ctrl.memDCacheOp;
+assign inst_cache_op = E_ctrl.memICacheOp;
+// icache has no waiting operation
+wire E_dcache_active = E_ctrl.memDCacheOp != CACHE_NOP;
 
-wire E_memory_waiting = (data_sram_write || data_sram_read) && !data_sram_valid;
+wire E_memory_waiting = (data_sram_write || data_sram_read || E_dcache_active) && !data_sram_valid;
 
 DataMemoryReadShifter E_dm_r(
         .originalData(E_regRead2_forward.value), // register@regRead2
@@ -584,7 +590,6 @@ reg M_lastWriteDataValid;
 reg [31:0] M_lastWriteData;
 reg [31:0] M_cp0Value;
 reg [31:0] M_bitCount;
-
 logic M_regWriteDataValid;
 logic [31:0] M_regWriteData;
 reg M_last_exception;

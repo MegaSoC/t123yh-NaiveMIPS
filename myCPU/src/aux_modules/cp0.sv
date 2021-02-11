@@ -23,7 +23,8 @@ module CP0 (
     input wire [4:0]    hardware_int,
     output wire         interrupt_pending,
 
-    output wire         kseg0_cached
+    output wire         kseg0_cached,
+    output wire [31:0]  tagLo0_o
 );
 
 reg [4:0] hardware_int_sample;
@@ -63,6 +64,7 @@ wire allow_int = cp0_reg_Status[2:0] == 3'b001;
 assign interrupt_pending = (|(cp0_reg_Status[15:8] & Cause_IP)) && allow_int;
 
 assign epc       = cp0_reg_EPC;
+assign tagLo0_o  = cp0_reg_TagLo0;
 
 wire SR_BEV = cp0_reg_Status[22];
 wire SR_EXL = cp0_reg_Status[1];

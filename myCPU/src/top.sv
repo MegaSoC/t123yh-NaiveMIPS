@@ -90,9 +90,10 @@ module mycpu_top #(
 
     wire [3:0] w_data_sram_byteen;
     wire cp0_we, cp0_en_exp, cp0_ewr_bd, cp0_interrupt_pending, cp0_kseg0_cached;
-    wire [31:0] cp0_rdata, cp0_wdata, cp0_ewr_epc, cp0_ewr_badVAddr, cp0_epc_o, cp0_exc_handler, cp0_int_handler, cp0_tlb_refill_handler;
+    wire [31:0] cp0_rdata, cp0_wdata, cp0_ewr_epc, cp0_ewr_badVAddr, cp0_epc_o, cp0_exc_handler, cp0_int_handler, cp0_tlb_refill_handler, cp0_tagLo0;
     ExcCode_t cp0_ewr_excCode;
     cp0_number_t cp0_rw_number;
+    cache_op dcache_op, icache_op;
     
     CPU #(.IMPLEMENT_LIKELY(IMPLEMENT_LIKELY)) core(
         .clk(aclk),
@@ -102,6 +103,7 @@ module mycpu_top #(
         .inst_sram_valid(w_i_valid),
         .inst_sram_addr(w_inst_sram_addr),
         .inst_sram_readen(w_inst_sram_readen),
+        .inst_cache_op(icache_op),
 
         .data_sram_rdata(w_d_outdata),
         .data_sram_valid(w_d_valid),
@@ -111,6 +113,7 @@ module mycpu_top #(
         .data_sram_wdata(w_data_sram_wdata),
         .data_sram_size(w_data_sram_size),
         .data_sram_byteen(w_data_sram_byteen),
+        .data_cache_op(dcache_op),
         
         .debug_wb_pc(debug_wb_pc),
         .debug_wb_rf_wdata(debug_wb_rf_wdata),
@@ -158,7 +161,8 @@ module mycpu_top #(
         .hardware_int(ext_int[4:0]),
         .interrupt_pending(cp0_interrupt_pending),
 
-        .kseg0_cached(cp0_kseg0_cached)
+        .kseg0_cached(cp0_kseg0_cached),
+        .tagLo0_o(cp0_tagLo0)
     );
 
     reg [31:0] i_paddr;
@@ -188,8 +192,7 @@ module mycpu_top #(
         end
     end
 
-     cache_soc 
-   #(
+    cache_soc #(
        .ICACHE_WORD_PER_LINE(`ICACHE_WORD_PER_LINE),
        .ICACHE_SET_ASSOC(`ICACHE_SET_ASSOC),
        .ICACHE_SIZE(`ICACHE_SIZE),
@@ -199,8 +202,7 @@ module mycpu_top #(
        .DCACHE_SIZE(`DCACHE_SIZE),
        .DCACHE_TAG_WIDTH(`DCACHE_TAG_WIDTH),
        .MEM_WRITE_FIFO_DEPTH(`MEM_WRITE_FIFO_DEPTH)
-   )
-    cache(
+    ) cache (
                   .i_clk(aclk),
                   .i_rst(global_reset),
 
@@ -223,13 +225,13 @@ module mycpu_top #(
                   .o_d_valid(w_d_valid),
                   .o_d_outdata(w_d_outdata),
                   
-                  .i_icache_instr(CACHE_NOP),
-                  .i_icache_instr_tag('0),
-                  .i_icache_instr_addr('0),
+                  .i_icache_instr(icache_op),
+                  .i_icache_instr_tag(cp0_tagLo0[31:(32 - `ICACHE_TAG_WIDTH)]),
+                  .i_icache_instr_addr(d_paddr),
 
-                  .i_dcache_instr(CACHE_NOP),
-                  .i_dcache_instr_tag('0),
-                  .i_dcache_instr_addr('0),
+                  .i_dcache_instr(dcache_op),
+                  .i_dcache_instr_tag(cp0_tagLo0[31:(32 - `DCACHE_TAG_WIDTH)]),
+                  .i_dcache_instr_addr(d_paddr),
 
                   .arid,
                   .araddr,

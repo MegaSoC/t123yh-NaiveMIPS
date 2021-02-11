@@ -84,6 +84,8 @@ typedef struct packed {
 
     bit memLoad;
     bit memStore;
+    cache_op memICacheOp;
+    cache_op memDCacheOp;
     bit calculateAddress;
     bit [1:0] memWidthCtrl;
     bit memReadSignExtend;
@@ -125,6 +127,8 @@ const ControlSignals kControlNop = '{
 
     memLoad: 0,
     memStore: 0, 
+    memICacheOp: CACHE_NOP,
+    memDCacheOp: CACHE_NOP,
     calculateAddress: 0,
     memWidthCtrl: 0, 
     memReadSignExtend: 0, 
