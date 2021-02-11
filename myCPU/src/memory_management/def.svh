@@ -13,14 +13,6 @@
 `define DCACHE_TAG_WIDTH (32 - $clog2(`DCACHE_SIZE/`DCACHE_SET_ASSOC))
 `define MEM_WRITE_FIFO_DEPTH 4
 
-typedef enum logic [2:0]{
-	CACHE_NOP,
-	CACHE_INDEX_WRITEBACK_INVALIDATE,
-	CACHE_INDEX_STORE_TAG,
-	CACHE_HIT_WRITEBACK_INVALIDATE,
-	CACHE_HIT_INVALIDATE
-} cache_op;
-
 typedef struct packed {
     logic [3:0]  arid;
     logic [31:0] araddr;

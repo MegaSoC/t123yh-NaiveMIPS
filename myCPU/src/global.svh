@@ -44,4 +44,12 @@ typedef enum logic [7:0] {
     cp0_nErrorEPC   = 8'b11110000
 } cp0_number_t;
 
+typedef enum logic [2:0] {
+    CACHE_NOP = 0,
+    CACHE_INDEX_WRITEBACK_INVALIDATE,
+    CACHE_INDEX_STORE_TAG,
+    CACHE_HIT_WRITEBACK_INVALIDATE,
+    CACHE_HIT_INVALIDATE
+} cache_op;
+
 `endif
