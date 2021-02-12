@@ -107,8 +107,9 @@ axi_w_req  w_axi_w_req;
 assign o_i_valid = w_out_isram_valid | w_icache_valid;
 assign o_i_inst = w_out_isram_valid ? w_isram_inst : w_icache_inst;
 //assign o_d_valid = w_out_dsram_valid || (!w_d_stall && i_d_cached && (i_d_read || i_d_write));
-assign o_d_valid = w_out_dsram_valid | w_dcache_valid;
+assign o_d_valid = (!i_d_cached && w_out_dsram_valid) | (i_d_cached && w_dcache_valid);
 assign o_d_outdata = w_out_dsram_valid ? w_dsram_data : w_dcache_data;
+
 
 always_ff @(posedge i_clk) begin
     if(i_rst)begin
