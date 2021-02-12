@@ -92,6 +92,7 @@ module mycpu_top #(
     wire cp0_we, cp0_en_exp, cp0_ewr_bd, cp0_interrupt_pending, cp0_kseg0_cached;
     wire [31:0] cp0_rdata, cp0_wdata, cp0_ewr_epc, cp0_ewr_badVAddr, cp0_epc_o, cp0_exc_handler, cp0_int_handler, cp0_tlb_refill_handler, cp0_tagLo0;
     ExcCode_t cp0_ewr_excCode;
+    wire w_data_cache_op_valid;
     cp0_number_t cp0_rw_number;
     cache_op dcache_op, icache_op;
     
@@ -114,6 +115,7 @@ module mycpu_top #(
         .data_sram_size(w_data_sram_size),
         .data_sram_byteen(w_data_sram_byteen),
         .data_cache_op(dcache_op),
+        .data_cache_op_valid(w_data_cache_op_valid),
         
         .debug_wb_pc(debug_wb_pc),
         .debug_wb_rf_wdata(debug_wb_rf_wdata),
@@ -224,6 +226,7 @@ module mycpu_top #(
                   .i_d_byteen(w_data_sram_byteen),
                   .o_d_valid(w_d_valid),
                   .o_d_outdata(w_d_outdata),
+                  .o_d_cache_instr_valid(w_data_cache_op_valid),
                   
                   .i_icache_instr(icache_op),
                   .i_icache_instr_tag(cp0_tagLo0[31:(32 - `ICACHE_TAG_WIDTH)]),

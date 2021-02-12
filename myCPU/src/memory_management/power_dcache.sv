@@ -23,6 +23,7 @@ module new_dcache#(
 	output logic o_inn_stall,//传给外部表示cache中需要暂�?????????????
 	output logic [31:0] o_mdata_data,
 	output logic o_valid,
+	output logic o_cache_instr_valid,
 
 	input mem_read_resp i_resp,
 	input logic i_memread_empty,
@@ -402,7 +403,7 @@ assign w_cache_inst_tag.valid = i_cache_instr != CACHE_HIT_INVALIDATE;
 assign w_cache_inst_tag_wen = i_cache_instr == CACHE_INDEX_STORE_TAG || (w_cache_inst_hit && i_cache_instr == CACHE_HIT_INVALIDATE);
 assign w_cache_inst_hit = (w_pipe_hit || w_rbuffer_hita || w_waita) && (i_cache_instr == CACHE_HIT_WRITEBACK_INVALIDATE || i_cache_instr == CACHE_HIT_INVALIDATE);
 assign w_cache_inst_wb = (w_cache_inst_hit && i_cache_instr == CACHE_HIT_WRITEBACK_INVALIDATE) || i_cache_instr == CACHE_INDEX_WRITEBACK_INVALIDATE;
-assign w_cache_inst_unhit = !w_pipe_hit && !w_rbuffer_hita && !w_waita && i_cache_instr == CACHE_HIT_WRITEBACK_INVALIDATE;
+assign w_cache_inst_unhit = !w_pipe_hit && !w_rbuffer_hita && !w_waita && i_cache_instr == CACHE_HIT_WRITEBACK_INVALIDATE && (r_state == IDLE||r_state == IDLE_RECEIVING);
 assign w_cache_inst_hitway = (w_hit_way & {2{w_pipe_hit}}) | (r_rbuffer_way & ({2{w_waita}} | {2{w_rbuffer_hita}}));
 assign w_cache_inst_waay = SET_ASSOC == 2?i_cache_instr_addr[LINE_BYTE_OFFSET + INDEX_WIDTH] : i_cache_instr_addr[LINE_BYTE_OFFSET + INDEX_WIDTH + 1 : LINE_BYTE_OFFSET + INDEX_WIDTH];
 assign w_reset_tag.tag = '0;
@@ -494,6 +495,7 @@ end
 //pipeline3
 
 assign o_valid = w_rbuffer_hita | w_wbuffer_hit | w_receiving_hit | w_pipe_hit | w_cache_inst_unhit;
+assign o_cache_instr_valid = w_cache_inst_unhit | w_receiving_hit | (i_cache_instr == CACHE_INDEX_WRITEBACK_INVALIDATE) | (i_cache_instr == CACHE_INDEX_STORE_TAG) | (i_cache_instr == CACHE_HIT_INVALIDATE);
 
 always_comb begin
 	w_data = r_data;

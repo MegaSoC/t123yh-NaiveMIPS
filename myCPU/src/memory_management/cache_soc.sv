@@ -31,6 +31,7 @@ module cache_soc #(
     input word   i_d_indata,//与i_d_phyaddr时机相同，写入的内容
     output word  o_d_outdata,//数据读出的内容
     output logic o_d_valid,//o_d_outdata的valid信号
+    output logic o_d_cache_instr_valid,
 
 	input [DCACHE_TAG_WIDTH - 1 : 0] i_dcache_instr_tag,//mu级传入 index storetag指令中的tag 对dcache有效
 	input cache_op i_dcache_instr, //m级传入 表明是哪个cache指令 对dcache有效 
@@ -206,6 +207,7 @@ dcache1(
     .i_cache_instr(i_dcache_instr),
     .i_cache_instr_addr(i_dcache_instr_addr),
     .i_cache_instr_tag(i_dcache_instr_tag),
+    .o_cache_instr_valid(o_d_cache_instr_valid),
 
     .i_resp(w_resp), //TODO
     .i_memread_empty(w_data_empty),// TODO
