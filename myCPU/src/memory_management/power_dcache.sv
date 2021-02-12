@@ -494,8 +494,8 @@ end
 
 //pipeline3
 
-assign o_valid = w_rbuffer_hita | w_wbuffer_hit | w_receiving_hit | w_pipe_hit | w_cache_inst_unhit;
-assign o_cache_instr_valid = w_cache_inst_unhit | w_receiving_hit | (i_cache_instr == CACHE_INDEX_WRITEBACK_INVALIDATE) | (i_cache_instr == CACHE_INDEX_STORE_TAG) | (i_cache_instr == CACHE_HIT_INVALIDATE);
+assign o_valid = w_rbuffer_hita | w_wbuffer_hit | w_receiving_hit | w_pipe_hit ;
+assign o_cache_instr_valid = w_cache_inst_unhit | w_receiving_hit  | (i_cache_instr == CACHE_INDEX_STORE_TAG) | (i_cache_instr == CACHE_HIT_INVALIDATE);
 
 always_comb begin
 	w_data = r_data;
@@ -607,9 +607,7 @@ always_ff @(posedge i_clk) begin
 		if(w_memread_start) begin
 			r_old_tag <= r_save_tag;
 			r_rbuffer_valid1 <=1;
-			r_rbuffer_index1 <= r_save_index;
-			r_rbuffer_tag.tag <= r_save_new_tag.tag;
-			r_rbuffer_tag.valid <= ~r_cache_wb_flag;
+			r_rbuffer_index1 <= r_save_index;		
 			cnt_rbuffer <= r_reqstart_offset;
 			r_rbuffer_way <= r_save_select_way;
 			r_rbuffer_onehot_way <= r_save_onehot_way;
@@ -624,6 +622,13 @@ always_ff @(posedge i_clk) begin
 			r_rbuffer_valid1 <= 0;
 			cnt_rbuffer <= '0;
 			r_rbuffer_valid <= '0;
+		end
+		if(w_memread_start) begin
+		    r_rbuffer_tag.tag <= r_save_new_tag.tag;
+			r_rbuffer_tag.valid <= ~r_cache_wb_flag;
+		end
+		else if(i_cache_instr == CACHE_INDEX_STORE_TAG && r_rbuffer_onehot_way == w_cache_inst_way && r_rbuffer_index1 == w_cache_inst_index) begin
+		    r_rbuffer_tag <= w_cache_inst_tag;
 		end
 	end
 end
