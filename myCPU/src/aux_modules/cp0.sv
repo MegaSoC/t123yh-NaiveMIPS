@@ -25,6 +25,7 @@ module CP0 (
 
     output wire         kseg0_cached,
     output wire         kernel_mode,
+    output wire         erl,
     output wire [31:0]  tagLo0_o
 );
 
@@ -81,6 +82,7 @@ assign tlb_refill_handler = SR_EXL ? ebase + 32'h180 : ebase;
 
 assign kseg0_cached = cp0_reg_Conf0[2:0] == 3'h3; // See Table 9.9, P. 98, Vol. III
 assign kernel_mode = SR_KSU == 2'b00 || SR_EXL || SR_ERL; // See Section 3.2, P. 19, Vol. III
+assign erl = SR_ERL;
 
 // TLB related
 wire [`TLB_IDX_BITS-1:0] nRandom = cp0_reg_Random[`TLB_IDX_BITS-1:0] + 1'b1;

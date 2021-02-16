@@ -81,7 +81,7 @@ module mycpu_top #(
 
     wire global_reset = !(aresetn && myaresetn);
     
-    word w_inst_sram_addr, w_i_paddr, w_data_sram_vaddr, w_data_sram_wdata;
+    word w_inst_sram_addr, w_w_inst_sram_paddr, w_data_sram_vaddr, w_data_sram_wdata;
     logic [2:0] w_data_sram_size;
     logic w_data_sram_read, w_data_sram_write, w_inst_sram_readen;
 
@@ -89,13 +89,16 @@ module mycpu_top #(
     logic w_i_valid, w_d_valid;
 
     wire [3:0] w_data_sram_byteen;
-    wire cp0_we, cp0_en_exp, cp0_ewr_bd, cp0_interrupt_pending, cp0_kseg0_cached;
-    wire [31:0] cp0_rdata, cp0_wdata, cp0_ewr_epc, cp0_ewr_badVAddr, cp0_epc_o, cp0_exc_handler, cp0_int_handler, cp0_tlb_refill_handler, cp0_tagLo0;
+    wire cp0_we, cp0_en_exp, cp0_ewr_bd, cp0_interrupt_pending, cp0_kseg0_cached, cp0_kernel_mode;
+    wire [31:0] cp0_rdata, cp0_wdata, cp0_ewr_epc, cp0_ewr_badVAddr, cp0_epc_o, cp0_exc_handler, cp0_int_handler, cp0_tlb_refill_handler, cp0_tagLo0, cp0_erl;
     ExcCode_t cp0_ewr_excCode;
     wire w_data_cache_op_valid;
     cp0_number_t cp0_rw_number;
     cache_op dcache_op, icache_op;
-    
+    wire w_inst_sram_tlb_addressError, w_inst_sram_tlb_hit, w_inst_sram_tlb_valid;
+    wire w_data_sram_tlb_addressError, w_data_sram_tlb_hit, w_data_sram_tlb_valid, w_data_sram_tlb_dirty, w_data_sram_tlb;
+    reg w_inst_sram_readen2;
+
     CPU #(.IMPLEMENT_LIKELY(IMPLEMENT_LIKELY)) core(
         .clk(aclk),
         .reset(global_reset),
@@ -104,6 +107,9 @@ module mycpu_top #(
         .inst_sram_valid(w_i_valid),
         .inst_sram_addr(w_inst_sram_addr),
         .inst_sram_readen(w_inst_sram_readen),
+        .inst_sram_addressError(w_inst_sram_tlb_addressError && w_inst_sram_readen2),
+        .inst_sram_tlb_miss(!w_inst_sram_tlb_hit && w_inst_sram_readen2),
+        .inst_sram_tlb_invalid(!w_inst_sram_tlb_valid && w_inst_sram_readen2),
         .inst_cache_op(icache_op),
 
         .data_sram_rdata(w_d_outdata),
@@ -116,6 +122,11 @@ module mycpu_top #(
         .data_sram_byteen(w_data_sram_byteen),
         .data_cache_op(dcache_op),
         .data_cache_op_valid(w_data_cache_op_valid),
+        .data_sram_tlb(w_data_sram_tlb),
+        .data_sram_addressError(w_data_sram_tlb && w_data_sram_tlb_addressError),
+        .data_sram_tlb_miss(w_data_sram_tlb && !w_data_sram_tlb_hit),
+        .data_sram_tlb_invalid(w_data_sram_tlb && !w_data_sram_tlb_valid),
+        .data_sram_tlb_modified(w_data_sram_write && !w_data_sram_tlb_dirty),
         
         .debug_wb_pc(debug_wb_pc),
         .debug_wb_rf_wdata(debug_wb_rf_wdata),
@@ -164,33 +175,51 @@ module mycpu_top #(
         .interrupt_pending(cp0_interrupt_pending),
 
         .kseg0_cached(cp0_kseg0_cached),
+        .erl(cp0_erl),
+        .kernel_mode(cp0_kernel_mode),
         .tagLo0_o(cp0_tagLo0)
     );
 
-    reg [31:0] i_paddr;
-    reg cache_valid2;
-    reg i_cached;
-    always @(posedge aclk) begin
-        if (global_reset) begin
-            i_paddr <= 0;
-            cache_valid2 <= 0;
-            i_cached <= 0;
-        end else begin
-            i_paddr <= {3'b0,core.inst_sram_addr[28:0]};
-            i_cached <= core.inst_sram_addr[31:29] == 3'b100;
-            cache_valid2 <= core.inst_sram_readen;
-        end
-    end
+    wire [31:0] w_inst_sram_paddr;
+    wire w_inst_sram_cached;
 
-    reg [31:0] d_paddr;
-    reg d_cached;
+    wire [31:0] w_data_sram_paddr;
+    wire w_data_sram_cached;
+
+    TLB tlb(
+        .clk(aclk),
+        .rst(global_reset),
+
+        .we(0),
+        .kernel_mode(cp0_kernel_mode),
+        .kseg0_cached(cp0_kseg0_cached),
+        .cp0_erl(cp0_erl),
+
+        .va0(w_inst_sram_addr),
+        .pa0(w_inst_sram_paddr),
+        .cached0(w_inst_sram_cached),
+        .hit0(w_inst_sram_tlb_hit),
+        .valid0(w_inst_sram_tlb_valid),
+        .error0(w_inst_sram_addressError),
+
+        .va1(w_data_sram_vaddr),
+        .pa1(w_data_sram_paddr),
+        .hit1(w_data_sram_tlb_hit),
+        .valid1(w_data_sram_valid),
+        .dirty1(w_data_sram_dirty),
+        .cached1(w_data_sram_cached),
+        .error1(w_data_sram_addressError)
+    );
+
+    wire w_inst_sram_okay = w_inst_sram_tlb_hit && w_inst_sram_tlb_valid && !w_inst_sram_addressError;
+    wire w_data_sram_read_okay = w_data_sram_tlb_hit && w_data_sram_valid && !w_inst_sram_addressError;
+    wire w_data_sram_write_okay = w_data_sram_read_okay && w_data_sram_dirty;
+
     always @(posedge aclk) begin
         if (global_reset) begin
-            d_paddr <= 0;
-            d_cached <= 0;
+            w_inst_sram_readen2 <= 0;
         end else begin
-            d_paddr <= {3'b0, core.data_sram_vaddr[28:0]};
-            d_cached <= core.data_sram_vaddr[31:29] == 3'b100;
+            w_inst_sram_readen2 <= w_inst_sram_readen;
         end
     end
 
@@ -209,18 +238,18 @@ module mycpu_top #(
                   .i_rst(global_reset),
 
 	              .i_i_valid1(w_inst_sram_readen),
-                  .i_i_valid2(cache_valid2),
+                  .i_i_valid2(w_inst_sram_readen2 && w_inst_sram_okay),
                   .i_i_npc(w_inst_sram_addr),
-                  .i_i_phyaddr(i_paddr),
-                  .i_i_cached(i_cached),
+                  .i_i_phyaddr(w_inst_sram_paddr),
+                  .i_i_cached(w_inst_sram_cached),
                   .o_i_valid(w_i_valid),
                   .o_i_inst(w_i_inst),
 
                   .i_d_va(w_data_sram_vaddr),
-                  .i_d_phyaddr(d_paddr),
-                  .i_d_cached(d_cached),
-                  .i_d_read(w_data_sram_read),
-                  .i_d_write(w_data_sram_write),
+                  .i_d_phyaddr(w_data_sram_paddr),
+                  .i_d_cached(w_data_sram_cached),
+                  .i_d_read(w_data_sram_read && w_data_sram_read_okay),
+                  .i_d_write(w_data_sram_write && w_data_sram_write_okay),
                   .i_d_size(w_data_sram_size),
                   .i_d_indata(w_data_sram_wdata),
                   .i_d_byteen(w_data_sram_byteen),
@@ -228,13 +257,13 @@ module mycpu_top #(
                   .o_d_outdata(w_d_outdata),
                   .o_d_cache_instr_valid(w_data_cache_op_valid),
                   
-                  .i_icache_instr(icache_op),
+                  .i_icache_instr(w_data_sram_read_okay ? icache_op : CACHE_NOP),
                   .i_icache_instr_tag(cp0_tagLo0[31:(32 - `ICACHE_TAG_WIDTH)]),
-                  .i_icache_instr_addr(d_paddr),
+                  .i_icache_instr_addr(w_data_sram_paddr),
 
-                  .i_dcache_instr(dcache_op),
+                  .i_dcache_instr(w_data_sram_read_okay ? dcache_op : CACHE_NOP),
                   .i_dcache_instr_tag(cp0_tagLo0[31:(32 - `DCACHE_TAG_WIDTH)]),
-                  .i_dcache_instr_addr(d_paddr),
+                  .i_dcache_instr_addr(w_data_sram_paddr),
 
                   .arid,
                   .araddr,

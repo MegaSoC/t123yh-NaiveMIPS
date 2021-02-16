@@ -9,6 +9,9 @@ module CPU #(
            output inst_sram_readen,
            input [31:0] inst_sram_rdata,
            input inst_sram_valid,
+           input inst_sram_addressError,
+           input inst_sram_tlb_miss,
+           input inst_sram_tlb_invalid,
            output cache_op inst_cache_op,
 
            output reg [31:0] data_sram_vaddr,
@@ -21,6 +24,11 @@ module CPU #(
            output [3:0] data_sram_byteen,
            output cache_op data_cache_op,
            input data_cache_op_valid,
+           output data_sram_tlb,
+           input data_sram_addressError,
+           input data_sram_tlb_miss,
+           input data_sram_tlb_invalid,
+           input data_sram_tlb_modified,
 
            output [31:0] debug_wb_pc,
            output [3:0] debug_wb_rf_wen,
@@ -120,6 +128,7 @@ InstructionMemory F_im (
 
                       .stall(stallLevel[m_F]),
                       .exception(exceptionLevel[m_D]),
+                      .fetchException(F_exception),
                       
                       .inst_sram_rdata(inst_sram_rdata),
                       .inst_sram_addr(inst_sram_addr),
@@ -127,11 +136,26 @@ InstructionMemory F_im (
                       .inst_sram_valid(inst_sram_valid)
                   );
 
-assign F_exception = F_im.adel;
+logic [31:0] F_badVAddr;
+logic F_tlb_refill;
 ExcCode_t F_excCode;
-assign F_excCode = F_im.adel ? cAdEL : cNone;
+always_comb begin
+    F_exception = 0;
+    F_excCode = cNone;
+    F_badVAddr = 'bx;
+    F_tlb_refill = 0;
+    if (F_im.outputPC[1:0] != 2'b0 || inst_sram_addressError) begin
+        F_exception = 1;
+        F_excCode = cAdEL;
+        F_badVAddr = F_im.outputPC;
+    end else if (inst_sram_tlb_miss || inst_sram_tlb_invalid) begin
+        F_exception = 1;
+        F_excCode = cTLBL;
+        F_badVAddr = F_im.outputPC;
+        F_tlb_refill = inst_sram_tlb_miss;
+    end
+end
 wire F_insert_bubble = F_im.bubble;
-wire [31:0] F_badVAddr = F_im.adel ? F_im.outputPC : 'bx;
 
 Decoder #(.IMPLEMENT_LIKELY(IMPLEMENT_LIKELY)) F_dec (
     .instruction(F_im.instruction),
@@ -153,6 +177,7 @@ ExcCode_t D_last_excCode;
 reg [31:0] D_badVAddr;
 logic [31:0] D_badVAddr_next;
 reg D_last_exception;
+reg D_tlb_refill;
 
 reg D_last_likely_failed;
 logic D_last_likely_failed_next;
@@ -166,6 +191,7 @@ always @(posedge clk) begin
         D_badVAddr <= 0;
         D_ctrl <= kControlNop;
         D_last_likely_failed <= 0;
+        D_tlb_refill <= 0;
     end
     else begin
         if (!D_stall) begin
@@ -177,6 +203,7 @@ always @(posedge clk) begin
             D_last_bubble <= F_insert_bubble || exceptionLevel[m_D] || D_last_likely_failed_next;
             D_ctrl <= (F_insert_bubble || exceptionLevel[m_D] || D_last_likely_failed_next || F_exception) ? kControlNop : F_dec.controls;
             D_last_likely_failed <= F_insert_bubble ? D_last_likely_failed_next : 0;
+            D_tlb_refill <= F_tlb_refill;
         end else begin
             D_last_bubble <= D_last_bubble || exceptionLevel[m_E];
             D_ctrl <= (D_last_bubble || exceptionLevel[m_E]) ? kControlNop : D_ctrl;
@@ -353,6 +380,7 @@ reg [31:0] E_memAddress;
 reg [31:0] E_aluOutput;
 reg E_aluOverflow;
 reg E_running;
+reg E_tlb_refill_last;
 
 reg E_regWriteDataValid;
 reg [31:0] E_regWriteData;
@@ -414,6 +442,7 @@ always @(posedge clk) begin
         E_aluOverflow <= 0;
         E_LLbit <= 0;
         E_running <= 0;
+        E_tlb_refill_last <= 0;
     end
     else begin
         if (!E_stall) begin
@@ -431,6 +460,7 @@ always @(posedge clk) begin
             E_aluOverflow <= D_alu.overflow;
             E_LLbit <= E_LLbit_next;
             E_running <= 0;
+            E_tlb_refill_last <= D_tlb_refill;
         end
         else begin
             E_bubble <= E_bubble || exceptionLevel[m_M];
@@ -467,16 +497,19 @@ ForwardController E_regRead2_forward (
                   );
 
 ExcCode_t E_excCode;
+logic E_tlb_refill;
 always_comb begin
     E_excCode = cNone;
     E_exception = 0;
     E_badVAddr_next = E_badVAddr;
+    E_tlb_refill = 0;
     if (E_bubble) begin
         E_exception = 0;
     end
     else if (E_last_exception) begin
         E_excCode = E_last_excCode;
         E_exception = 1;
+        E_tlb_refill = E_tlb_refill_last;
     end
     else if (E_ctrl.checkOverflow && E_aluOverflow) begin
         E_excCode = cOv;
@@ -485,6 +518,19 @@ always_comb begin
     else if (E_ctrl.trap && E_aluOutput) begin
         E_excCode = cTr;
         E_exception = 1;
+    end else if (data_sram_addressError) begin
+        E_exception = 1;
+        E_excCode = data_sram_write ? cAdES : cAdEL;
+        E_badVAddr_next = E_memAddress;
+    end else if (data_sram_tlb_miss || data_sram_tlb_invalid) begin
+        E_exception = 1;
+        E_excCode = data_sram_write ? cTLBS : cTLBL;
+        E_badVAddr_next = E_memAddress;
+        E_tlb_refill = data_sram_tlb_miss;
+    end else if (data_sram_tlb_modified) begin
+        E_exception = 1;
+        E_excCode = cTLBMod;
+        E_badVAddr_next = E_memAddress;
     end
 end
 
@@ -531,6 +577,7 @@ wire E_memEnable = !E_ctrl.checkLLbit || E_LLbit;
 assign data_sram_write = E_ctrl.memStore && E_memEnable;
 assign data_sram_read = E_ctrl.memLoad;
 assign data_sram_size = E_ctrl.memWidthCtrl;
+assign data_sram_tlb = E_ctrl.calculateAddress;
 assign data_cache_op = E_ctrl.memDCacheOp;
 assign inst_cache_op = E_ctrl.memICacheOp;
 // icache has no waiting operation
@@ -567,7 +614,7 @@ count_bit E_bitCounter(
     .val(E_regRead1) // forwarding is done in D to reduce delay
 );
 
-assign E_data_waiting = E_mul_collision || E_memory_waiting;
+assign E_data_waiting = !E_exception && (E_mul_collision || E_memory_waiting);
 reg [31:0] E_real_pc;
 
 always_comb begin
@@ -594,6 +641,7 @@ reg [31:0] M_bitCount;
 logic M_regWriteDataValid;
 logic [31:0] M_regWriteData;
 reg M_last_exception;
+reg M_tlb_refill;
 
 reg M_isDelaySlot;
 
@@ -610,6 +658,7 @@ always @(posedge clk) begin
         M_ctrl <= kControlNop;
         M_memData <= 0;
         M_cp0Value <= 0;
+        M_tlb_refill <= 0;
         M_bitCount <= 0;
     end
     else begin
@@ -626,6 +675,7 @@ always @(posedge clk) begin
         M_ctrl <= (E_insert_bubble || exceptionLevel[m_M] || E_exception) ? kControlNop : E_ctrl;
         M_cp0Value <= cp0_rdata;
         M_bitCount <= E_bitCounter.count;
+        M_tlb_refill <= E_tlb_refill;
 `ifndef SYNTHESIS
         if (E_exception) begin
             if (E_excCode == cERET) begin
@@ -679,7 +729,7 @@ always_comb begin
     case (M_last_excCode)
         cERET:        exceptionJumpAddr = cp0_epc;
         cInt:         exceptionJumpAddr = cp0_int_handler;
-        cTLBL, cTLBS: exceptionJumpAddr = cp0_tlb_refill_handler;
+        cTLBL, cTLBS: exceptionJumpAddr = M_tlb_refill ? cp0_tlb_refill_handler : cp0_exc_handler;
         default:      exceptionJumpAddr = cp0_exc_handler;
     endcase
 end

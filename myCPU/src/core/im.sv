@@ -8,11 +8,11 @@ module InstructionMemory(
 
            input stall,
            input exception,
+           input fetchException,
 
            output [31:0] outputPC,
            output [31:0] instruction,
            output logic bubble,
-           output logic adel,
            output logic isDelaySlot,
 
            output [31:0] inst_sram_addr,
@@ -36,7 +36,6 @@ wire canSendNewCommand = inst_sram_valid || !busy;
 assign instruction = inst_sram_rdata;
 assign outputPC = pc;
 assign inst_sram_addr = pc_next;
-assign adel = pc[1:0] != 0;
 
 always_comb begin
     pc_next = 'bx;
@@ -55,7 +54,7 @@ always_comb begin
             pendingException_next = 0;
             pendingJump_next = 0;
             if (!pendingException && !exception)
-                bubble = !inst_sram_valid && !adel;
+                bubble = !inst_sram_valid && !fetchException;
             if (!absJump && !pendingJump) begin
                 if (!bubble)
                     pc_next = pc + 4;

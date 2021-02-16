@@ -27,7 +27,7 @@ module TLB #(
 
     input  [31:0] va0,
     output [31:0] pa0,
-    output miss0,
+    output hit0,
     output valid0,
     output dirty0,
     output cached0,
@@ -35,7 +35,7 @@ module TLB #(
 
     input  [31:0] va1,
     output [31:0] pa1,
-    output miss1,
+    output hit1,
     output valid1,
     output dirty1,
     output cached1,
@@ -110,13 +110,13 @@ endgenerate
 
 assign probe_index_o = ((~|match) << 31) | index[TLB_NUM];
 
-MMUMatcher matcher0(va0, pa0, miss0, valid0, dirty0, cached0, error0);
-MMUMatcher matcher1(va1, pa1, miss1, valid1, dirty1, cached1, error1);
+MMUMatcher matcher0(va0, pa0, hit0, valid0, dirty0, cached0, error0);
+MMUMatcher matcher1(va1, pa1, hit1, valid1, dirty1, cached1, error1);
 
 module MMUMatcher(
     input  [31:0] va,
     output reg [31:0] pa,
-    output reg miss,
+    output reg hit,
     output reg valid,
     output reg dirty,
     output reg cached,
@@ -214,14 +214,14 @@ module MMUMatcher(
         addressError <= error;
         if (mapped) begin
             pa <= lp_pa0[TLB_NUM];
-            miss <= !(|match0);
+            hit <= |match0;
             valid <= lp_v0[TLB_NUM];
             dirty <= lp_d0[TLB_NUM];
             // See Table 9.9, P. 98, Vol. III
             cached <= lp_c0[TLB_NUM] == 3;
         end else begin
             pa <= {3'b0, va[28:0]};
-            miss <= 0;
+            hit <= 0;
             valid <= 1;
             dirty <= 1;
             cached <= va_seg == kseg0 ? kseg0_cached : 0;
