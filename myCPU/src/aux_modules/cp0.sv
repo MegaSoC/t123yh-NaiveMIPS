@@ -24,6 +24,7 @@ module CP0 (
     output wire         interrupt_pending,
 
     output wire         kseg0_cached,
+    output wire         kernel_mode,
     output wire [31:0]  tagLo0_o
 );
 
@@ -69,6 +70,7 @@ assign tagLo0_o  = cp0_reg_TagLo0;
 wire SR_BEV = cp0_reg_Status[22];
 wire SR_EXL = cp0_reg_Status[1];
 wire SR_ERL = cp0_reg_Status[2];
+wire SR_KSU = cp0_reg_Status[4:3];
 wire CAUSE_IV = cp0_reg_Cause[23];
 
 // See Table 6.8 / 6.9, Reference III
@@ -77,7 +79,8 @@ assign exc_handler = ebase + 32'h180;
 assign int_handler = CAUSE_IV ? ebase + 32'h200 : ebase + 32'h180;
 assign tlb_refill_handler = SR_EXL ? ebase + 32'h180 : ebase;
 
-assign kseg0_cached = cp0_reg_Conf0[2:0] == 3'h3;
+assign kseg0_cached = cp0_reg_Conf0[2:0] == 3'h3; // See Table 9.9, P. 98, Vol. III
+assign kernel_mode = SR_KSU == 2'b00 || SR_EXL || SR_ERL; // See Section 3.2, P. 19, Vol. III
 
 // TLB related
 wire [`TLB_IDX_BITS-1:0] nRandom = cp0_reg_Random[`TLB_IDX_BITS-1:0] + 1'b1;
