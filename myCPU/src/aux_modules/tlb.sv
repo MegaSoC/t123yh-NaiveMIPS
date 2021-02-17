@@ -153,7 +153,7 @@ module MMUMatcher(
     logic mapped;
     logic error;
 
-    typedef enum {
+    typedef enum logic [2:0] {
         useg,
         kseg0,
         kseg1,
