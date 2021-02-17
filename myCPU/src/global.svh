@@ -5,9 +5,9 @@
 
 typedef enum logic [4:0] {
     cNone   = 5'bx,
-    cInt    = 5'd0, 
+    cInt    = 5'd0,
     cTLBMod = 5'd1,
-    cTLBL   = 5'd2, 
+    cTLBL   = 5'd2,
     cTLBS   = 5'd3,
     cAdEL   = 5'd4,
     cAdES   = 5'd5,
@@ -51,5 +51,12 @@ typedef enum logic [2:0] {
     CACHE_HIT_WRITEBACK_INVALIDATE,
     CACHE_HIT_INVALIDATE
 } cache_op;
+
+typedef struct packed {
+    bit p;
+    bit r;
+    bit w;
+    bit random;
+} tlb_op_t;
 
 `endif

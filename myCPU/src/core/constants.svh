@@ -112,49 +112,53 @@ typedef struct packed {
 
     bit setLLbit;
     bit checkLLbit;
+
+    tlb_op_t tlb;
 } ControlSignals;
 
 const ControlSignals kControlNop = '{
-    regRead1: 0, 
-    regRead2: 0, 
-    grfWriteSource: `grfWriteDisable, 
-    destinationRegister: 0, 
-    immediate: 'bx, 
+    regRead1: 0,
+    regRead2: 0,
+    grfWriteSource: `grfWriteDisable,
+    destinationRegister: 0,
+    immediate: 'bx,
 
-    mulEnable: 0, 
-    mulOutputSel: 'bx, 
-    mulCtrl: `mtDisabled, 
+    mulEnable: 0,
+    mulOutputSel: 'bx,
+    mulCtrl: `mtDisabled,
 
     memLoad: 0,
-    memStore: 0, 
+    memStore: 0,
     memICacheOp: CACHE_NOP,
     memDCacheOp: CACHE_NOP,
     calculateAddress: 0,
-    memWidthCtrl: 0, 
-    memReadSignExtend: 0, 
+    memWidthCtrl: 0,
+    memReadSignExtend: 0,
     memUnaligned: 0,
     memLeftPart: 0,
 
-    branch: 0, 
+    branch: 0,
     branchLikely: 0,
-    cmpCtrl: 'bx, 
-    absJump: 0, 
+    cmpCtrl: 'bx,
+    absJump: 0,
     absJumpLoc: 'bx,
 
-    aluSrc: 0, 
-    aluCtrl: `aluDisabled, 
-    checkOverflow: 0, 
+    aluSrc: 0,
+    aluCtrl: `aluDisabled,
+    checkOverflow: 0,
     trap: 0,
 
-    generateException: `ctrlNoException, 
-    writeCP0: 0, 
+    generateException: `ctrlNoException,
+    writeCP0: 0,
     numberCP0: cp0_nX,
-    
+
     bitCounterEnable: 0,
     bitCounterType: 'bx,
 
     setLLbit: 0,
-    checkLLbit: 0
+    checkLLbit: 0,
+
+    tlb: tlb_op_t'{p: 0, r: 0, w: 0, random: 0}
 };
 
 `endif

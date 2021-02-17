@@ -120,6 +120,25 @@ always_comb begin
                 begin                           
                     controls.generateException = `ctrlERET;
                 end
+
+                11'b10000_000001: // tlbr
+                begin
+                    controls.tlb.r = 1;
+                end
+                11'b10000_001000: // tlbp
+                begin
+                    controls.tlb.p = 1;
+                end
+                11'b10000_000010: // tlbwi
+                begin
+                    controls.tlb.w = 1;
+                end
+                11'b10000_000110: // tlbwr
+                begin
+                    controls.tlb.w = 1;
+                    controls.tlb.random = 1;
+                end
+
                 default: begin
                     controls.generateException = `ctrlUnknownInstruction;
                 end

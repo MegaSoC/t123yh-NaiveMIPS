@@ -54,7 +54,9 @@ module CPU #(
            output [31:0] cp0_ewr_epc,
            output [31:0] cp0_ewr_badVAddr,
 
-           input cp0_interrupt_pending
+           input cp0_interrupt_pending,
+
+           output tlb_op_t tlb_op
        );
 
 wire D_data_waiting;
@@ -603,6 +605,7 @@ end
 assign cp0_we = E_ctrl.writeCP0;
 assign cp0_number = E_ctrl.numberCP0;
 assign cp0_wdata = E_regRead1_forward.value;
+assign tlb_op = E_ctrl.tlb;
 
 count_bit E_bitCounter(
     .bit_val(E_ctrl.bitCounterType),

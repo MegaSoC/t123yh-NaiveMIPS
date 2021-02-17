@@ -1,8 +1,8 @@
 // TODO: partially copied from ucas, rewriting needed
 
 module TLB #(
-    parameter TLB_NUM = 32,
-    parameter IDX_BITS = $clog2(TLB_NUM)
+    parameter TLB_NUM = 1 << `TLB_IDX_BITS,
+    parameter IDX_BITS = `TLB_IDX_BITS
 )(
     input        clk,
     input        rst,

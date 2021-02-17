@@ -32,7 +32,16 @@ module CP0 (
     output wire [31:0] entryLo1_o,
     output wire [31:0] entryHi_o,
     output wire [31:0] pageMask_o,
-    output wire [31:0] index_o
+    output wire [31:0] tlbIndex_o,
+
+    input  wire        tlbp,
+    input  wire        tlbr,
+    input  wire        tlbrandom,
+    input  wire [31:0] entryLo0_i,
+    input  wire [31:0] entryLo1_i,
+    input  wire [31:0] entryHi_i,
+    input  wire [31:0] pageMask_i,
+    input  wire [31:0] index_i
 );
 
 reg [4:0] hardware_int_sample;
@@ -77,7 +86,7 @@ assign entryHi_o = cp0_reg_EntryHi;
 assign entryLo0_o = cp0_reg_EntryLo0;
 assign entryLo1_o = cp0_reg_EntryLo1;
 assign pageMask_o = cp0_reg_PageMask;
-assign index_o    = cp0_reg_Index;
+assign tlbIndex_o = tlbrandom ? cp0_reg_Random : cp0_reg_Index;
 
 wire SR_BEV = cp0_reg_Status[22];
 wire SR_EXL = cp0_reg_Status[1];
@@ -124,8 +133,8 @@ assign data_o = ({32{rw_number == cp0_nIndex    }} & cp0_reg_Index    ) |
                 ({32{rw_number == cp0_nEPC      }} & cp0_reg_EPC      ) |
                 ({32{rw_number == cp0_nPRId     }} & INIT_PRId        ) |
                 ({32{rw_number == cp0_nEBase    }} & cp0_reg_EBase    ) |
-                ({32{rw_number == cp0_nConf0    }} & cp0_reg_Conf0    ) | 
-                ({32{rw_number == cp0_nConf1    }} & cp0_reg_Conf1    ) |  
+                ({32{rw_number == cp0_nConf0    }} & cp0_reg_Conf0    ) |
+                ({32{rw_number == cp0_nConf1    }} & cp0_reg_Conf1    ) |
                 ({32{rw_number == cp0_nTagLo0	}} & cp0_reg_TagLo0   ) |
                 ({32{rw_number == cp0_nTagHi0   }} & cp0_reg_TagHi0   ) ;
 
@@ -165,25 +174,50 @@ always_ff @(posedge clk) begin
             timer_int <= 1'b0;
         end
 
-        if (we) begin
+        if (en_exp_i) begin
+            if (ewr_excCode == cERET) begin
+                cp0_reg_Status[1] <= 1'b0;
+            end else begin
+                case (ewr_excCode)
+                    cAdEL, cAdES: begin
+                        cp0_reg_BadVAddr <= ewr_badVAddr;
+                    end
+
+                    cTLBL, cTLBS, cTLBMod: begin
+                        cp0_reg_BadVAddr <= ewr_badVAddr;
+                        cp0_reg_Context[22:4] <= ewr_badVAddr[31:13]; // P. 99, Vol. III
+                        cp0_reg_EntryHi[31:13] <= ewr_badVAddr[31:13]; // P. 117, Vol. III
+                    end
+                endcase
+
+                cp0_reg_Cause[6:2]     <= ewr_excCode;
+                cp0_reg_Status[1]      <= 1'b1;
+
+                if (!SR_EXL) begin
+                    // These registers are only updated when not in EXL. See Table 9.25, P. 126, Vol. III.
+                    cp0_reg_Cause[31]      <= ewr_bd;
+                    cp0_reg_EPC            <= ewr_epc;
+                end
+            end
+        end else if (we) begin
             case (rw_number)
                 cp0_nIndex: begin
                     cp0_reg_Index[`TLB_IDX_BITS-1:0] <= data_i[`TLB_IDX_BITS-1:0];
                 end
                 cp0_nEntryLo0: begin
-                    cp0_reg_EntryLo0[25:0]           <= data_i[25:0]; 
+                    cp0_reg_EntryLo0[25:0]           <= data_i[25:0];
                 end
                 cp0_nEntryLo1: begin
-                    cp0_reg_EntryLo1[25:0]           <= data_i[25:0]; 
+                    cp0_reg_EntryLo1[25:0]           <= data_i[25:0];
                 end
                 cp0_nContext: begin
                     cp0_reg_Context[31:23]           <= data_i[31:23];
                 end
                 cp0_nPageMask: begin
-                    cp0_reg_PageMask[28:13]          <= data_i[28:13]; 
+                    cp0_reg_PageMask[28:13]          <= data_i[28:13];
                 end
                 cp0_nWired: begin
-                    cp0_reg_Wired[`TLB_IDX_BITS-1:0] <= data_i[`TLB_IDX_BITS-1:0]; 
+                    cp0_reg_Wired[`TLB_IDX_BITS-1:0] <= data_i[`TLB_IDX_BITS-1:0];
                     cp0_reg_Random[`TLB_IDX_BITS-1:0]<= INIT_Random;
                 end
                 cp0_nCount: begin
@@ -223,48 +257,15 @@ always_ff @(posedge clk) begin
                     $display("unkown cp0 register number %d", rw_number);
                 end
             endcase
-        end
-        else begin
-        /*
-            if (tlbr) begin
-                cp0_reg_EntryHi  <= entryhi_r;
-                cp0_reg_EntryLo0 <= entrylo0_r;
-                cp0_reg_EntryLo1 <= entrylo1_r;
-                cp0_reg_PageMask[28:13] <= mask_r;
-            end
-            if (tlbp) begin
-                cp0_reg_Index <= index_probe_r;
-            end
-            if (tlbwr) begin
-                cp0_reg_Random <= nRandom < cp0_reg_Wired ? cp0_reg_Wired : nRandom;
-            end
-            */
-            if (en_exp_i) begin
-                if (ewr_excCode == cERET) begin
-                    cp0_reg_Status[1] <= 1'b0;
-                end else begin
-                    case (ewr_excCode)
-                        cAdEL, cAdES: begin
-                            cp0_reg_BadVAddr <= ewr_badVAddr;
-                        end
-
-                        cTLBL, cTLBS, cTLBMod: begin
-                            cp0_reg_BadVAddr <= ewr_badVAddr;
-                            cp0_reg_Context[22:4] <= ewr_badVAddr[31:13]; // P. 99, Vol. III
-                            cp0_reg_EntryHi[31:13] <= ewr_badVAddr[31:13]; // P. 117, Vol. III
-                        end
-                    endcase
-
-                    cp0_reg_Cause[6:2]     <= ewr_excCode;
-                    cp0_reg_Status[1]      <= 1'b1; 
-
-                    if (!SR_EXL) begin
-                        // These registers are only updated when not in EXL. See Table 9.25, P. 126, Vol. III.
-                        cp0_reg_Cause[31]      <= ewr_bd; 
-                        cp0_reg_EPC            <= ewr_epc;
-                    end
-                end
-            end
+        end else if (tlbr) begin
+            cp0_reg_EntryHi  <= entryHi_i;
+            cp0_reg_EntryLo0 <= entryLo0_i;
+            cp0_reg_EntryLo1 <= entryLo1_i;
+            cp0_reg_PageMask[28:13] <= pageMask_i;
+        end else if (tlbp) begin
+            cp0_reg_Index <= index_i;
+        end else if (tlbrandom) begin
+            cp0_reg_Random <= nRandom < cp0_reg_Wired ? cp0_reg_Wired : nRandom;
         end
     end
 end
