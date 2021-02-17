@@ -55,6 +55,7 @@ module CPU #(
            output [31:0] cp0_ewr_badVAddr,
 
            input cp0_interrupt_pending,
+           input cp0_privileged,
 
            output tlb_op_t tlb_op
        );
@@ -330,6 +331,9 @@ always_comb begin
     else if (cp0_interrupt_pending) begin
         D_excCode = cInt;
         D_exception = 1;
+    end else if (D_ctrl.privileged && !cp0_privileged) begin
+        D_exception = 1;
+        D_excCode = cCpU;
     end else if (D_ctrl.memStore && D_memAddressError) begin
         D_excCode = cAdES;
         D_exception = 1;

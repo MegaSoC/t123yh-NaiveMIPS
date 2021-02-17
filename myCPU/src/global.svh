@@ -14,6 +14,7 @@ typedef enum logic [4:0] {
     cSys    = 5'd8,
     cBp     = 5'd9,
     cRI     = 5'd10,
+    cCpU    = 5'd11,
     cOv     = 5'd12,
     cTr     = 5'd13,
     cERET   = 5'd31  // treat eret as a special type of exception

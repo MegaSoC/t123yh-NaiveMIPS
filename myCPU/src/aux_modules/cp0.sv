@@ -23,6 +23,7 @@ module CP0 (
     input wire [4:0]    hardware_int,
     output wire         interrupt_pending,
 
+    output wire         privileged,
     output wire         kseg0_cached,
     output wire         kernel_mode,
     output wire         erl,
@@ -88,6 +89,7 @@ assign entryLo1_o = cp0_reg_EntryLo1;
 assign pageMask_o = cp0_reg_PageMask;
 assign tlbIndex_o = tlbrandom ? cp0_reg_Random : cp0_reg_Index;
 
+wire SR_CU0 = cp0_reg_Status[28];
 wire SR_BEV = cp0_reg_Status[22];
 wire SR_EXL = cp0_reg_Status[1];
 wire SR_ERL = cp0_reg_Status[2];
@@ -103,6 +105,7 @@ assign tlb_refill_handler = SR_EXL ? ebase + 32'h180 : ebase;
 assign kseg0_cached = cp0_reg_Conf0[2:0] == 3'h3; // See Table 9.9, P. 98, Vol. III
 assign kernel_mode = SR_KSU == 2'b00 || SR_EXL || SR_ERL; // See Section 3.2, P. 19, Vol. III
 assign erl = SR_ERL;
+assign privileged = SR_CU0 || kernel_mode; // See Section 3.5.3, P. 21, Vol. III
 
 // TLB related
 wire [`TLB_IDX_BITS-1:0] nRandom = cp0_reg_Random[`TLB_IDX_BITS-1:0] + 1'b1;
@@ -270,4 +273,4 @@ always_ff @(posedge clk) begin
     end
 end
 
-endmodule
+endmodule : CP0

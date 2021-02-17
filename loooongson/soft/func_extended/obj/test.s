@@ -9,7 +9,7 @@ bfc00000 <_ftext>:
 /home/lxb/project-for-linux/loooongson/soft/func_extended/start.S:19
 bfc00000:	24081800 	li	t0,6144
 /home/lxb/project-for-linux/loooongson/soft/func_extended/start.S:20
-bfc00004:	40882800 	mtc0	t0,$5
+bfc00004:	40882800 	mtc0	t0,c0_pagemask
 /home/lxb/project-for-linux/loooongson/soft/func_extended/start.S:21
 bfc00008:	00000013 	mtlo	zero
 /home/lxb/project-for-linux/loooongson/soft/func_extended/start.S:22
@@ -167,13 +167,13 @@ bfc00404 <syscall_ex>:
 /home/lxb/project-for-linux/loooongson/soft/func_extended/start.S:115
 bfc00404:	00009021 	move	s2,zero
 /home/lxb/project-for-linux/loooongson/soft/func_extended/start.S:116
-bfc00408:	401a7000 	mfc0	k0,$14
+bfc00408:	401a7000 	mfc0	k0,c0_epc
 /home/lxb/project-for-linux/loooongson/soft/func_extended/start.S:117
 bfc0040c:	175400b0 	bne	k0,s4,bfc006d0 <ex_finish>
 /home/lxb/project-for-linux/loooongson/soft/func_extended/start.S:118
 bfc00410:	00000000 	nop
 /home/lxb/project-for-linux/loooongson/soft/func_extended/start.S:119
-bfc00414:	401a6800 	mfc0	k0,$13
+bfc00414:	401a6800 	mfc0	k0,c0_cause
 /home/lxb/project-for-linux/loooongson/soft/func_extended/start.S:120
 bfc00418:	335a007c 	andi	k0,k0,0x7c
 /home/lxb/project-for-linux/loooongson/soft/func_extended/start.S:121
@@ -183,7 +183,7 @@ bfc00420:	175b00ab 	bne	k0,k1,bfc006d0 <ex_finish>
 /home/lxb/project-for-linux/loooongson/soft/func_extended/start.S:123
 bfc00424:	00000000 	nop
 /home/lxb/project-for-linux/loooongson/soft/func_extended/start.S:124
-bfc00428:	401a6000 	mfc0	k0,$12
+bfc00428:	401a6000 	mfc0	k0,c0_status
 /home/lxb/project-for-linux/loooongson/soft/func_extended/start.S:125
 bfc0042c:	335a0002 	andi	k0,k0,0x2
 /home/lxb/project-for-linux/loooongson/soft/func_extended/start.S:126
@@ -203,13 +203,13 @@ bfc00448 <break_ex>:
 /home/lxb/project-for-linux/loooongson/soft/func_extended/start.S:134
 bfc00448:	00009021 	move	s2,zero
 /home/lxb/project-for-linux/loooongson/soft/func_extended/start.S:135
-bfc0044c:	401a7000 	mfc0	k0,$14
+bfc0044c:	401a7000 	mfc0	k0,c0_epc
 /home/lxb/project-for-linux/loooongson/soft/func_extended/start.S:136
 bfc00450:	1754009f 	bne	k0,s4,bfc006d0 <ex_finish>
 /home/lxb/project-for-linux/loooongson/soft/func_extended/start.S:137
 bfc00454:	00000000 	nop
 /home/lxb/project-for-linux/loooongson/soft/func_extended/start.S:138
-bfc00458:	401a6800 	mfc0	k0,$13
+bfc00458:	401a6800 	mfc0	k0,c0_cause
 /home/lxb/project-for-linux/loooongson/soft/func_extended/start.S:139
 bfc0045c:	335a007c 	andi	k0,k0,0x7c
 /home/lxb/project-for-linux/loooongson/soft/func_extended/start.S:140
@@ -219,7 +219,7 @@ bfc00464:	175b009a 	bne	k0,k1,bfc006d0 <ex_finish>
 /home/lxb/project-for-linux/loooongson/soft/func_extended/start.S:142
 bfc00468:	00000000 	nop
 /home/lxb/project-for-linux/loooongson/soft/func_extended/start.S:143
-bfc0046c:	401a6000 	mfc0	k0,$12
+bfc0046c:	401a6000 	mfc0	k0,c0_status
 /home/lxb/project-for-linux/loooongson/soft/func_extended/start.S:144
 bfc00470:	335a0002 	andi	k0,k0,0x2
 /home/lxb/project-for-linux/loooongson/soft/func_extended/start.S:145
@@ -239,13 +239,13 @@ bfc0048c <trap_ex>:
 /home/lxb/project-for-linux/loooongson/soft/func_extended/start.S:155
 bfc0048c:	00009021 	move	s2,zero
 /home/lxb/project-for-linux/loooongson/soft/func_extended/start.S:156
-bfc00490:	401a7000 	mfc0	k0,$14
+bfc00490:	401a7000 	mfc0	k0,c0_epc
 /home/lxb/project-for-linux/loooongson/soft/func_extended/start.S:157
 bfc00494:	1754008e 	bne	k0,s4,bfc006d0 <ex_finish>
 /home/lxb/project-for-linux/loooongson/soft/func_extended/start.S:158
 bfc00498:	00000000 	nop
 /home/lxb/project-for-linux/loooongson/soft/func_extended/start.S:159
-bfc0049c:	401a6800 	mfc0	k0,$13
+bfc0049c:	401a6800 	mfc0	k0,c0_cause
 /home/lxb/project-for-linux/loooongson/soft/func_extended/start.S:160
 bfc004a0:	335a007c 	andi	k0,k0,0x7c
 /home/lxb/project-for-linux/loooongson/soft/func_extended/start.S:161
@@ -255,7 +255,7 @@ bfc004a8:	175b0089 	bne	k0,k1,bfc006d0 <ex_finish>
 /home/lxb/project-for-linux/loooongson/soft/func_extended/start.S:163
 bfc004ac:	00000000 	nop
 /home/lxb/project-for-linux/loooongson/soft/func_extended/start.S:164
-bfc004b0:	401a6000 	mfc0	k0,$12
+bfc004b0:	401a6000 	mfc0	k0,c0_status
 /home/lxb/project-for-linux/loooongson/soft/func_extended/start.S:165
 bfc004b4:	335a0002 	andi	k0,k0,0x2
 /home/lxb/project-for-linux/loooongson/soft/func_extended/start.S:166
@@ -275,11 +275,11 @@ bfc004d0 <overflow_ex>:
 /home/lxb/project-for-linux/loooongson/soft/func_extended/start.S:174
 bfc004d0:	00009021 	move	s2,zero
 /home/lxb/project-for-linux/loooongson/soft/func_extended/start.S:175
-bfc004d4:	401a7000 	mfc0	k0,$14
+bfc004d4:	401a7000 	mfc0	k0,c0_epc
 /home/lxb/project-for-linux/loooongson/soft/func_extended/start.S:176
 bfc004d8:	1754007d 	bne	k0,s4,bfc006d0 <ex_finish>
 /home/lxb/project-for-linux/loooongson/soft/func_extended/start.S:177
-bfc004dc:	401a6800 	mfc0	k0,$13
+bfc004dc:	401a6800 	mfc0	k0,c0_cause
 /home/lxb/project-for-linux/loooongson/soft/func_extended/start.S:178
 bfc004e0:	335a007c 	andi	k0,k0,0x7c
 /home/lxb/project-for-linux/loooongson/soft/func_extended/start.S:179
@@ -289,7 +289,7 @@ bfc004e8:	175b0079 	bne	k0,k1,bfc006d0 <ex_finish>
 /home/lxb/project-for-linux/loooongson/soft/func_extended/start.S:181
 bfc004ec:	00000000 	nop
 /home/lxb/project-for-linux/loooongson/soft/func_extended/start.S:182
-bfc004f0:	401a6000 	mfc0	k0,$12
+bfc004f0:	401a6000 	mfc0	k0,c0_status
 /home/lxb/project-for-linux/loooongson/soft/func_extended/start.S:183
 bfc004f4:	335a0002 	andi	k0,k0,0x2
 /home/lxb/project-for-linux/loooongson/soft/func_extended/start.S:184
@@ -309,13 +309,13 @@ bfc00510 <adel_load_ex>:
 /home/lxb/project-for-linux/loooongson/soft/func_extended/start.S:192
 bfc00510:	00009021 	move	s2,zero
 /home/lxb/project-for-linux/loooongson/soft/func_extended/start.S:193
-bfc00514:	401a7000 	mfc0	k0,$14
+bfc00514:	401a7000 	mfc0	k0,c0_epc
 /home/lxb/project-for-linux/loooongson/soft/func_extended/start.S:194
 bfc00518:	1754006d 	bne	k0,s4,bfc006d0 <ex_finish>
 /home/lxb/project-for-linux/loooongson/soft/func_extended/start.S:195
 bfc0051c:	00000000 	nop
 /home/lxb/project-for-linux/loooongson/soft/func_extended/start.S:196
-bfc00520:	401a6800 	mfc0	k0,$13
+bfc00520:	401a6800 	mfc0	k0,c0_cause
 /home/lxb/project-for-linux/loooongson/soft/func_extended/start.S:197
 bfc00524:	335a007c 	andi	k0,k0,0x7c
 /home/lxb/project-for-linux/loooongson/soft/func_extended/start.S:198
@@ -325,7 +325,7 @@ bfc0052c:	175b0068 	bne	k0,k1,bfc006d0 <ex_finish>
 /home/lxb/project-for-linux/loooongson/soft/func_extended/start.S:200
 bfc00530:	00000000 	nop
 /home/lxb/project-for-linux/loooongson/soft/func_extended/start.S:201
-bfc00534:	401a6000 	mfc0	k0,$12
+bfc00534:	401a6000 	mfc0	k0,c0_status
 /home/lxb/project-for-linux/loooongson/soft/func_extended/start.S:202
 bfc00538:	335a0002 	andi	k0,k0,0x2
 /home/lxb/project-for-linux/loooongson/soft/func_extended/start.S:203
@@ -345,13 +345,13 @@ bfc00554 <ades_ex>:
 /home/lxb/project-for-linux/loooongson/soft/func_extended/start.S:211
 bfc00554:	00009021 	move	s2,zero
 /home/lxb/project-for-linux/loooongson/soft/func_extended/start.S:212
-bfc00558:	401a7000 	mfc0	k0,$14
+bfc00558:	401a7000 	mfc0	k0,c0_epc
 /home/lxb/project-for-linux/loooongson/soft/func_extended/start.S:213
 bfc0055c:	1754005c 	bne	k0,s4,bfc006d0 <ex_finish>
 /home/lxb/project-for-linux/loooongson/soft/func_extended/start.S:214
 bfc00560:	00000000 	nop
 /home/lxb/project-for-linux/loooongson/soft/func_extended/start.S:215
-bfc00564:	401a6800 	mfc0	k0,$13
+bfc00564:	401a6800 	mfc0	k0,c0_cause
 /home/lxb/project-for-linux/loooongson/soft/func_extended/start.S:216
 bfc00568:	335a007c 	andi	k0,k0,0x7c
 /home/lxb/project-for-linux/loooongson/soft/func_extended/start.S:217
@@ -361,7 +361,7 @@ bfc00570:	175b0057 	bne	k0,k1,bfc006d0 <ex_finish>
 /home/lxb/project-for-linux/loooongson/soft/func_extended/start.S:219
 bfc00574:	00000000 	nop
 /home/lxb/project-for-linux/loooongson/soft/func_extended/start.S:220
-bfc00578:	401a6000 	mfc0	k0,$12
+bfc00578:	401a6000 	mfc0	k0,c0_status
 /home/lxb/project-for-linux/loooongson/soft/func_extended/start.S:221
 bfc0057c:	335a0002 	andi	k0,k0,0x2
 /home/lxb/project-for-linux/loooongson/soft/func_extended/start.S:222
@@ -381,15 +381,15 @@ bfc00598 <adel_if_ex>:
 /home/lxb/project-for-linux/loooongson/soft/func_extended/start.S:230
 bfc00598:	00009021 	move	s2,zero
 /home/lxb/project-for-linux/loooongson/soft/func_extended/start.S:231
-bfc0059c:	401a7000 	mfc0	k0,$14
+bfc0059c:	401a7000 	mfc0	k0,c0_epc
 /home/lxb/project-for-linux/loooongson/soft/func_extended/start.S:232
 bfc005a0:	1754004b 	bne	k0,s4,bfc006d0 <ex_finish>
 /home/lxb/project-for-linux/loooongson/soft/func_extended/start.S:233
 bfc005a4:	00000000 	nop
 /home/lxb/project-for-linux/loooongson/soft/func_extended/start.S:234
-bfc005a8:	40957000 	mtc0	s5,$14
+bfc005a8:	40957000 	mtc0	s5,c0_epc
 /home/lxb/project-for-linux/loooongson/soft/func_extended/start.S:235
-bfc005ac:	401a6800 	mfc0	k0,$13
+bfc005ac:	401a6800 	mfc0	k0,c0_cause
 /home/lxb/project-for-linux/loooongson/soft/func_extended/start.S:236
 bfc005b0:	335a007c 	andi	k0,k0,0x7c
 /home/lxb/project-for-linux/loooongson/soft/func_extended/start.S:237
@@ -399,7 +399,7 @@ bfc005b8:	175b0045 	bne	k0,k1,bfc006d0 <ex_finish>
 /home/lxb/project-for-linux/loooongson/soft/func_extended/start.S:239
 bfc005bc:	00000000 	nop
 /home/lxb/project-for-linux/loooongson/soft/func_extended/start.S:240
-bfc005c0:	401a6000 	mfc0	k0,$12
+bfc005c0:	401a6000 	mfc0	k0,c0_status
 /home/lxb/project-for-linux/loooongson/soft/func_extended/start.S:241
 bfc005c4:	335a0002 	andi	k0,k0,0x2
 /home/lxb/project-for-linux/loooongson/soft/func_extended/start.S:242
@@ -419,13 +419,13 @@ bfc005e0 <reserved_inst_ex>:
 /home/lxb/project-for-linux/loooongson/soft/func_extended/start.S:250
 bfc005e0:	00009021 	move	s2,zero
 /home/lxb/project-for-linux/loooongson/soft/func_extended/start.S:251
-bfc005e4:	401a7000 	mfc0	k0,$14
+bfc005e4:	401a7000 	mfc0	k0,c0_epc
 /home/lxb/project-for-linux/loooongson/soft/func_extended/start.S:252
 bfc005e8:	17540039 	bne	k0,s4,bfc006d0 <ex_finish>
 /home/lxb/project-for-linux/loooongson/soft/func_extended/start.S:253
 bfc005ec:	00000000 	nop
 /home/lxb/project-for-linux/loooongson/soft/func_extended/start.S:254
-bfc005f0:	401a6800 	mfc0	k0,$13
+bfc005f0:	401a6800 	mfc0	k0,c0_cause
 /home/lxb/project-for-linux/loooongson/soft/func_extended/start.S:255
 bfc005f4:	335a007c 	andi	k0,k0,0x7c
 /home/lxb/project-for-linux/loooongson/soft/func_extended/start.S:256
@@ -435,7 +435,7 @@ bfc005fc:	175b0034 	bne	k0,k1,bfc006d0 <ex_finish>
 /home/lxb/project-for-linux/loooongson/soft/func_extended/start.S:258
 bfc00600:	00000000 	nop
 /home/lxb/project-for-linux/loooongson/soft/func_extended/start.S:259
-bfc00604:	401a6000 	mfc0	k0,$12
+bfc00604:	401a6000 	mfc0	k0,c0_status
 /home/lxb/project-for-linux/loooongson/soft/func_extended/start.S:260
 bfc00608:	335a0002 	andi	k0,k0,0x2
 /home/lxb/project-for-linux/loooongson/soft/func_extended/start.S:261
@@ -455,7 +455,7 @@ bfc00624 <int_ex>:
 /home/lxb/project-for-linux/loooongson/soft/func_extended/start.S:269
 bfc00624:	00009021 	move	s2,zero
 /home/lxb/project-for-linux/loooongson/soft/func_extended/start.S:270
-bfc00628:	401a7000 	mfc0	k0,$14
+bfc00628:	401a7000 	mfc0	k0,c0_epc
 /home/lxb/project-for-linux/loooongson/soft/func_extended/start.S:271
 bfc0062c:	17540028 	bne	k0,s4,bfc006d0 <ex_finish>
 /home/lxb/project-for-linux/loooongson/soft/func_extended/start.S:272
@@ -463,7 +463,7 @@ bfc00630:	00000000 	nop
 /home/lxb/project-for-linux/loooongson/soft/func_extended/start.S:273
 bfc00634:	275a0008 	addiu	k0,k0,8
 /home/lxb/project-for-linux/loooongson/soft/func_extended/start.S:274
-bfc00638:	409a7000 	mtc0	k0,$14
+bfc00638:	409a7000 	mtc0	k0,c0_epc
 /home/lxb/project-for-linux/loooongson/soft/func_extended/start.S:275
 bfc0063c:	3c1bbfb0 	lui	k1,0xbfb0
 bfc00640:	af608ffc 	sw	zero,-28676(k1)
@@ -474,7 +474,7 @@ bfc00650:	af608ffc 	sw	zero,-28676(k1)
 bfc00654:	8f608ffc 	lw	zero,-28676(k1)
 bfc00658:	8f7bfff8 	lw	k1,-8(k1)
 /home/lxb/project-for-linux/loooongson/soft/func_extended/start.S:276
-bfc0065c:	401a6800 	mfc0	k0,$13
+bfc0065c:	401a6800 	mfc0	k0,c0_cause
 /home/lxb/project-for-linux/loooongson/soft/func_extended/start.S:277
 bfc00660:	3c1bbfb0 	lui	k1,0xbfb0
 bfc00664:	af608ffc 	sw	zero,-28676(k1)
@@ -494,7 +494,7 @@ bfc0068c:	00000000 	nop
 /home/lxb/project-for-linux/loooongson/soft/func_extended/start.S:281
 bfc00690:	00000000 	nop
 /home/lxb/project-for-linux/loooongson/soft/func_extended/start.S:282
-bfc00694:	401a6000 	mfc0	k0,$12
+bfc00694:	401a6000 	mfc0	k0,c0_status
 bfc00698:	00000000 	nop
 /home/lxb/project-for-linux/loooongson/soft/func_extended/start.S:283
 bfc0069c:	335a0002 	andi	k0,k0,0x2
@@ -510,10 +510,10 @@ bfc006b0:	241affff 	li	k0,-1
 /home/lxb/project-for-linux/loooongson/soft/func_extended/start.S:288
 bfc006b4:	241b0000 	li	k1,0
 /home/lxb/project-for-linux/loooongson/soft/func_extended/start.S:289
-bfc006b8:	409a5800 	mtc0	k0,$11
+bfc006b8:	409a5800 	mtc0	k0,c0_compare
 bfc006bc:	00000000 	nop
 /home/lxb/project-for-linux/loooongson/soft/func_extended/start.S:290
-bfc006c0:	409b6800 	mtc0	k1,$13
+bfc006c0:	409b6800 	mtc0	k1,c0_cause
 /home/lxb/project-for-linux/loooongson/soft/func_extended/start.S:291
 bfc006c4:	10000010 	b	bfc00708 <ex_ret>
 /home/lxb/project-for-linux/loooongson/soft/func_extended/start.S:292
@@ -523,13 +523,13 @@ bfc006cc:	00000000 	nop
 
 bfc006d0 <ex_finish>:
 /home/lxb/project-for-linux/loooongson/soft/func_extended/start.S:296
-bfc006d0:	401a6800 	mfc0	k0,$13
+bfc006d0:	401a6800 	mfc0	k0,c0_cause
 /home/lxb/project-for-linux/loooongson/soft/func_extended/start.S:297
 bfc006d4:	3c1b8000 	lui	k1,0x8000
 /home/lxb/project-for-linux/loooongson/soft/func_extended/start.S:298
 bfc006d8:	035bd024 	and	k0,k0,k1
 /home/lxb/project-for-linux/loooongson/soft/func_extended/start.S:299
-bfc006dc:	401b7000 	mfc0	k1,$14
+bfc006dc:	401b7000 	mfc0	k1,c0_epc
 bfc006e0:	00000000 	nop
 /home/lxb/project-for-linux/loooongson/soft/func_extended/start.S:300
 bfc006e4:	13400003 	beqz	k0,bfc006f4 <ex_finish+0x24>
@@ -540,7 +540,7 @@ bfc006ec:	00000000 	nop
 /home/lxb/project-for-linux/loooongson/soft/func_extended/start.S:303
 bfc006f0:	277b0004 	addiu	k1,k1,4
 /home/lxb/project-for-linux/loooongson/soft/func_extended/start.S:305
-bfc006f4:	409b7000 	mtc0	k1,$14
+bfc006f4:	409b7000 	mtc0	k1,c0_epc
 /home/lxb/project-for-linux/loooongson/soft/func_extended/start.S:306
 bfc006f8:	16400003 	bnez	s2,bfc00708 <ex_ret>
 /home/lxb/project-for-linux/loooongson/soft/func_extended/start.S:307
@@ -552,7 +552,7 @@ bfc00704:	3c12ffff 	lui	s2,0xffff
 
 bfc00708 <ex_ret>:
 /home/lxb/project-for-linux/loooongson/soft/func_extended/start.S:312
-bfc00708:	42000018 	c0	0x18
+bfc00708:	42000018 	eret
 /home/lxb/project-for-linux/loooongson/soft/func_extended/start.S:314
 bfc0070c:	00000000 	nop
 
@@ -601,13 +601,13 @@ bfc0075c:	00000000 	nop
 
 bfc00760 <tlbwr_return>:
 /home/lxb/project-for-linux/loooongson/soft/func_extended/start.S:337
-bfc00760:	40955000 	mtc0	s5,$10
+bfc00760:	40955000 	mtc0	s5,c0_entryhi
 bfc00764:	00000000 	nop
 /home/lxb/project-for-linux/loooongson/soft/func_extended/start.S:338
-bfc00768:	40881000 	mtc0	t0,$2
+bfc00768:	40881000 	mtc0	t0,c0_entrylo0
 bfc0076c:	00000000 	nop
 /home/lxb/project-for-linux/loooongson/soft/func_extended/start.S:339
-bfc00770:	40891800 	mtc0	t1,$3
+bfc00770:	40891800 	mtc0	t1,c0_entrylo1
 /home/lxb/project-for-linux/loooongson/soft/func_extended/start.S:340
 bfc00774:	42000006 	tlbwr
 /home/lxb/project-for-linux/loooongson/soft/func_extended/start.S:341
@@ -617,11 +617,11 @@ bfc0077c:	3463dc15 	ori	v1,v1,0xdc15
 /home/lxb/project-for-linux/loooongson/soft/func_extended/start.S:343
 bfc00780:	007a1820 	add	v1,v1,k0
 /home/lxb/project-for-linux/loooongson/soft/func_extended/start.S:345
-bfc00784:	42000018 	c0	0x18
+bfc00784:	42000018 	eret
 
 bfc00788 <tlbwi_ex>:
 /home/lxb/project-for-linux/loooongson/soft/func_extended/start.S:348
-bfc00788:	40034000 	mfc0	v1,$8
+bfc00788:	40034000 	mfc0	v1,c0_badvaddr
 /home/lxb/project-for-linux/loooongson/soft/func_extended/start.S:349
 bfc0078c:	3c05ffff 	lui	a1,0xffff
 /home/lxb/project-for-linux/loooongson/soft/func_extended/start.S:350
@@ -629,15 +629,15 @@ bfc00790:	34a5e000 	ori	a1,a1,0xe000
 /home/lxb/project-for-linux/loooongson/soft/func_extended/start.S:351
 bfc00794:	00a31824 	and	v1,a1,v1
 /home/lxb/project-for-linux/loooongson/soft/func_extended/start.S:352
-bfc00798:	40835000 	mtc0	v1,$10
+bfc00798:	40835000 	mtc0	v1,c0_entryhi
 /home/lxb/project-for-linux/loooongson/soft/func_extended/start.S:353
 bfc0079c:	24034007 	li	v1,16391
 /home/lxb/project-for-linux/loooongson/soft/func_extended/start.S:354
-bfc007a0:	40831000 	mtc0	v1,$2
+bfc007a0:	40831000 	mtc0	v1,c0_entrylo0
 /home/lxb/project-for-linux/loooongson/soft/func_extended/start.S:355
 bfc007a4:	24034007 	li	v1,16391
 /home/lxb/project-for-linux/loooongson/soft/func_extended/start.S:356
-bfc007a8:	40831800 	mtc0	v1,$3
+bfc007a8:	40831800 	mtc0	v1,c0_entrylo1
 /home/lxb/project-for-linux/loooongson/soft/func_extended/start.S:357
 bfc007ac:	42000002 	tlbwi
 /home/lxb/project-for-linux/loooongson/soft/func_extended/start.S:358
@@ -645,26 +645,26 @@ bfc007b0:	3c03ed12 	lui	v1,0xed12
 /home/lxb/project-for-linux/loooongson/soft/func_extended/start.S:359
 bfc007b4:	34635678 	ori	v1,v1,0x5678
 /home/lxb/project-for-linux/loooongson/soft/func_extended/start.S:361
-bfc007b8:	42000018 	c0	0x18
+bfc007b8:	42000018 	eret
 /home/lxb/project-for-linux/loooongson/soft/func_extended/start.S:363
 bfc007bc:	00000000 	nop
 
 bfc007c0 <tlb_double_ex>:
 /home/lxb/project-for-linux/loooongson/soft/func_extended/start.S:367
-bfc007c0:	40195000 	mfc0	t9,$10
+bfc007c0:	40195000 	mfc0	t9,c0_entryhi
 /home/lxb/project-for-linux/loooongson/soft/func_extended/start.S:368
 bfc007c4:	3c198000 	lui	t9,0x8000
 bfc007c8:	3739d007 	ori	t9,t9,0xd007
 /home/lxb/project-for-linux/loooongson/soft/func_extended/start.S:369
-bfc007cc:	40991000 	mtc0	t9,$2
+bfc007cc:	40991000 	mtc0	t9,c0_entrylo0
 /home/lxb/project-for-linux/loooongson/soft/func_extended/start.S:370
-bfc007d0:	40991800 	mtc0	t9,$3
+bfc007d0:	40991800 	mtc0	t9,c0_entrylo1
 /home/lxb/project-for-linux/loooongson/soft/func_extended/start.S:371
 bfc007d4:	42000006 	tlbwr
 /home/lxb/project-for-linux/loooongson/soft/func_extended/start.S:372
-bfc007d8:	40197000 	mfc0	t9,$14
+bfc007d8:	40197000 	mfc0	t9,c0_epc
 /home/lxb/project-for-linux/loooongson/soft/func_extended/start.S:374
-bfc007dc:	42000018 	c0	0x18
+bfc007dc:	42000018 	eret
 
 bfc007e0 <tlb_double_fill>:
 /home/lxb/project-for-linux/loooongson/soft/func_extended/start.S:378
@@ -684,9 +684,9 @@ bfc007f8:	02484025 	or	t0,s2,t0
 /home/lxb/project-for-linux/loooongson/soft/func_extended/start.S:385
 bfc007fc:	02494825 	or	t1,s2,t1
 /home/lxb/project-for-linux/loooongson/soft/func_extended/start.S:386
-bfc00800:	40881000 	mtc0	t0,$2
+bfc00800:	40881000 	mtc0	t0,c0_entrylo0
 /home/lxb/project-for-linux/loooongson/soft/func_extended/start.S:387
-bfc00804:	40891800 	mtc0	t1,$3
+bfc00804:	40891800 	mtc0	t1,c0_entrylo1
 /home/lxb/project-for-linux/loooongson/soft/func_extended/start.S:388
 bfc00808:	42000006 	tlbwr
 /home/lxb/project-for-linux/loooongson/soft/func_extended/start.S:389
@@ -694,7 +694,7 @@ bfc0080c:	3c033333 	lui	v1,0x3333
 /home/lxb/project-for-linux/loooongson/soft/func_extended/start.S:390
 bfc00810:	3463dc15 	ori	v1,v1,0xdc15
 /home/lxb/project-for-linux/loooongson/soft/func_extended/start.S:393
-bfc00814:	42000018 	c0	0x18
+bfc00814:	42000018 	eret
 /home/lxb/project-for-linux/loooongson/soft/func_extended/start.S:395
 bfc00818:	00000000 	nop
 
@@ -954,7 +954,7 @@ bfc00a10 <e8_lwl_lwr>:
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/e8_lwl_lwr.S:8
 bfc00a10:	26100001 	addiu	s0,s0,1
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/e8_lwl_lwr.S:9
-bfc00a14:	40805800 	mtc0	zero,$11
+bfc00a14:	40805800 	mtc0	zero,c0_compare
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/e8_lwl_lwr.S:10
 bfc00a18:	24120001 	li	s2,1
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/e8_lwl_lwr.S:11
@@ -1246,7 +1246,7 @@ bfc00c70 <e5_movz_movn>:
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/e5_movz_movn.S:8
 bfc00c70:	26100001 	addiu	s0,s0,1
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/e5_movz_movn.S:9
-bfc00c74:	40805800 	mtc0	zero,$11
+bfc00c74:	40805800 	mtc0	zero,c0_compare
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/e5_movz_movn.S:10
 bfc00c78:	24120001 	li	s2,1
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/e5_movz_movn.S:11
@@ -1258,26 +1258,26 @@ bfc00c84:	240904d2 	li	t1,1234
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/e5_movz_movn.S:19
 bfc00c88:	240b0000 	li	t3,0
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/e5_movz_movn.S:20
-bfc00c8c:	012b500b 	0x12b500b
+bfc00c8c:	012b500b 	movn	t2,t1,t3
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/e5_movz_movn.S:21
 bfc00c90:	240904d6 	li	t1,1238
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/e5_movz_movn.S:22
 bfc00c94:	240b0001 	li	t3,1
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/e5_movz_movn.S:23
-bfc00c98:	012b500b 	0x12b500b
+bfc00c98:	012b500b 	movn	t2,t1,t3
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/e5_movz_movn.S:24
 bfc00c9c:	24090929 	li	t1,2345
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/e5_movz_movn.S:25
 bfc00ca0:	240b0000 	li	t3,0
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/e5_movz_movn.S:26
-bfc00ca4:	012b500a 	0x12b500a
+bfc00ca4:	012b500a 	movz	t2,t1,t3
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/e5_movz_movn.S:27
 bfc00ca8:	3c090001 	lui	t1,0x1
 bfc00cac:	35292bdf 	ori	t1,t1,0x2bdf
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/e5_movz_movn.S:28
 bfc00cb0:	240b0001 	li	t3,1
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/e5_movz_movn.S:29
-bfc00cb4:	012b500a 	0x12b500a
+bfc00cb4:	012b500a 	movz	t2,t1,t3
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/e5_movz_movn.S:34
 bfc00cb8:	26730001 	addiu	s3,s3,1
 
@@ -1297,7 +1297,7 @@ bfc00cd0 <e1_trap_test>:
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/e1_trap_test.S:8
 bfc00cd0:	26100001 	addiu	s0,s0,1
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/e1_trap_test.S:9
-bfc00cd4:	40805800 	mtc0	zero,$11
+bfc00cd4:	40805800 	mtc0	zero,c0_compare
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/e1_trap_test.S:10
 bfc00cd8:	24120009 	li	s2,9
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/e1_trap_test.S:11
@@ -1637,7 +1637,7 @@ bfc0111c:	241a0010 	li	k0,16
 
 bfc01120 <test_phase1_start>:
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/n92_tlbwi.S:15
-bfc01120:	40920000 	mtc0	s2,$0
+bfc01120:	40920000 	mtc0	s2,c0_index
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/n92_tlbwi.S:16
 bfc01124:	3c02efe8 	lui	v0,0xefe8
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/n92_tlbwi.S:17
@@ -1739,7 +1739,7 @@ bfc011f0 <e3_madd_msub_test>:
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/e3_madd_msub.S:8
 bfc011f0:	26100001 	addiu	s0,s0,1
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/e3_madd_msub.S:9
-bfc011f4:	40805800 	mtc0	zero,$11
+bfc011f4:	40805800 	mtc0	zero,c0_compare
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/e3_madd_msub.S:10
 bfc011f8:	24120009 	li	s2,9
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/e3_madd_msub.S:11
@@ -1755,15 +1755,15 @@ bfc0120c:	24091234 	li	t1,4660
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/e3_madd_msub.S:18
 bfc01210:	240a5678 	li	t2,22136
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/e3_madd_msub.S:19
-bfc01214:	712a0000 	0x712a0000
+bfc01214:	712a0000 	madd	t1,t2
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/e3_madd_msub.S:20
-bfc01218:	712a0000 	0x712a0000
+bfc01218:	712a0000 	madd	t1,t2
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/e3_madd_msub.S:21
 bfc0121c:	00004812 	mflo	t1
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/e3_madd_msub.S:22
 bfc01220:	00005010 	mfhi	t2
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/e3_madd_msub.S:23
-bfc01224:	712a0004 	0x712a0004
+bfc01224:	712a0004 	msub	t1,t2
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/e3_madd_msub.S:24
 bfc01228:	00004812 	mflo	t1
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/e3_madd_msub.S:25
@@ -1777,7 +1777,7 @@ bfc01238:	01200013 	mtlo	t1
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/e3_madd_msub.S:29
 bfc0123c:	01400011 	mthi	t2
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/e3_madd_msub.S:30
-bfc01240:	712a0001 	0x712a0001
+bfc01240:	712a0001 	maddu	t1,t2
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/e3_madd_msub.S:31
 bfc01244:	00004812 	mflo	t1
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/e3_madd_msub.S:32
@@ -1791,7 +1791,7 @@ bfc01254:	01200013 	mtlo	t1
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/e3_madd_msub.S:36
 bfc01258:	01400011 	mthi	t2
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/e3_madd_msub.S:37
-bfc0125c:	712a0000 	0x712a0000
+bfc0125c:	712a0000 	madd	t1,t2
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/e3_madd_msub.S:38
 bfc01260:	00004812 	mflo	t1
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/e3_madd_msub.S:39
@@ -1805,7 +1805,7 @@ bfc01270:	01200013 	mtlo	t1
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/e3_madd_msub.S:43
 bfc01274:	01400011 	mthi	t2
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/e3_madd_msub.S:44
-bfc01278:	712a0005 	0x712a0005
+bfc01278:	712a0005 	msubu	t1,t2
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/e3_madd_msub.S:45
 bfc0127c:	00004812 	mflo	t1
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/e3_madd_msub.S:46
@@ -1819,7 +1819,7 @@ bfc0128c:	01200013 	mtlo	t1
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/e3_madd_msub.S:50
 bfc01290:	01400011 	mthi	t2
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/e3_madd_msub.S:51
-bfc01294:	712a0004 	0x712a0004
+bfc01294:	712a0004 	msub	t1,t2
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/e3_madd_msub.S:52
 bfc01298:	00004812 	mflo	t1
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/e3_madd_msub.S:53
@@ -1844,7 +1844,7 @@ bfc012c0 <e4_ll_sc>:
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/e4_ll_sc.S:8
 bfc012c0:	26100001 	addiu	s0,s0,1
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/e4_ll_sc.S:9
-bfc012c4:	40805800 	mtc0	zero,$11
+bfc012c4:	40805800 	mtc0	zero,c0_compare
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/e4_ll_sc.S:10
 bfc012c8:	24120001 	li	s2,1
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/e4_ll_sc.S:11
@@ -1900,7 +1900,7 @@ bfc01330 <e2_clo_clz_test>:
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/e2_clo_clz.S:8
 bfc01330:	26100001 	addiu	s0,s0,1
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/e2_clo_clz.S:9
-bfc01334:	40805800 	mtc0	zero,$11
+bfc01334:	40805800 	mtc0	zero,c0_compare
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/e2_clo_clz.S:10
 bfc01338:	24120009 	li	s2,9
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/e2_clo_clz.S:11
@@ -1911,28 +1911,28 @@ bfc01340:	ad120000 	sw	s2,0(t0)
 bfc01344:	3c08e234 	lui	t0,0xe234
 bfc01348:	35085678 	ori	t0,t0,0x5678
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/e2_clo_clz.S:16
-bfc0134c:	71094821 	0x71094821
+bfc0134c:	71094821 	clo	t1,t0
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/e2_clo_clz.S:17
-bfc01350:	71094820 	0x71094820
+bfc01350:	71094820 	clz	t1,t0
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/e2_clo_clz.S:18
 bfc01354:	3c088000 	lui	t0,0x8000
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/e2_clo_clz.S:19
-bfc01358:	71094821 	0x71094821
+bfc01358:	71094821 	clo	t1,t0
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/e2_clo_clz.S:20
-bfc0135c:	71094820 	0x71094820
+bfc0135c:	71094820 	clz	t1,t0
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/e2_clo_clz.S:21
 bfc01360:	3c081926 	lui	t0,0x1926
 bfc01364:	35080817 	ori	t0,t0,0x817
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/e2_clo_clz.S:22
-bfc01368:	71094821 	0x71094821
+bfc01368:	71094821 	clo	t1,t0
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/e2_clo_clz.S:23
-bfc0136c:	71094820 	0x71094820
+bfc0136c:	71094820 	clz	t1,t0
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/e2_clo_clz.S:24
 bfc01370:	2408000e 	li	t0,14
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/e2_clo_clz.S:25
-bfc01374:	71094821 	0x71094821
+bfc01374:	71094821 	clo	t1,t0
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/e2_clo_clz.S:26
-bfc01378:	71094820 	0x71094820
+bfc01378:	71094820 	clz	t1,t0
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/e2_clo_clz.S:30
 bfc0137c:	26730001 	addiu	s3,s3,1
 
@@ -1953,7 +1953,7 @@ bfc013a0 <e9_swl_swr>:
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/e9_swl_swr.S:8
 bfc013a0:	26100001 	addiu	s0,s0,1
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/e9_swl_swr.S:9
-bfc013a4:	40805800 	mtc0	zero,$11
+bfc013a4:	40805800 	mtc0	zero,c0_compare
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/e9_swl_swr.S:10
 bfc013a8:	24120001 	li	s2,1
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/e9_swl_swr.S:11
@@ -2270,7 +2270,7 @@ bfc01660:	3c150013 	lui	s5,0x13
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/n93_tlbwr.S:68
 bfc01664:	36b5e0dc 	ori	s5,s5,0xe0dc
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/n93_tlbwr.S:69
-bfc01668:	40955000 	mtc0	s5,$10
+bfc01668:	40955000 	mtc0	s5,c0_entryhi
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/n93_tlbwr.S:70
 bfc0166c:	3c120013 	lui	s2,0x13
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/n93_tlbwr.S:71
@@ -2355,19 +2355,19 @@ bfc01714:	3c150011 	lui	s5,0x11
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/n93_tlbwr.S:115
 bfc01718:	36b5e000 	ori	s5,s5,0xe000
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/n93_tlbwr.S:116
-bfc0171c:	40955000 	mtc0	s5,$10
+bfc0171c:	40955000 	mtc0	s5,c0_entryhi
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/n93_tlbwr.S:117
-bfc01720:	40801000 	mtc0	zero,$2
+bfc01720:	40801000 	mtc0	zero,c0_entrylo0
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/n93_tlbwr.S:118
-bfc01724:	40801800 	mtc0	zero,$3
+bfc01724:	40801800 	mtc0	zero,c0_entrylo1
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/n93_tlbwr.S:119
 bfc01728:	42000008 	tlbp
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/n93_tlbwr.S:120
 bfc0172c:	42000001 	tlbr
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/n93_tlbwr.S:121
-bfc01730:	40805000 	mtc0	zero,$10
+bfc01730:	40805000 	mtc0	zero,c0_entryhi
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/n93_tlbwr.S:122
-bfc01734:	400b1000 	mfc0	t3,$2
+bfc01734:	400b1000 	mfc0	t3,c0_entrylo0
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/n93_tlbwr.S:123
 bfc01738:	240c4007 	li	t4,16391
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/n93_tlbwr.S:124
@@ -2375,7 +2375,7 @@ bfc0173c:	156c000a 	bne	t3,t4,bfc01768 <inst_error>
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/n93_tlbwr.S:125
 bfc01740:	00000000 	nop
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/n93_tlbwr.S:126
-bfc01744:	400b1800 	mfc0	t3,$3
+bfc01744:	400b1800 	mfc0	t3,c0_entrylo1
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/n93_tlbwr.S:127
 bfc01748:	240c4007 	li	t4,16391
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/n93_tlbwr.S:128
@@ -2383,9 +2383,9 @@ bfc0174c:	156c0006 	bne	t3,t4,bfc01768 <inst_error>
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/n93_tlbwr.S:129
 bfc01750:	00000000 	nop
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/n93_tlbwr.S:130
-bfc01754:	40801000 	mtc0	zero,$2
+bfc01754:	40801000 	mtc0	zero,c0_entrylo0
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/n93_tlbwr.S:131
-bfc01758:	40801800 	mtc0	zero,$3
+bfc01758:	40801800 	mtc0	zero,c0_entrylo1
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/n93_tlbwr.S:132
 bfc0175c:	42000002 	tlbwi
 /home/lxb/project-for-linux/loooongson/soft/func_extended/inst/n93_tlbwr.S:133
@@ -2423,131 +2423,131 @@ Disassembly of section .debug_aranges:
    4:	00000002 	srl	zero,zero,0x0
    8:	00040000 	sll	zero,a0,0x0
    c:	00000000 	nop
-  10:	bfc00000 	0xbfc00000
+  10:	bfc00000 	cache	0x0,0(s8)
   14:	00000a0c 	syscall	0x28
 	...
   20:	0000001c 	0x1c
   24:	006b0002 	0x6b0002
   28:	00040000 	sll	zero,a0,0x0
   2c:	00000000 	nop
-  30:	bfc00a10 	0xbfc00a10
+  30:	bfc00a10 	cache	0x0,2576(s8)
   34:	0000015c 	0x15c
 	...
   40:	0000001c 	0x1c
   44:	00e00002 	0xe00002
   48:	00040000 	sll	zero,a0,0x0
   4c:	00000000 	nop
-  50:	bfc00b70 	0xbfc00b70
+  50:	bfc00b70 	cache	0x0,2928(s8)
   54:	0000009c 	0x9c
 	...
   60:	0000001c 	0x1c
   64:	015a0002 	0x15a0002
   68:	00040000 	sll	zero,a0,0x0
   6c:	00000000 	nop
-  70:	bfc00c10 	0xbfc00c10
+  70:	bfc00c10 	cache	0x0,3088(s8)
   74:	00000060 	0x60
 	...
   80:	0000001c 	0x1c
   84:	01d70002 	0x1d70002
   88:	00040000 	sll	zero,a0,0x0
   8c:	00000000 	nop
-  90:	bfc00c70 	0xbfc00c70
+  90:	bfc00c70 	cache	0x0,3184(s8)
   94:	00000060 	0x60
 	...
   a0:	0000001c 	0x1c
   a4:	024e0002 	0x24e0002
   a8:	00040000 	sll	zero,a0,0x0
   ac:	00000000 	nop
-  b0:	bfc00cd0 	0xbfc00cd0
+  b0:	bfc00cd0 	cache	0x0,3280(s8)
   b4:	00000440 	sll	zero,zero,0x11
 	...
   c0:	0000001c 	0x1c
   c4:	02c50002 	0x2c50002
   c8:	00040000 	sll	zero,a0,0x0
   cc:	00000000 	nop
-  d0:	bfc01110 	0xbfc01110
+  d0:	bfc01110 	cache	0x0,4368(s8)
   d4:	000000dc 	0xdc
 	...
   e0:	0000001c 	0x1c
   e4:	03390002 	0x3390002
   e8:	00040000 	sll	zero,a0,0x0
   ec:	00000000 	nop
-  f0:	bfc011f0 	0xbfc011f0
+  f0:	bfc011f0 	cache	0x0,4592(s8)
   f4:	000000c8 	0xc8
 	...
  100:	0000001c 	0x1c
  104:	03b00002 	0x3b00002
  108:	00040000 	sll	zero,a0,0x0
  10c:	00000000 	nop
- 110:	bfc012c0 	0xbfc012c0
+ 110:	bfc012c0 	cache	0x0,4800(s8)
  114:	00000068 	0x68
 	...
  120:	0000001c 	0x1c
  124:	04230002 	bgezl	at,130 <data_size+0x120>
  128:	00040000 	sll	zero,a0,0x0
  12c:	00000000 	nop
- 130:	bfc01330 	0xbfc01330
+ 130:	bfc01330 	cache	0x0,4912(s8)
  134:	00000064 	0x64
 	...
  140:	0000001c 	0x1c
  144:	04980002 	0x4980002
  148:	00040000 	sll	zero,a0,0x0
  14c:	00000000 	nop
- 150:	bfc013a0 	0xbfc013a0
+ 150:	bfc013a0 	cache	0x0,5024(s8)
  154:	000001e0 	0x1e0
 	...
  160:	0000001c 	0x1c
  164:	050d0002 	0x50d0002
  168:	00040000 	sll	zero,a0,0x0
  16c:	00000000 	nop
- 170:	bfc01580 	0xbfc01580
+ 170:	bfc01580 	cache	0x0,5504(s8)
  174:	000001fc 	0x1fc
 	...
 
 Disassembly of section .pdr:
 
 00000000 <.pdr>:
-   0:	bfc00a10 	0xbfc00a10
+   0:	bfc00a10 	cache	0x0,2576(s8)
 	...
   18:	0000001d 	0x1d
   1c:	0000001f 	0x1f
-  20:	bfc00b98 	0xbfc00b98
+  20:	bfc00b98 	cache	0x0,2968(s8)
 	...
   38:	0000001d 	0x1d
   3c:	0000001f 	0x1f
-  40:	bfc00c10 	0xbfc00c10
+  40:	bfc00c10 	cache	0x0,3088(s8)
 	...
   58:	0000001d 	0x1d
   5c:	0000001f 	0x1f
-  60:	bfc00c70 	0xbfc00c70
+  60:	bfc00c70 	cache	0x0,3184(s8)
 	...
   78:	0000001d 	0x1d
   7c:	0000001f 	0x1f
-  80:	bfc00cd0 	0xbfc00cd0
+  80:	bfc00cd0 	cache	0x0,3280(s8)
 	...
   98:	0000001d 	0x1d
   9c:	0000001f 	0x1f
-  a0:	bfc01110 	0xbfc01110
+  a0:	bfc01110 	cache	0x0,4368(s8)
 	...
   b8:	0000001d 	0x1d
   bc:	0000001f 	0x1f
-  c0:	bfc011f0 	0xbfc011f0
+  c0:	bfc011f0 	cache	0x0,4592(s8)
 	...
   d8:	0000001d 	0x1d
   dc:	0000001f 	0x1f
-  e0:	bfc012c0 	0xbfc012c0
+  e0:	bfc012c0 	cache	0x0,4800(s8)
 	...
   f8:	0000001d 	0x1d
   fc:	0000001f 	0x1f
- 100:	bfc01330 	0xbfc01330
+ 100:	bfc01330 	cache	0x0,4912(s8)
 	...
  118:	0000001d 	0x1d
  11c:	0000001f 	0x1f
- 120:	bfc013a0 	0xbfc013a0
+ 120:	bfc013a0 	cache	0x0,5024(s8)
 	...
  138:	0000001d 	0x1d
  13c:	0000001f 	0x1f
- 140:	bfc01580 	0xbfc01580
+ 140:	bfc01580 	cache	0x0,5504(s8)
 	...
  158:	0000001d 	0x1d
  15c:	0000001f 	0x1f
@@ -2682,12 +2682,12 @@ Disassembly of section .debug_line:
  1f0:	01000000 	0x1000000
  1f4:	0d0efb01 	jal	43bec04 <data_size+0x43bebf4>
  1f8:	01010100 	0x1010100
- 1fc:	00000001 	0x1
- 200:	01000001 	0x1000001
+ 1fc:	00000001 	movf	zero,zero,$fcc0
+ 200:	01000001 	movf	zero,t0,$fcc0
  204:	5f386500 	0x5f386500
  208:	5f6c776c 	0x5f6c776c
  20c:	2e72776c 	sltiu	s2,s3,30572
- 210:	00000053 	0x53
+ 210:	00000053 	mtlhx	zero
  214:	05000000 	bltz	t0,218 <data_size+0x208>
  218:	c00a1002 	ll	t2,4098(zero)
  21c:	4b4b19bf 	c2	0x14b19bf
@@ -2756,7 +2756,7 @@ Disassembly of section .debug_line:
  318:	024b4b4b 	0x24b4b4b
  31c:	01010004 	sllv	zero,at,t0
  320:	0000004e 	0x4e
- 324:	00250002 	0x250002
+ 324:	00250002 	ror	zero,a1,0x0
  328:	01010000 	0x1010000
  32c:	000d0efb 	0xd0efb
  330:	01010101 	0x1010101
@@ -2788,7 +2788,7 @@ Disassembly of section .debug_line:
  398:	532e7473 	beql	t9,t6,1d568 <data_size+0x1d558>
  39c:	00000000 	nop
  3a0:	02050000 	0x2050000
- 3a4:	bfc00cd0 	0xbfc00cd0
+ 3a4:	bfc00cd0 	cache	0x0,3280(s8)
  3a8:	4b4b4b19 	c2	0x14b4b19
  3ac:	3d084d4b 	0x3d084d4b
  3b0:	f3f33d08 	0xf3f33d08
@@ -2822,7 +2822,7 @@ Disassembly of section .debug_line:
  420:	396e0001 	xori	t6,t3,0x1
  424:	6c745f32 	0x6c745f32
  428:	2e697762 	sltiu	t1,s3,30562
- 42c:	00000053 	0x53
+ 42c:	00000053 	mtlhx	zero
  430:	05000000 	bltz	t0,434 <data_size+0x424>
  434:	c0111002 	ll	s1,4098(zero)
  438:	4c4b1abf 	0x4c4b1abf
@@ -2845,8 +2845,8 @@ Disassembly of section .debug_line:
  47c:	01000000 	0x1000000
  480:	0d0efb01 	jal	43bec04 <data_size+0x43bebf4>
  484:	01010100 	0x1010100
- 488:	00000001 	0x1
- 48c:	01000001 	0x1000001
+ 488:	00000001 	movf	zero,zero,$fcc0
+ 48c:	01000001 	movf	zero,t0,$fcc0
  490:	5f336500 	0x5f336500
  494:	6464616d 	0x6464616d
  498:	75736d5f 	jalx	5cdb57c <data_size+0x5cdb56c>
@@ -2879,7 +2879,7 @@ Disassembly of section .debug_line:
  504:	532e6373 	beql	t9,t6,192d4 <data_size+0x192c4>
  508:	00000000 	nop
  50c:	02050000 	0x2050000
- 510:	bfc012c0 	0xbfc012c0
+ 510:	bfc012c0 	cache	0x0,4800(s8)
  514:	4b4b4b19 	c2	0x14b4b19
  518:	4b83504b 	c2	0x183504b
  51c:	4c4b4b4b 	0x4c4b4b4b
@@ -2950,14 +2950,14 @@ Disassembly of section .debug_line:
  620:	01000000 	0x1000000
  624:	0d0efb01 	jal	43bec04 <data_size+0x43bebf4>
  628:	01010100 	0x1010100
- 62c:	00000001 	0x1
- 630:	01000001 	0x1000001
+ 62c:	00000001 	movf	zero,zero,$fcc0
+ 630:	01000001 	movf	zero,t0,$fcc0
  634:	33396e00 	andi	t9,t9,0x6e00
  638:	626c745f 	0x626c745f
  63c:	532e7277 	beql	t9,t6,1d01c <data_size+0x1d00c>
  640:	00000000 	nop
  644:	02050000 	0x2050000
- 648:	bfc01580 	0xbfc01580
+ 648:	bfc01580 	cache	0x0,5504(s8)
  64c:	4b4d4b1a 	c2	0x14d4b1a
  650:	4b4b4b4b 	c2	0x14b4b4b
  654:	4b4b4b4b 	c2	0x14b4b4b
@@ -3000,8 +3000,8 @@ Disassembly of section .debug_info:
    4:	00000002 	srl	zero,zero,0x0
    8:	01040000 	0x1040000
    c:	00000000 	nop
-  10:	bfc00000 	0xbfc00000
-  14:	bfc00a0c 	0xbfc00a0c
+  10:	bfc00000 	cache	0x0,0(s8)
+  14:	bfc00a0c 	cache	0x0,2572(s8)
   18:	72617473 	0x72617473
   1c:	00532e74 	teq	v0,s3,0xb9
   20:	6d6f682f 	0x6d6f682f
@@ -3053,11 +3053,11 @@ Disassembly of section .debug_info:
   d8:	352e3831 	ori	t6,t1,0x3831
   dc:	80010030 	lb	at,48(zero)
   e0:	00000076 	tne	zero,zero,0x1
-  e4:	00280002 	0x280002
+  e4:	00280002 	ror	zero,t0,0x0
   e8:	01040000 	0x1040000
   ec:	00000266 	0x266
-  f0:	bfc00b70 	0xbfc00b70
-  f4:	bfc00c0c 	0xbfc00c0c
+  f0:	bfc00b70 	cache	0x0,2928(s8)
+  f4:	bfc00c0c 	cache	0x0,3084(s8)
   f8:	6d5f3665 	0x6d5f3665
   fc:	65707061 	0x65707061
  100:	6e695f64 	0x6e695f64
@@ -3082,7 +3082,7 @@ Disassembly of section .debug_info:
  14c:	20534120 	addi	s3,v0,16672
  150:	38312e32 	xori	s1,at,0x2e32
  154:	0030352e 	0x30352e
- 158:	00798001 	0x798001
+ 158:	00798001 	movt	s0,v1,$fcc6
  15c:	00020000 	sll	zero,v0,0x0
  160:	0000003c 	0x3c
  164:	02c70104 	0x2c70104
@@ -3236,8 +3236,8 @@ Disassembly of section .debug_info:
  3b4:	00a00002 	0xa00002
  3b8:	01040000 	0x1040000
  3bc:	000004e2 	0x4e2
- 3c0:	bfc012c0 	0xbfc012c0
- 3c4:	bfc01328 	0xbfc01328
+ 3c0:	bfc012c0 	cache	0x0,4800(s8)
+ 3c4:	bfc01328 	cache	0x0,4904(s8)
  3c8:	6c5f3465 	0x6c5f3465
  3cc:	63735f6c 	0x63735f6c
  3d0:	2f00532e 	sltiu	zero,t8,21294
@@ -3294,8 +3294,8 @@ Disassembly of section .debug_info:
  49c:	00c80002 	0xc80002
  4a0:	01040000 	0x1040000
  4a4:	00000582 	srl	zero,zero,0x16
- 4a8:	bfc013a0 	0xbfc013a0
- 4ac:	bfc01580 	0xbfc01580
+ 4a8:	bfc013a0 	cache	0x0,5024(s8)
+ 4ac:	bfc01580 	cache	0x0,5504(s8)
  4b0:	735f3965 	0x735f3965
  4b4:	735f6c77 	0x735f6c77
  4b8:	532e7277 	beql	t9,t6,1ce98 <data_size+0x1ce88>

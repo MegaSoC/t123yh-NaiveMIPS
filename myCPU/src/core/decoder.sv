@@ -109,6 +109,7 @@ always_comb begin
     case (opcode)
         6'b010000: // cop0
         begin
+            controls.privileged = 1; // all cop0 operations are privileged
             casez ({rsi, funct})
                 // last 3 bits of mfc0 and mtc0 are sel
                 11'b00000000???: // mfc0
@@ -720,6 +721,7 @@ always_comb begin
 
         6'b101111: // cache
         begin
+            controls.privileged = 1;
             controls.regRead1 = rsi;
             controls.immediate = signExtendedImmediate;
             controls.calculateAddress = 1;

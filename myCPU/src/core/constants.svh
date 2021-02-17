@@ -107,6 +107,7 @@ typedef struct packed {
     bit [2:0] generateException;
     bit writeCP0;
     cp0_number_t numberCP0;
+    bit privileged;
 
     bit bitCounterEnable;
     bit bitCounterType;
@@ -155,6 +156,7 @@ const ControlSignals kControlNop = '{
     generateException: `ctrlNoException,
     writeCP0: 0,
     numberCP0: cp0_nX,
+    privileged: 0,
 
     bitCounterEnable: 0,
     bitCounterType: 'bx,
