@@ -184,7 +184,7 @@ module mycpu_top #(
     wire w_inst_sram_cached;
 
     wire [31:0] w_data_sram_paddr;
-    wire w_data_sram_cached;
+    wire w_data_sram_tlb_cached;
 
     TLB tlb(
         .clk(aclk),
@@ -200,20 +200,20 @@ module mycpu_top #(
         .cached0(w_inst_sram_cached),
         .hit0(w_inst_sram_tlb_hit),
         .valid0(w_inst_sram_tlb_valid),
-        .error0(w_inst_sram_addressError),
+        .error0(w_inst_sram_tlb_addressError),
 
         .va1(w_data_sram_vaddr),
         .pa1(w_data_sram_paddr),
         .hit1(w_data_sram_tlb_hit),
-        .valid1(w_data_sram_valid),
-        .dirty1(w_data_sram_dirty),
-        .cached1(w_data_sram_cached),
-        .error1(w_data_sram_addressError)
+        .valid1(w_data_sram_tlb_valid),
+        .dirty1(w_data_sram_tlb_dirty),
+        .cached1(w_data_sram_tlb_cached),
+        .error1(w_data_sram_tlb_addressError)
     );
 
-    wire w_inst_sram_okay = w_inst_sram_tlb_hit && w_inst_sram_tlb_valid && !w_inst_sram_addressError;
-    wire w_data_sram_read_okay = w_data_sram_tlb_hit && w_data_sram_valid && !w_inst_sram_addressError;
-    wire w_data_sram_write_okay = w_data_sram_read_okay && w_data_sram_dirty;
+    wire w_inst_sram_okay = w_inst_sram_tlb_hit && w_inst_sram_tlb_valid && !w_inst_sram_tlb_addressError;
+    wire w_data_sram_read_okay = w_data_sram_tlb_hit && w_data_sram_tlb_valid && !w_inst_sram_tlb_addressError;
+    wire w_data_sram_write_okay = w_data_sram_read_okay && w_data_sram_tlb_dirty;
 
     always @(posedge aclk) begin
         if (global_reset) begin
@@ -247,7 +247,7 @@ module mycpu_top #(
 
                   .i_d_va(w_data_sram_vaddr),
                   .i_d_phyaddr(w_data_sram_paddr),
-                  .i_d_cached(w_data_sram_cached),
+                  .i_d_cached(w_data_sram_tlb_cached),
                   .i_d_read(w_data_sram_read && w_data_sram_read_okay),
                   .i_d_write(w_data_sram_write && w_data_sram_write_okay),
                   .i_d_size(w_data_sram_size),

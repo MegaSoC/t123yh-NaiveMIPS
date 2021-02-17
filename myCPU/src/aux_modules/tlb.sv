@@ -221,7 +221,7 @@ module MMUMatcher(
             cached <= lp_c0[TLB_NUM] == 3;
         end else begin
             pa <= {3'b0, va[28:0]};
-            hit <= 0;
+            hit <= 1;
             valid <= 1;
             dirty <= 1;
             cached <= va_seg == kseg0 ? kseg0_cached : 0;
