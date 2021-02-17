@@ -44,6 +44,7 @@
 `define grfWriteCP0 5
 `define grfWriteBitCounter 6
 `define grfWriteLLbit 7
+`define grfWriteMove 8
 
 `define absJumpImmediate 1
 `define absJumpRegister 0
@@ -113,6 +114,9 @@ typedef struct packed {
     bit setLLbit;
     bit checkLLbit;
 
+    bit move;
+    bit moveCondition;
+
     tlb_op_t tlb;
 } ControlSignals;
 
@@ -157,6 +161,9 @@ const ControlSignals kControlNop = '{
 
     setLLbit: 0,
     checkLLbit: 0,
+
+    move: 0,
+    moveCondition: 'bx,
 
     tlb: tlb_op_t'{p: 0, r: 0, w: 0, random: 0}
 };

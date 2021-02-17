@@ -93,7 +93,14 @@ wire [31:0] signExtendedImmediate = $signed(imm);
     controls.grfWriteSource = `grfWriteBitCounter; \
     controls.destinationRegister = rdi; \
     controls.bitCounterEnable = 1; \
-    controls.regRead1 = rsi; 
+    controls.regRead1 = rsi;
+
+`define simpleMove \
+    controls.grfWriteSource = `grfWriteMove; \
+    controls.regRead1 = rsi; \
+    controls.regRead2 = rti; \
+    controls.destinationRegister = rdi; \
+    controls.move = 1;
 
 always_comb begin
     controls = kControlNop;
@@ -105,7 +112,7 @@ always_comb begin
             casez ({rsi, funct})
                 // last 3 bits of mfc0 and mtc0 are sel
                 11'b00000000???: // mfc0
-                begin 
+                begin
                     controls.destinationRegister = rti;
                     controls.grfWriteSource = `grfWriteCP0;
                     controls.numberCP0 = cp0_number_t'({rdi, sel});
@@ -117,7 +124,7 @@ always_comb begin
                     controls.numberCP0 = cp0_number_t'({rdi, sel});
                 end
                 11'b10000011000: // eret
-                begin                           
+                begin
                     controls.generateException = `ctrlERET;
                 end
 
@@ -283,7 +290,7 @@ always_comb begin
                 end
             endcase
         end
-        
+
         6'b000000: // SPECIAL
         begin
             case(funct)
@@ -487,6 +494,17 @@ always_comb begin
                     controls.aluCtrl = `aluSNE;
                 end
 
+                6'b001010: // movz
+                begin
+                    `simpleMove
+                    controls.moveCondition = 0;
+                end
+                6'b001011: // movn
+                begin
+                    `simpleMove
+                    controls.moveCondition = 1;
+                end
+
                 default: begin
                     controls.generateException = `ctrlUnknownInstruction;
                 end
@@ -605,7 +623,7 @@ always_comb begin
         begin
             `simpleBranch
             controls.cmpCtrl = `cmpGreaterThanZero;
-        end 
+        end
 
         5'b010100: // beql
         begin
@@ -632,7 +650,7 @@ always_comb begin
             `simpleBranch
             controls.cmpCtrl = `cmpGreaterThanZero;
             controls.branchLikely = 1;
-        end 
+        end
 
         6'b001111: // lui
         begin
@@ -733,4 +751,4 @@ always_comb begin
     end
 end
 
-endmodule
+endmodule : Decoder

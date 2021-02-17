@@ -37,7 +37,7 @@ module CPU #(
            output [31:0] debug_wb_rf_wdata,
            output [31:0] debug_i_pc,
            output [31:0] debug_i_instr,
-           
+
            output cp0_we,
            output cp0_number_t cp0_number,
            output [31:0] cp0_wdata,
@@ -132,7 +132,7 @@ InstructionMemory F_im (
                       .stall(stallLevel[m_F]),
                       .exception(exceptionLevel[m_D]),
                       .fetchException(F_exception),
-                      
+
                       .inst_sram_rdata(inst_sram_rdata),
                       .inst_sram_addr(inst_sram_addr),
                       .inst_sram_readen(inst_sram_readen),
@@ -230,7 +230,7 @@ GeneralRegisterFile D_grf(
 ForwardController D_regRead1_forward (
                       .request(D_ctrl.regRead1),
                       .original(D_grf.readOutput1),
-                      .enabled(D_ctrl.aluCtrl != `aluDisabled || D_ctrl.absJump || D_ctrl.branch || D_ctrl.calculateAddress || D_ctrl.bitCounterEnable),
+                      .enabled(D_ctrl.aluCtrl != `aluDisabled || D_ctrl.absJump || D_ctrl.branch || D_ctrl.calculateAddress || D_ctrl.bitCounterEnable || D_ctrl.move),
 
                       .src1Valid(forwardValidE),
                       .src1Reg(forwardAddressE),
@@ -243,7 +243,7 @@ ForwardController D_regRead1_forward (
 ForwardController D_regRead2_forward (
                       .request(D_ctrl.regRead2),
                       .original(D_grf.readOutput2),
-                      .enabled(D_ctrl.absJump || D_ctrl.branch || D_ctrl.aluCtrl != `aluDisabled),
+                      .enabled(D_ctrl.absJump || D_ctrl.branch || D_ctrl.aluCtrl != `aluDisabled || D_ctrl.move),
 
                       .src1Valid(forwardValidE),
                       .src1Reg(forwardAddressE),
@@ -255,6 +255,7 @@ ForwardController D_regRead2_forward (
 
 assign D_data_waiting = D_regRead1_forward.stallExec || D_regRead2_forward.stallExec;
 wire [31:0] D_memAddress = D_regRead1_forward.value + D_ctrl.immediate;
+wire D_moveDisable = D_ctrl.move && !(D_ctrl.moveCondition == (D_regRead2_forward.value != 0));
 
 Comparator cmp(
                .A(D_regRead1_forward.value),
@@ -384,7 +385,7 @@ reg [31:0] E_aluOutput;
 reg E_aluOverflow;
 reg E_running;
 reg E_tlb_refill_last;
-
+reg E_moveDisable;
 reg E_regWriteDataValid;
 reg [31:0] E_regWriteData;
 
@@ -399,7 +400,7 @@ reg E_isDelaySlot;
 reg E_last_exception;
 
 assign forwardValidE = E_regWriteDataValid;
-assign forwardAddressE = E_ctrl.destinationRegister;
+assign forwardAddressE = E_moveDisable ? 0 : E_ctrl.destinationRegister;
 assign forwardValueE = E_regWriteData;
 
 assign data_sram_vaddr = D_memAddress;
@@ -421,6 +422,10 @@ always_comb begin
             E_regWriteData = {31'b0, E_LLbit};
             E_regWriteDataValid = 1;
         end
+        `grfWriteMove: begin
+            E_regWriteData = E_regRead1;
+            E_regWriteDataValid = 1;
+        end
     endcase
 end
 
@@ -439,6 +444,7 @@ always @(posedge clk) begin
         E_aluOverflow <= 0;
         E_LLbit <= 0;
         E_running <= 0;
+        E_moveDisable <= 0;
         E_tlb_refill_last <= 0;
     end
     else begin
@@ -458,6 +464,7 @@ always @(posedge clk) begin
             E_LLbit <= E_LLbit_next;
             E_running <= 0;
             E_tlb_refill_last <= D_tlb_refill;
+            E_moveDisable <= D_moveDisable;
         end
         else begin
             E_bubble <= E_bubble || exceptionLevel[m_M];
@@ -640,6 +647,7 @@ logic M_regWriteDataValid;
 logic [31:0] M_regWriteData;
 reg M_last_exception;
 reg M_tlb_refill;
+reg M_moveDisable;
 
 reg M_isDelaySlot;
 
@@ -658,6 +666,7 @@ always @(posedge clk) begin
         M_cp0Value <= 0;
         M_tlb_refill <= 0;
         M_bitCount <= 0;
+        M_moveDisable <= 0;
     end
     else begin
         M_bubble <= E_insert_bubble || exceptionLevel[m_M];
@@ -674,6 +683,7 @@ always @(posedge clk) begin
         M_cp0Value <= cp0_rdata;
         M_bitCount <= E_bitCounter.count;
         M_tlb_refill <= E_tlb_refill;
+        M_moveDisable <= E_moveDisable;
 `ifndef SYNTHESIS
         if (E_exception) begin
             if (E_excCode == cERET) begin
@@ -686,7 +696,7 @@ always @(posedge clk) begin
     end
 end
 
-assign forwardAddressM = M_ctrl.destinationRegister;
+assign forwardAddressM = M_moveDisable ? 0 : M_ctrl.destinationRegister;
 assign forwardValueM = M_regWriteData;
 assign forwardValidM = M_regWriteDataValid;
 always_comb begin
@@ -717,7 +727,7 @@ always_comb begin
         endcase
     end
 end
-assign grfWriteAddress = M_ctrl.destinationRegister;
+assign grfWriteAddress = M_moveDisable ? 0 : M_ctrl.destinationRegister;
 assign grfWriteData = M_regWriteData;
 
 assign M_exception = !M_bubble && M_last_exception;
