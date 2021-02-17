@@ -26,6 +26,7 @@ module TLB #(
     input kseg0_cached,
 
     input  [31:0] va0,
+    input         ce0,
     output [31:0] pa0,
     output hit0,
     output valid0,
@@ -34,6 +35,7 @@ module TLB #(
     output error0,
 
     input  [31:0] va1,
+    input         ce1,
     output [31:0] pa1,
     output hit1,
     output valid1,
@@ -110,11 +112,12 @@ endgenerate
 
 assign probe_index_o = ((~|match) << 31) | index[TLB_NUM];
 
-MMUMatcher matcher0(va0, pa0, hit0, valid0, dirty0, cached0, error0);
-MMUMatcher matcher1(va1, pa1, hit1, valid1, dirty1, cached1, error1);
+MMUMatcher matcher0(va0, ce0, pa0, hit0, valid0, dirty0, cached0, error0);
+MMUMatcher matcher1(va1, ce1, pa1, hit1, valid1, dirty1, cached1, error1);
 
 module MMUMatcher(
     input  [31:0] va,
+    input         ce,
     output reg [31:0] pa,
     output reg hit,
     output reg valid,
@@ -211,20 +214,22 @@ module MMUMatcher(
     end
 
     always_ff @(posedge clk) begin
-        addressError <= error;
-        if (mapped) begin
-            pa <= lp_pa0[TLB_NUM];
-            hit <= |match0;
-            valid <= lp_v0[TLB_NUM];
-            dirty <= lp_d0[TLB_NUM];
-            // See Table 9.9, P. 98, Vol. III
-            cached <= lp_c0[TLB_NUM] == 3;
-        end else begin
-            pa <= {3'b0, va[28:0]};
-            hit <= 1;
-            valid <= 1;
-            dirty <= 1;
-            cached <= va_seg == kseg0 ? kseg0_cached : 0;
+        if (ce) begin
+            addressError <= error;
+            if (mapped) begin
+                pa <= lp_pa0[TLB_NUM];
+                hit <= |match0;
+                valid <= lp_v0[TLB_NUM];
+                dirty <= lp_d0[TLB_NUM];
+                // See Table 9.9, P. 98, Vol. III
+                cached <= lp_c0[TLB_NUM] == 3;
+            end else begin
+                pa <= {3'b0, va[28:0]};
+                hit <= 1;
+                valid <= 1;
+                dirty <= 1;
+                cached <= va_seg == kseg0 ? kseg0_cached : 0;
+            end
         end
     end
 endmodule

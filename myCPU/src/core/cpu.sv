@@ -29,6 +29,7 @@ module CPU #(
            input data_sram_tlb_miss,
            input data_sram_tlb_invalid,
            input data_sram_tlb_modified,
+           output data_sram_va_hold,
 
            output [31:0] debug_wb_pc,
            output [3:0] debug_wb_rf_wen,
@@ -399,14 +400,8 @@ assign forwardValidE = E_regWriteDataValid;
 assign forwardAddressE = E_ctrl.destinationRegister;
 assign forwardValueE = E_regWriteData;
 
-// keep vaddr when busy
-always_comb begin
-    if (!E_data_waiting) begin
-        data_sram_vaddr = D_memAddress;
-    end else begin
-        data_sram_vaddr = E_memAddress;
-    end
-end
+assign data_sram_vaddr = D_memAddress;
+assign data_sram_va_hold = E_data_waiting;
 
 always_comb begin
     E_regWriteDataValid = 0;

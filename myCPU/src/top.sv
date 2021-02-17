@@ -82,6 +82,7 @@ module mycpu_top #(
     wire global_reset = !(aresetn && myaresetn);
     
     word w_inst_sram_addr, w_w_inst_sram_paddr, w_data_sram_vaddr, w_data_sram_wdata;
+    word data_sram_vaddr_last;
     logic [2:0] w_data_sram_size;
     logic w_data_sram_read, w_data_sram_write, w_inst_sram_readen;
 
@@ -98,6 +99,7 @@ module mycpu_top #(
     wire w_inst_sram_tlb_addressError, w_inst_sram_tlb_hit, w_inst_sram_tlb_valid;
     wire w_data_sram_tlb_addressError, w_data_sram_tlb_hit, w_data_sram_tlb_valid, w_data_sram_tlb_dirty, w_data_sram_tlb;
     reg w_inst_sram_readen2;
+    wire w_data_sram_va_hold;
 
     CPU #(.IMPLEMENT_LIKELY(IMPLEMENT_LIKELY)) core(
         .clk(aclk),
@@ -115,6 +117,7 @@ module mycpu_top #(
         .data_sram_rdata(w_d_outdata),
         .data_sram_valid(w_d_valid),
         .data_sram_vaddr(w_data_sram_vaddr),
+        .data_sram_va_hold(w_data_sram_va_hold),
         .data_sram_read(w_data_sram_read),
         .data_sram_write(w_data_sram_write),
         .data_sram_wdata(w_data_sram_wdata),
@@ -150,6 +153,12 @@ module mycpu_top #(
         .cp0_ewr_badVAddr(cp0_ewr_badVAddr),
         .cp0_interrupt_pending(cp0_interrupt_pending)
     );
+
+    always @(posedge aclk) begin
+        if (!w_data_sram_va_hold) begin
+            data_sram_vaddr_last <= w_data_sram_vaddr;
+        end
+    end
 
     CP0 cp0(
         .clk(aclk),
@@ -208,6 +217,7 @@ module mycpu_top #(
         .cp0_erl(cp0_erl),
 
         .va0(w_inst_sram_addr),
+        .ce0(1),
         .pa0(w_inst_sram_paddr),
         .cached0(w_inst_sram_cached),
         .hit0(w_inst_sram_tlb_hit),
@@ -215,6 +225,7 @@ module mycpu_top #(
         .error0(w_inst_sram_tlb_addressError),
 
         .va1(w_data_sram_vaddr),
+        .ce1(!w_data_sram_va_hold),
         .pa1(w_data_sram_paddr),
         .hit1(w_data_sram_tlb_hit),
         .valid1(w_data_sram_tlb_valid),
@@ -257,7 +268,7 @@ module mycpu_top #(
                   .o_i_valid(w_i_valid),
                   .o_i_inst(w_i_inst),
 
-                  .i_d_va(w_data_sram_vaddr),
+                  .i_d_va(w_data_sram_va_hold ? data_sram_vaddr_last : w_data_sram_vaddr),
                   .i_d_phyaddr(w_data_sram_paddr),
                   .i_d_cached(w_data_sram_tlb_cached),
                   .i_d_read(w_data_sram_read && w_data_sram_read_okay),
