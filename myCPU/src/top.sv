@@ -90,7 +90,7 @@ module mycpu_top #(
 
     wire [3:0] w_data_sram_byteen;
     wire cp0_we, cp0_en_exp, cp0_ewr_bd, cp0_interrupt_pending, cp0_kseg0_cached, cp0_kernel_mode;
-    wire [31:0] cp0_rdata, cp0_wdata, cp0_ewr_epc, cp0_ewr_badVAddr, cp0_epc_o, cp0_exc_handler, cp0_int_handler, cp0_tlb_refill_handler, cp0_tagLo0, cp0_erl;
+    wire [31:0] cp0_rdata, cp0_wdata, cp0_ewr_epc, cp0_ewr_badVAddr, cp0_epc_o, cp0_exc_handler, cp0_int_handler, cp0_tlb_refill_handler, cp0_tagLo0, cp0_erl, cp0_entryLo0, cp0_entryLo1, cp0_entryHi, cp0_index, cp0_pageMask;
     ExcCode_t cp0_ewr_excCode;
     wire w_data_cache_op_valid;
     cp0_number_t cp0_rw_number;
@@ -177,7 +177,13 @@ module mycpu_top #(
         .kseg0_cached(cp0_kseg0_cached),
         .erl(cp0_erl),
         .kernel_mode(cp0_kernel_mode),
-        .tagLo0_o(cp0_tagLo0)
+        .tagLo0_o(cp0_tagLo0),
+
+        .entryLo0_o(cp0_entryLo0),
+        .entryLo1_o(cp0_entryLo1),
+        .entryHi_o(cp0_entryHi),
+        .index_o(cp0_index),
+        .pageMask_o(cp0_pageMask)
     );
 
     wire [31:0] w_inst_sram_paddr;
@@ -191,6 +197,12 @@ module mycpu_top #(
         .rst(global_reset),
 
         .we(0),
+        .index_i(cp0_index),
+        .mask_i(cp0_pageMask),
+        .entryhi_i(cp0_entryHi),
+        .entrylo1_i(cp0_entryLo1),
+        .entrylo0_i(cp0_entryLo0),
+
         .kernel_mode(cp0_kernel_mode),
         .kseg0_cached(cp0_kseg0_cached),
         .cp0_erl(cp0_erl),

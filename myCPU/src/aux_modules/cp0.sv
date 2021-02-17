@@ -26,7 +26,13 @@ module CP0 (
     output wire         kseg0_cached,
     output wire         kernel_mode,
     output wire         erl,
-    output wire [31:0]  tagLo0_o
+    output wire [31:0]  tagLo0_o,
+
+    output wire [31:0] entryLo0_o,
+    output wire [31:0] entryLo1_o,
+    output wire [31:0] entryHi_o,
+    output wire [31:0] pageMask_o,
+    output wire [31:0] index_o
 );
 
 reg [4:0] hardware_int_sample;
@@ -67,6 +73,11 @@ assign interrupt_pending = (|(cp0_reg_Status[15:8] & Cause_IP)) && allow_int;
 
 assign epc       = cp0_reg_EPC;
 assign tagLo0_o  = cp0_reg_TagLo0;
+assign entryHi_o = cp0_reg_EntryHi;
+assign entryLo0_o = cp0_reg_EntryLo0;
+assign entryLo1_o = cp0_reg_EntryLo1;
+assign pageMask_o = cp0_reg_PageMask;
+assign index_o    = cp0_reg_Index;
 
 wire SR_BEV = cp0_reg_Status[22];
 wire SR_EXL = cp0_reg_Status[1];
