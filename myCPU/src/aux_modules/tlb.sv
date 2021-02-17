@@ -136,7 +136,7 @@ module MMUMatcher(
     assign lp_c0[0] = 3'b0;
     assign lp_v0[0] = 1'b0;
     assign lp_d0[0] = 1'b0;
-
+    genvar i;
     generate
         for (i = 0; i < TLB_NUM; i = i + 1) begin
             // TODO: duplicated https://github.com/nscscc2019ucas/nscscc2019ucas/blob/master/performance/soc_axi_func/rtl/myCPU/core/tlb.v#L138
