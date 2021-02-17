@@ -133,7 +133,7 @@ InstructionMemory F_im (
                       .inst_sram_rdata(inst_sram_rdata),
                       .inst_sram_addr(inst_sram_addr),
                       .inst_sram_readen(inst_sram_readen),
-                      .inst_sram_valid(inst_sram_valid)
+                      .inst_sram_valid(inst_sram_valid || inst_sram_addressError || inst_sram_tlb_miss || inst_sram_tlb_invalid)
                   );
 
 logic [31:0] F_badVAddr;
