@@ -12,7 +12,8 @@ module DataMemoryWriteShifter(
 wire [1:0] offset = address[1:0];
 
 always_comb begin
-    writeDataOut = 0;
+    writeDataOut = 'bx;
+    writeByteEn = 0;
     if (unaligned) begin
         if (leftPart) begin
             writeDataOut = writeDataIn >> {~offset, 3'b0};
