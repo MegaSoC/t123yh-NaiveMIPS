@@ -206,6 +206,15 @@ module MMUMatcher(
                     error = 1;
                 end
             end
+            ksseg: begin
+                if (kernel_mode) begin
+                    mapped = 1;
+                    error = 0;
+                end else begin
+                    mapped = 'bX;
+                    error = 1;
+                end
+            end
             default: begin
                 error = 1;
                 mapped = 'bX;
