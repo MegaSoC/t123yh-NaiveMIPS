@@ -1,5 +1,5 @@
 // TODO: partially copied from ucas, rewriting needed
-
+`include "../global.svh"
 module TLB #(
     parameter TLB_NUM = 1 << `TLB_IDX_BITS,
     parameter IDX_BITS = `TLB_IDX_BITS
