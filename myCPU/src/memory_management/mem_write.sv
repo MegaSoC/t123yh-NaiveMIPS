@@ -131,8 +131,12 @@ always_ff @(posedge i_clk) begin
             r_sram_data <= i_sram_data;
             r_buffer_history[1][w_sram_lock] <= 1'b1;
             r_sram_req <= i_sram_req;
-            r_sram_req_num <= r_sram_req_num + 1 ;
         end
+        if(axi_bus_resp.bvalid && r_write_process)begin
+            r_write_process <= 1'b0;
+            r_buffer_history[w_key] <= 1'b0;
+        end//与w_pop坌时
+        r_sram_req_num <= r_sram_req_num + i_sram_we  - axi_bus_resp.bvalid && r_write_process && w_key_select;
         r_push1 <= w_push1;
         r_push2 <= w_push2;
         r_pop <= w_pop;
@@ -174,31 +178,8 @@ always_ff @(posedge i_clk) begin
                     r_data[14] <= i_dcache_data[14];
                     r_data[15] <= i_dcache_data[15];
                 end
-                // r_data[0] <= i_dcache_data[0];
-                // r_data[1] <= i_dcache_data[1];
-                // r_data[2] <= i_dcache_data[2];
-                // r_data[3] <= i_dcache_data[3];
-                // r_data[4] <= i_dcache_data[4];
-                // r_data[5] <= i_dcache_data[5];
-                // r_data[6] <= i_dcache_data[6];
-                // r_data[7] <= i_dcache_data[7];
-                // if(BUFFER_NUM == 16)begin
-                //     r_data[8] <=  i_dcache_data[8] ;
-                //     r_data[9] <=  i_dcache_data[9] ;
-                //     r_data[10] <= i_dcache_data[10];
-                //     r_data[11] <= i_dcache_data[11];
-                //     r_data[12] <= i_dcache_data[12];
-                //     r_data[13] <= i_dcache_data[13];
-                //     r_data[14] <= i_dcache_data[14];
-                //     r_data[15] <= i_dcache_data[15];
-                //end
             end
         end
-        if(axi_bus_resp.bvalid && r_write_process)begin
-            r_write_process <= 1'b0;
-            r_buffer_history[w_key] <= 1'b0;
-            r_sram_req_num <= w_key_select ? r_sram_req_num - 1 : r_sram_req_num;
-        end//与w_pop坌时
     end
 end
 
