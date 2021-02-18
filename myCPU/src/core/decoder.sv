@@ -146,6 +146,9 @@ always_comb begin
                     controls.tlb.w = 1;
                     controls.tlb.random = 1;
                 end
+                11'b1????_100000: // wait
+                begin
+                end
 
                 default: begin
                     controls.generateException = `ctrlUnknownInstruction;
@@ -407,6 +410,11 @@ always_comb begin
                 6'b001101: // break
                 begin
                     controls.generateException = `ctrlBreak;
+                end
+
+                6'b001111: // sync
+                begin
+                    // TODO: Ensure no cache activity here
                 end
 
                 6'b011000: // mult
@@ -742,6 +750,12 @@ always_comb begin
                     controls.memDCacheOp = CACHE_HIT_WRITEBACK_INVALIDATE;
             endcase
         end
+
+        6'b110011: // pref
+        begin
+        end
+
+
 
         default: begin
             controls.generateException = `ctrlUnknownInstruction;
