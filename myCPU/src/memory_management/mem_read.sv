@@ -26,6 +26,7 @@ module mem_read # (
     output logic o_line_num,
     output logic o_instr_empty,
     output logic o_data_empty,
+    output logic o_empty,
 
     output axi_r_req axi_bus_req,
     input  axi_r_resp axi_bus_resp
@@ -56,6 +57,7 @@ assign o_start_va = w_dout.va;
 assign o_line_num = ((axi_bus_req.arlen + 1) >> $clog2(LEN_UNIT)) == 2; //1:2 0:1
 assign o_icache_end = r_end && r_status == 0;
 assign o_dcache_end = r_end && r_status == 2'b10;
+assign o_empty = w_empty;
 
 logic w_empty1, w_empty2;
 logic r_valid_flag;
