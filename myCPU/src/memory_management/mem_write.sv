@@ -131,21 +131,21 @@ always_ff @(posedge i_clk) begin
         r_sram_req_num <= '0;
     end
     else begin
-        if(i_dcache_we)begin
+        if (i_dcache_we)begin
             r_key2 <= {1'b0, w_dcache_lock};
             r_buffer_history[0][w_dcache_lock] <= 1'b1;
             r_dcache_req <= i_dcache_req;
         end
-        if(i_sram_we)begin
+        if (i_sram_we)begin
             r_key1 <= {1'b1,w_sram_lock};
             r_sram_data <= i_sram_data;
             r_buffer_history[1][w_sram_lock] <= 1'b1;
             r_sram_req <= i_sram_req;
         end
-        if(axi_bus_resp.bvalid && r_write_process)begin
+        if (axi_bus_resp.bvalid && r_write_process)begin
             r_buffer_history[w_key] <= 1'b0;
         end//与w_pop坌时
-        r_sram_req_num <= r_sram_req_num + i_sram_we  - axi_bus_resp.bvalid && r_write_process && w_key_select;
+        r_sram_req_num <= r_sram_req_num + i_sram_we - (axi_bus_resp.bvalid && r_write_process && w_key_select);
         r_write_process <= w_write_process;
         r_push1 <= w_push1;
         r_push2 <= w_push2;
