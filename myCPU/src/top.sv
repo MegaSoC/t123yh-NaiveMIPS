@@ -51,6 +51,7 @@ module mycpu_top #(
         output bready ,
 
         output [31:0] debug_wb_pc,
+        output [31:0] debug_wb_instr,
         output [3:0] debug_wb_rf_wen,
         output [4:0] debug_wb_rf_wnum,
         output [31:0] debug_wb_rf_wdata,
@@ -61,6 +62,7 @@ module mycpu_top #(
     (* mark_debug = "true" *) wire [3:0] _debug_wb_rf_wen = debug_wb_rf_wen;
     (* mark_debug = "true" *) wire [4:0] _debug_wb_rf_wnum = debug_wb_rf_wnum;
     (* mark_debug = "true" *) wire [31:0] _debug_wb_pc = debug_wb_pc;
+    (* mark_debug = "true" *) wire [31:0] _debug_wb_instr = debug_wb_instr;
     (* mark_debug = "true" *) wire [31:0] _debug_wb_rf_wdata = debug_wb_rf_wdata;
     (* mark_debug = "true" *) wire [31:0] _debug_i_pc = debug_i_pc;
     (* mark_debug = "true" *) wire [31:0] _debug_i_instr = debug_i_instr;
@@ -136,6 +138,7 @@ module mycpu_top #(
         .data_sram_tlb_modified(w_data_sram_write && !w_data_sram_tlb_dirty),
 
         .debug_wb_pc(debug_wb_pc),
+        .debug_wb_instr(debug_wb_instr),
         .debug_wb_rf_wdata(debug_wb_rf_wdata),
         .debug_wb_rf_wnum(debug_wb_rf_wnum),
         .debug_wb_rf_wen(debug_wb_rf_wen),

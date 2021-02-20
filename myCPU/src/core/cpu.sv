@@ -35,6 +35,7 @@ module CPU #(
            output [3:0] debug_wb_rf_wen,
            output [4:0] debug_wb_rf_wnum,
            output [31:0] debug_wb_rf_wdata,
+           output [31:0] debug_wb_instr,
            output [31:0] debug_i_pc,
            output [31:0] debug_i_instr,
 
@@ -176,6 +177,7 @@ reg D_last_bubble;
 wire D_insert_bubble = D_last_bubble || D_data_waiting;
 ControlSignals D_ctrl;
 reg [31:0] D_pc;
+reg [31:0] D_instr; // WARNING: for debug purpose only, do not use in logic. To add new functionality, change decoder.
 reg D_isDelaySlot;
 ExcCode_t D_last_excCode;
 reg [31:0] D_badVAddr;
@@ -196,6 +198,7 @@ always @(posedge clk) begin
         D_ctrl <= kControlNop;
         D_last_likely_failed <= 0;
         D_tlb_refill <= 0;
+        D_instr <= 0;
     end
     else begin
         if (!D_stall) begin
@@ -204,6 +207,7 @@ always @(posedge clk) begin
             D_last_exception <= F_exception;
             D_last_excCode <= F_excCode;
             D_pc <= F_im.outputPC;
+            D_instr <= F_im.instruction;
             D_last_bubble <= F_insert_bubble || exceptionLevel[m_D] || D_last_likely_failed_next;
             D_ctrl <= (F_insert_bubble || exceptionLevel[m_D] || D_last_likely_failed_next || F_exception) ? kControlNop : F_dec.controls;
             D_last_likely_failed <= F_insert_bubble ? D_last_likely_failed_next : 0;
@@ -382,6 +386,7 @@ reg E_bubble;
 wire E_insert_bubble = E_bubble || E_data_waiting;
 ControlSignals E_ctrl;
 reg [31:0] E_pc;
+reg [31:0] E_instr; // Do not use
 reg [31:0] E_regRead1;
 reg [31:0] E_regRead2;
 reg [31:0] E_memAddress;
@@ -450,6 +455,7 @@ always @(posedge clk) begin
         E_running <= 0;
         E_moveDisable <= 0;
         E_tlb_refill_last <= 0;
+        E_instr <= 0;
     end
     else begin
         if (!E_stall) begin
@@ -469,6 +475,7 @@ always @(posedge clk) begin
             E_running <= 0;
             E_tlb_refill_last <= D_tlb_refill;
             E_moveDisable <= D_moveDisable;
+            E_instr <= D_instr;
         end
         else begin
             E_bubble <= E_bubble || exceptionLevel[m_M];
@@ -639,6 +646,7 @@ end
 reg M_bubble;
 ControlSignals M_ctrl;
 reg [31:0] M_pc;
+reg [31:0] M_instr;
 reg [31:0] M_mulOutput;
 reg [31:0] M_memData;
 reg [31:0] M_lastBadVAddr;
@@ -671,6 +679,7 @@ always @(posedge clk) begin
         M_tlb_refill <= 0;
         M_bitCount <= 0;
         M_moveDisable <= 0;
+        M_instr <= 0;
     end
     else begin
         M_bubble <= E_insert_bubble || exceptionLevel[m_M];
@@ -688,6 +697,7 @@ always @(posedge clk) begin
         M_bitCount <= E_bitCounter.count;
         M_tlb_refill <= E_tlb_refill;
         M_moveDisable <= E_moveDisable;
+        M_instr <= E_instr;
 `ifndef SYNTHESIS
         if (E_exception) begin
             if (E_excCode == cERET) begin
@@ -756,5 +766,6 @@ assign debug_wb_pc = M_bubble ? 0 : M_pc;
 assign debug_wb_rf_wen = grfWriteAddress != 0 ? 4'b1111 : 0;
 assign debug_wb_rf_wnum = grfWriteAddress;
 assign debug_wb_rf_wdata = grfWriteData;
+assign debug_wb_instr = M_bubble ? 0 : M_instr;
 
 endmodule
