@@ -387,7 +387,7 @@ reg [31:0] E_regRead2;
 reg [31:0] E_memAddress;
 reg [31:0] E_aluOutput;
 reg E_aluOverflow;
-reg E_running;
+reg E_mul_running;
 reg E_tlb_refill_last;
 reg E_moveDisable;
 reg E_regWriteDataValid;
@@ -447,7 +447,7 @@ always @(posedge clk) begin
         E_aluOutput <= 0;
         E_aluOverflow <= 0;
         E_LLbit <= 0;
-        E_running <= 0;
+        E_mul_running <= 0;
         E_moveDisable <= 0;
         E_tlb_refill_last <= 0;
     end
@@ -466,7 +466,7 @@ always @(posedge clk) begin
             E_aluOutput <= D_alu.out;
             E_aluOverflow <= D_alu.overflow;
             E_LLbit <= E_LLbit_next;
-            E_running <= 0;
+            E_mul_running <= 0;
             E_tlb_refill_last <= D_tlb_refill;
             E_moveDisable <= D_moveDisable;
         end
@@ -475,7 +475,7 @@ always @(posedge clk) begin
             E_ctrl <= (E_bubble || exceptionLevel[m_M]) ? kControlNop : E_ctrl;
             E_regRead1 <= E_regRead1_forward.value;
             E_regRead2 <= E_regRead2_forward.value;
-            E_running <= 1;
+            E_mul_running <= E_mulStart || E_mul_running;
         end
     end
 end
@@ -547,14 +547,14 @@ logic E_mul_collision, E_mulStart;
 always_comb begin
     E_mulStart = 0;
     E_mul_collision = 0;
-    if (E_ctrl.mulEnable && E_ctrl.grfWriteSource == `grfWriteMul && !E_running) begin
+    if (E_ctrl.mulEnable && E_ctrl.grfWriteSource == `grfWriteMul && !E_mul_running) begin
         E_mul_collision = 1;
     end
     if (E_ctrl.mulEnable || E_ctrl.grfWriteSource == `grfWriteMul) begin
         if (E_mul.busy) begin
             E_mul_collision = 1;
         end
-        else if (E_ctrl.mulEnable && !M_exception) begin
+        else if (E_ctrl.mulEnable && !M_exception && !E_mul_running) begin
             E_mulStart = 1;
         end
     end
