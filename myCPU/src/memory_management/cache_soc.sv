@@ -33,6 +33,8 @@ module cache_soc #(
     output logic o_d_valid,//o_d_outdata的valid信号
     output logic o_d_cache_instr_valid,
 
+    output logic o_idle,//读写fifo均空
+
 	input [DCACHE_TAG_WIDTH - 1 : 0] i_dcache_instr_tag,//mu级传入 index storetag指令中的tag 对dcache有效
 	input cache_op i_dcache_instr, //m级传入 表明是哪个cache指令 对dcache有效 
     input word i_dcache_instr_addr, //m级传入 cache指令的32位地址，含义根据不同指令不同 对dcache有效
@@ -100,6 +102,7 @@ word w_memread_start_pc, w_memread_start_addr;
 word [DCACHE_LINE_WORD_NUM - 1 : 0] w_dcache_memwrite_data;
 word r_isram_inst, r_dsram_data, w_isram_inst, w_dsram_data;
 mem_write_req w_dcache_wreq, w_dsram_wreq;
+logic w_rqueue_empty, w_wqueue_empty;
 axi_r_resp w_axi_r_resp;
 axi_r_req  w_axi_r_req;
 axi_w_resp w_axi_w_resp;
@@ -110,6 +113,7 @@ assign o_i_inst = w_out_isram_valid ? w_isram_inst : w_icache_inst;
 //assign o_d_valid = w_out_dsram_valid || (!w_d_stall && i_d_cached && (i_d_read || i_d_write));
 assign o_d_valid = (!i_d_cached && w_out_dsram_valid) | (i_d_cached && w_dcache_valid);
 assign o_d_outdata = w_out_dsram_valid ? w_dsram_data : w_dcache_data;
+assign o_idle = w_rqueue_empty && w_wqueue_empty;
    
 
 always_ff @(posedge i_clk) begin
@@ -271,6 +275,7 @@ mem_read # (
 	.o_start_va(w_memread_start_pc),
 	.o_start_addr(w_memread_start_addr),
     .o_line_num(),
+    .o_empty(w_rqueue_empty),
     .axi_bus_req(w_axi_r_req),
 	.axi_bus_resp(w_axi_r_resp)
 );
@@ -291,6 +296,7 @@ mem_write #(
     .o_dcache_lock(w_dcache_lock),
     .o_sram_lock(),
     .o_key(w_key),
+    .o_empty(w_wqueue_empty),
     .i_dcache_req(w_dcache_wreq),
     .i_sram_req(w_dsram_wreq),
     .o_sram_empty(w_sram_empty),

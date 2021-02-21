@@ -313,6 +313,8 @@ module mycpu_top #(
                   .i_dcache_instr_tag(cp0_tagLo0[31:(32 - `DCACHE_TAG_WIDTH)]),
                   .i_dcache_instr_addr(w_data_sram_paddr),
 
+                  .o_idle(),
+
                   .arid,
                   .araddr,
                   .arlen,
