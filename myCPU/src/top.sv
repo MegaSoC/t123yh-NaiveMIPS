@@ -304,12 +304,14 @@ module mycpu_top #(
                   .o_d_valid(w_d_valid),
                   .o_d_outdata(w_d_outdata),
 
-                  .i_icache_instr(w_data_sram_read_okay ? icache_op : CACHE_NOP),
+                  .i_icache_instr_en(w_data_sram_read_okay),
+                  .i_icache_instr(icache_op),
                   .i_icache_instr_tag(cp0_tagLo0[31:(32 - `ICACHE_TAG_WIDTH)]),
                   .i_icache_instr_addr(w_data_sram_paddr),
                   .o_i_cache_instr_valid(),
 
-                  .i_dcache_instr(w_data_sram_read_okay ? dcache_op : CACHE_NOP),
+                  .i_dcache_instr_en(w_data_sram_read_okay),
+                  .i_dcache_instr(dcache_op),
                   .i_dcache_instr_tag(cp0_tagLo0[31:(32 - `DCACHE_TAG_WIDTH)]),
                   .i_dcache_instr_addr(w_data_sram_paddr),
                   .o_d_cache_instr_valid(w_data_cache_op_valid),

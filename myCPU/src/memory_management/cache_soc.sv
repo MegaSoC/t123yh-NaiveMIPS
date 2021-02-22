@@ -34,11 +34,13 @@ module cache_soc #(
 
     output logic o_idle,//读写fifo均空
 
+    input logic i_dcache_instr_en,
 	input [DCACHE_TAG_WIDTH - 1 : 0] i_dcache_instr_tag,//mu级传入 index storetag指令中的tag 对dcache有效
 	input cache_op i_dcache_instr, //m级传入 表明是哪个cache指令 对dcache有效 
     input word i_dcache_instr_addr, //m级传入 cache指令的32位地址，含义根据不同指令不同 对dcache有效
     output logic o_d_cache_instr_valid,
     
+    input logic i_icache_instr_en,
     input cache_op i_icache_instr, //m级传入 表明是哪个cache指令 对icache有效 
 	input word i_icache_instr_addr,   //m级传入 cache指令的32位地址，含义根据不同指令不同 对icache有效
 	input [ICACHE_TAG_WIDTH - 1 : 0] i_icache_instr_tag,//m级传入 index storetag指令中的tag 对icache有效
@@ -166,7 +168,7 @@ icache1(
     .o_ready(w_icache_ready),
     .o_mdata_data(w_icache_inst),
 
-    .i_cache_instr(i_icache_instr & {$bits(i_icache_instr){w_icache_ready}}),
+    .i_cache_instr((i_icache_instr_en && w_icache_ready) ? i_icache_instr : CACHE_NOP),
     .i_cache_instr_addr(i_icache_instr_addr),
     .i_cache_instr_tag(i_icache_instr_tag),
     .o_cache_instr_valid(o_i_cache_instr_valid),
@@ -213,7 +215,7 @@ dcache1(
     .o_ready(w_dcache_ready),
     .o_mdata_data(w_dcache_data),
 
-    .i_cache_instr(i_dcache_instr & {$bits(i_dcache_instr){w_dcache_ready}}),
+    .i_cache_instr((i_dcache_instr_en && w_dcache_ready) ? i_dcache_instr : CACHE_NOP),
     .i_cache_instr_addr(i_dcache_instr_addr),
     .i_cache_instr_tag(i_dcache_instr_tag),
     .o_cache_instr_valid(o_d_cache_instr_valid),
