@@ -31,17 +31,18 @@ module cache_soc #(
     input word   i_d_indata,//与i_d_phyaddr时机相同，写入的内容
     output word  o_d_outdata,//数据读出的内容
     output logic o_d_valid,//o_d_outdata的valid信号
-    output logic o_d_cache_instr_valid,
 
     output logic o_idle,//读写fifo均空
 
 	input [DCACHE_TAG_WIDTH - 1 : 0] i_dcache_instr_tag,//mu级传入 index storetag指令中的tag 对dcache有效
 	input cache_op i_dcache_instr, //m级传入 表明是哪个cache指令 对dcache有效 
     input word i_dcache_instr_addr, //m级传入 cache指令的32位地址，含义根据不同指令不同 对dcache有效
+    output logic o_d_cache_instr_valid,
     
     input cache_op i_icache_instr, //m级传入 表明是哪个cache指令 对icache有效 
 	input word i_icache_instr_addr,   //m级传入 cache指令的32位地址，含义根据不同指令不同 对icache有效
 	input [ICACHE_TAG_WIDTH - 1 : 0] i_icache_instr_tag,//m级传入 index storetag指令中的tag 对icache有效
+    output logic o_i_cache_instr_valid,
 
     output logic [3 :0] arid ,
     output logic [31:0] araddr ,
@@ -98,6 +99,7 @@ logic w_dcache_memread_we, w_dcache_memwrite_start,w_dcache_memwrite_end;
 logic w_dcache_memwrite_we, w_icache_memread_we, w_i_stall, w_d_stall;
 logic r_isram_valid, r_dsram_read, r_dsram_write, w_isram_valid, w_dsram_read, w_dsram_write;
 logic w_out_isram_valid, w_out_dsram_valid, w_dcache_valid, w_icache_valid;
+logic w_icache_ready, w_dcache_ready;
 word w_memread_start_pc, w_memread_start_addr;
 word [DCACHE_LINE_WORD_NUM - 1 : 0] w_dcache_memwrite_data;
 word r_isram_inst, r_dsram_data, w_isram_inst, w_dsram_data;
@@ -161,11 +163,13 @@ icache1(
     .i_va(i_i_npc), 
     //.o_inn_stall(w_i_stall),
     .o_valid(w_icache_valid),
+    .o_ready(w_icache_ready),
     .o_mdata_data(w_icache_inst),
 
-    .i_cache_instr(i_icache_instr),
+    .i_cache_instr(i_icache_instr & {$bits(i_icache_instr){w_icache_ready}}),
     .i_cache_instr_addr(i_icache_instr_addr),
     .i_cache_instr_tag(i_icache_instr_tag),
+    .o_cache_instr_valid(o_i_cache_instr_valid),
 
     .i_resp(w_resp), //TODO
     .i_memread_empty(w_inst_empty),// TODO
@@ -206,9 +210,10 @@ dcache1(
     .i_in_data(i_d_indata),
     //.o_inn_stall(w_d_stall),
     .o_valid(w_dcache_valid),
+    .o_ready(w_dcache_ready),
     .o_mdata_data(w_dcache_data),
 
-    .i_cache_instr(i_dcache_instr),
+    .i_cache_instr(i_dcache_instr & {$bits(i_dcache_instr){w_dcache_ready}}),
     .i_cache_instr_addr(i_dcache_instr_addr),
     .i_cache_instr_tag(i_dcache_instr_tag),
     .o_cache_instr_valid(o_d_cache_instr_valid),
