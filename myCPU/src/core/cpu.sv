@@ -13,6 +13,7 @@ module CPU #(
            input inst_sram_tlb_miss,
            input inst_sram_tlb_invalid,
            output cache_op inst_cache_op,
+           input inst_cache_op_valid,
 
            output reg [31:0] data_sram_vaddr,
            output data_sram_read,
@@ -30,6 +31,8 @@ module CPU #(
            input data_sram_tlb_invalid,
            input data_sram_tlb_modified,
            output data_sram_va_hold,
+
+           input mem_idle,
 
            output [31:0] debug_wb_pc,
            output [3:0] debug_wb_rf_wen,
@@ -597,8 +600,9 @@ assign data_cache_op = E_ctrl.memDCacheOp;
 assign inst_cache_op = E_ctrl.memICacheOp;
 // icache has no waiting operation
 wire E_dcache_active = E_ctrl.memDCacheOp != CACHE_NOP;
+wire E_icache_active = E_ctrl.memICacheOp != CACHE_NOP;
 
-wire E_memory_waiting = ((data_sram_write || data_sram_read) && !data_sram_valid) || (E_dcache_active && !data_cache_op_valid);
+wire E_memory_waiting = ((data_sram_write || data_sram_read) && !data_sram_valid) || (E_dcache_active && !data_cache_op_valid) || (E_icache_active && !inst_cache_op_valid) || (E_ctrl.memWaitForIdle && !mem_idle);
 
 DataMemoryReadShifter E_dm_r(
         .originalData(E_regRead2_forward.value), // register@regRead2
