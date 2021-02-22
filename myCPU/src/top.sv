@@ -311,7 +311,7 @@ module mycpu_top #(
                   .i_icache_instr(icache_op),
                   .i_icache_instr_tag(cp0_tagLo0[31:(32 - `ICACHE_TAG_WIDTH)]),
                   .i_icache_instr_addr(w_data_sram_paddr),
-                  .o_i_cache_instr_valid(),
+                  .o_i_cache_instr_valid(w_inst_cache_op_valid),
 
                   .i_dcache_instr_en(w_data_sram_read_okay),
                   .i_dcache_instr(dcache_op),
