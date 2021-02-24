@@ -28,7 +28,7 @@ perf_test_stream_copy:
   stage: perf_test
   script:
     - /opt/Xilinx/Vivado/2019.2/bin/vivado -mode tcl loooongson/soc_axi_perf/run_vivado/mycpu_prj1/mycpu.xpr -source scripts/run_perf_test.tcl -tclargs stream_copy
-    - grep 'stream_copy PASS!' loooongson/soc_axi_perf/run_vivado/mycpu_prj1/mycpu.sim/sim_1/behav/xsim/simulate.log
+    - grep 'stream copy PASS!' loooongson/soc_axi_perf/run_vivado/mycpu_prj1/mycpu.sim/sim_1/behav/xsim/simulate.log
   only:
     variables:
       - $CI_COMMIT_MESSAGE =~ /\[perf/i
@@ -48,7 +48,7 @@ perf_test_stringsearch:
   stage: perf_test
   script:
     - /opt/Xilinx/Vivado/2019.2/bin/vivado -mode tcl loooongson/soc_axi_perf/run_vivado/mycpu_prj1/mycpu.xpr -source scripts/run_perf_test.tcl -tclargs stringsearch
-    - grep 'stringsearch PASS!' loooongson/soc_axi_perf/run_vivado/mycpu_prj1/mycpu.sim/sim_1/behav/xsim/simulate.log
+    - grep 'string search PASS!' loooongson/soc_axi_perf/run_vivado/mycpu_prj1/mycpu.sim/sim_1/behav/xsim/simulate.log
   only:
     variables:
       - $CI_COMMIT_MESSAGE =~ /\[perf/i
@@ -58,7 +58,7 @@ perf_test_select_sort:
   stage: perf_test
   script:
     - /opt/Xilinx/Vivado/2019.2/bin/vivado -mode tcl loooongson/soc_axi_perf/run_vivado/mycpu_prj1/mycpu.xpr -source scripts/run_perf_test.tcl -tclargs select_sort
-    - grep 'select_sort PASS!' loooongson/soc_axi_perf/run_vivado/mycpu_prj1/mycpu.sim/sim_1/behav/xsim/simulate.log
+    - grep 'select sort PASS!' loooongson/soc_axi_perf/run_vivado/mycpu_prj1/mycpu.sim/sim_1/behav/xsim/simulate.log
   only:
     variables:
       - $CI_COMMIT_MESSAGE =~ /\[perf/i
@@ -68,7 +68,7 @@ perf_test_bubble_sort:
   stage: perf_test
   script:
     - /opt/Xilinx/Vivado/2019.2/bin/vivado -mode tcl loooongson/soc_axi_perf/run_vivado/mycpu_prj1/mycpu.xpr -source scripts/run_perf_test.tcl -tclargs bubble_sort
-    - grep 'bubble_sort PASS!' loooongson/soc_axi_perf/run_vivado/mycpu_prj1/mycpu.sim/sim_1/behav/xsim/simulate.log
+    - grep 'bubble sort PASS!' loooongson/soc_axi_perf/run_vivado/mycpu_prj1/mycpu.sim/sim_1/behav/xsim/simulate.log
   only:
     variables:
       - $CI_COMMIT_MESSAGE =~ /\[perf/i
@@ -79,7 +79,7 @@ perf_test_quick_sort:
   stage: perf_test
   script:
     - /opt/Xilinx/Vivado/2019.2/bin/vivado -mode tcl loooongson/soc_axi_perf/run_vivado/mycpu_prj1/mycpu.xpr -source scripts/run_perf_test.tcl -tclargs quick_sort
-    - grep 'quick_sort PASS!' loooongson/soc_axi_perf/run_vivado/mycpu_prj1/mycpu.sim/sim_1/behav/xsim/simulate.log
+    - grep 'quick sort PASS!' loooongson/soc_axi_perf/run_vivado/mycpu_prj1/mycpu.sim/sim_1/behav/xsim/simulate.log
   only:
     variables:
       - $CI_COMMIT_MESSAGE =~ /\[perf/i
