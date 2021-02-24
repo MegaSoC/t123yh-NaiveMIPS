@@ -395,7 +395,7 @@ end
 // assign o_mdata_data = r_receiving_hit ? r_data : w_data;
 assign o_mdata_data = w_data;
 assign o_inn_stall = w_state != IDLE_RECEIVING && w_state != IDLE;
-assign o_memread_stall = w_state == WRITE_WAITING;
+assign o_memread_stall = r_state == WRITE_WAITING;
 assign o_ready = r_state != REFILL && r_state != INVALIDATING;
 
 //pipeline1 process 
