@@ -243,6 +243,7 @@ word [SET_ASSOC - 1 : 0][WORD_PER_LINE - 1 : 0] w_pipe_data_a, w_pipe_data_b;
 
 // pipe 3-4 signal
 logic web_refill, web_w; 
+logic w_switch_data_index, r_switch_data_index;
 
 
 //miss sigbal
@@ -470,7 +471,26 @@ end
 assign w_pipe_hit = |w_way_hita && (r_state == IDLE || r_state == IDLE_RECEIVING);
 assign w_hit_way = w_whichway_hita[SET_ASSOC];
 
-assign w_data_indexa = w_state == WRITE_WAITING ? r_rbuffer_index1 : get_index(i_va);   
+always_comb begin
+	w_switch_data_index = r_switch_data_index;
+	if((w_resp.last && w_resp.valid2)&& r_old_tag.valid) begin
+		w_switch_data_index = 1;
+	end
+	if(r_switch_data_index && !r_wbuffer_full) begin
+		w_switch_data_index = 0;
+	end
+end
+
+always_ff @(posedge i_clk) begin
+	if(i_rst) begin
+		r_switch_data_index = 0;
+	end
+	else begin
+		r_switch_data_index <= w_switch_data_index;
+	end
+end
+
+assign w_data_indexa = w_switch_data_index ? r_rbuffer_index1 : get_index(i_va);   
 assign w_data_indexb = web_refill ? r_rbuffer_index1 : r_indexa; 
 assign web_refill = r_state == REFILL;
 //TODO!!!!!! lru
