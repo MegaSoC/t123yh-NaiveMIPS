@@ -414,7 +414,7 @@ always_comb begin
 
                 6'b001111: // sync
                 begin
-                    // TODO: Ensure no cache activity here
+                    controls.memWaitForIdle = 1;
                 end
 
                 6'b011000: // mult

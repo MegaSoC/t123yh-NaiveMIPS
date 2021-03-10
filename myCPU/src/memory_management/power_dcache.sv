@@ -13,17 +13,15 @@ module new_dcache#(
 
 	input logic i_valid, //�?????????????�?????????????16�????????????? 可�?�项�?????????????16 8 4 2 1 0
 	//input logic i_uncached,   //当前地址是否经过icache
+	
 	input logic [31:0] i_phy_addr, //假设查tlb要花费一个周�?????????????
-	input cache_op i_cache_instr, //m级传入
-	input word i_cache_instr_addr,   //m级传入
-	input [TAG_WIDTH - 1 : 0] i_cache_instr_tag,
 	input logic [31:0] i_va, //提前�?????????????个周期进入cache
 	input logic [3:0] i_wen,
 	input logic [31:0] i_in_data,
 	output logic o_inn_stall,//传给外部表示cache中需要暂�?????????????
 	output logic [31:0] o_mdata_data,
 	output logic o_valid,
-	output logic o_cache_instr_valid,
+	output logic o_ready,
 
 	input mem_read_resp i_resp,
 	input logic i_memread_empty,
@@ -42,7 +40,12 @@ module new_dcache#(
 	input logic i_memwrite_end,
 	output mem_write_req o_memwrite_req,
 	output word [WORD_PER_LINE - 1 : 0] o_write_data,
-	output logic o_mem_write_we
+	output logic o_mem_write_we,
+
+	input cache_op i_cache_instr, //m级传入
+	input word i_cache_instr_addr,   //m级传入
+	input [TAG_WIDTH - 1 : 0] i_cache_instr_tag,
+	output logic o_cache_instr_valid
 
 );
 
@@ -393,7 +396,8 @@ end
 // assign o_mdata_data = r_receiving_hit ? r_data : w_data;
 assign o_mdata_data = w_data;
 assign o_inn_stall = w_state != IDLE_RECEIVING && w_state != IDLE;
-assign o_memread_stall = w_state == WRITE_WAITING;
+assign o_memread_stall = r_state == WRITE_WAITING;
+assign o_ready = r_state != REFILL && r_state != INVALIDATING;
 
 //pipeline1 process 
 assign w_tag_wea = w_memread_end ;

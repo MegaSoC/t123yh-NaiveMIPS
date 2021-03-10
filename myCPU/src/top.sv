@@ -51,6 +51,7 @@ module mycpu_top #(
         output bready ,
 
         output [31:0] debug_wb_pc,
+        output [31:0] debug_wb_instr,
         output [3:0] debug_wb_rf_wen,
         output [4:0] debug_wb_rf_wnum,
         output [31:0] debug_wb_rf_wdata,
@@ -61,6 +62,7 @@ module mycpu_top #(
     (* mark_debug = "true" *) wire [3:0] _debug_wb_rf_wen = debug_wb_rf_wen;
     (* mark_debug = "true" *) wire [4:0] _debug_wb_rf_wnum = debug_wb_rf_wnum;
     (* mark_debug = "true" *) wire [31:0] _debug_wb_pc = debug_wb_pc;
+    (* mark_debug = "true" *) wire [31:0] _debug_wb_instr = debug_wb_instr;
     (* mark_debug = "true" *) wire [31:0] _debug_wb_rf_wdata = debug_wb_rf_wdata;
     (* mark_debug = "true" *) wire [31:0] _debug_i_pc = debug_i_pc;
     (* mark_debug = "true" *) wire [31:0] _debug_i_instr = debug_i_instr;
@@ -94,7 +96,7 @@ module mycpu_top #(
     wire cp0_we, cp0_en_exp, cp0_ewr_bd, cp0_interrupt_pending, cp0_kseg0_cached, cp0_kernel_mode, cp0_privileged;
     wire [31:0] cp0_rdata, cp0_wdata, cp0_ewr_epc, cp0_ewr_badVAddr, cp0_epc_o, cp0_exc_handler, cp0_int_handler, cp0_tlb_refill_handler, cp0_tagLo0, cp0_erl, cp0_entryLo0, cp0_entryLo1, cp0_entryHi, cp0_index, cp0_pageMask;
     ExcCode_t cp0_ewr_excCode;
-    wire w_data_cache_op_valid;
+    wire w_data_cache_op_valid, w_inst_cache_op_valid, w_mem_idle;
     cp0_number_t cp0_rw_number;
     cache_op dcache_op, icache_op;
     wire w_inst_sram_tlb_addressError, w_inst_sram_tlb_hit, w_inst_sram_tlb_valid;
@@ -117,6 +119,7 @@ module mycpu_top #(
         .inst_sram_tlb_miss(!w_inst_sram_tlb_hit && w_inst_sram_readen2),
         .inst_sram_tlb_invalid(!w_inst_sram_tlb_valid && w_inst_sram_readen2),
         .inst_cache_op(icache_op),
+        .inst_cache_op_valid(w_inst_cache_op_valid),
 
         .data_sram_rdata(w_d_outdata),
         .data_sram_valid(w_d_valid),
@@ -135,7 +138,10 @@ module mycpu_top #(
         .data_sram_tlb_invalid(w_data_sram_tlb && !w_data_sram_tlb_valid),
         .data_sram_tlb_modified(w_data_sram_write && !w_data_sram_tlb_dirty),
 
+        .mem_idle(w_mem_idle),
+
         .debug_wb_pc(debug_wb_pc),
+        .debug_wb_instr(debug_wb_instr),
         .debug_wb_rf_wdata(debug_wb_rf_wdata),
         .debug_wb_rf_wnum(debug_wb_rf_wnum),
         .debug_wb_rf_wen(debug_wb_rf_wen),
@@ -300,17 +306,20 @@ module mycpu_top #(
                   .i_d_byteen(w_data_sram_byteen),
                   .o_d_valid(w_d_valid),
                   .o_d_outdata(w_d_outdata),
-                  .o_d_cache_instr_valid(w_data_cache_op_valid),
 
-                  .i_icache_instr(w_data_sram_read_okay ? icache_op : CACHE_NOP),
+                  .i_icache_instr_en(w_data_sram_read_okay),
+                  .i_icache_instr(icache_op),
                   .i_icache_instr_tag(cp0_tagLo0[31:(32 - `ICACHE_TAG_WIDTH)]),
                   .i_icache_instr_addr(w_data_sram_paddr),
+                  .o_i_cache_instr_valid(w_inst_cache_op_valid),
 
-                  .i_dcache_instr(w_data_sram_read_okay ? dcache_op : CACHE_NOP),
+                  .i_dcache_instr_en(w_data_sram_read_okay),
+                  .i_dcache_instr(dcache_op),
                   .i_dcache_instr_tag(cp0_tagLo0[31:(32 - `DCACHE_TAG_WIDTH)]),
                   .i_dcache_instr_addr(w_data_sram_paddr),
+                  .o_d_cache_instr_valid(w_data_cache_op_valid),
 
-                  .o_idle(),
+                  .o_idle(w_mem_idle),
 
                   .arid,
                   .araddr,

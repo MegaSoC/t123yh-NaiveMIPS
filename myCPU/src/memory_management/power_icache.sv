@@ -14,20 +14,23 @@ module new_icache#(
     input logic i_valid2,
 	//input logic i_uncached,   //当前地址是否经过icache
 	input logic [31:0] i_phy_addr, //假设查tlb要花费一个周�?????????????
-	input cache_op i_cache_instr, //m级传入
-	input word i_cache_instr_addr,   //m级传入
-	input [TAG_WIDTH - 1 : 0] i_cache_instr_tag,
 	input logic [31:0] i_va, //提前�?????????????个周期进入cache
 	output logic o_inn_stall,//传给外部表示cache中需要暂�?????????????
 	output logic [31:0] o_mdata_data,
 	output logic o_valid,
+	output logic o_ready,
 
 	input mem_read_resp i_resp,
 	input logic i_memread_empty,
 	input logic i_memread_start,
 	input logic i_memread_end,
 	output mem_read_req o_memread_req,
-	output logic o_mem_read_we
+	output logic o_mem_read_we,
+
+	input cache_op i_cache_instr, //m级传入
+	input word i_cache_instr_addr,   //m级传入
+	input [TAG_WIDTH - 1 : 0] i_cache_instr_tag,
+	output logic o_cache_instr_valid
 
 );
 
@@ -304,6 +307,8 @@ end
 assign o_mdata_data = w_data;
 assign w_inn_stall = w_state != IDLE_RECEIVING && w_state != IDLE;
 assign o_inn_stall = w_inn_stall;
+assign o_ready = r_state != REFILL && r_state != INVALIDATING;
+
 //pipeline1 process 
 assign w_tag_wea = w_memread_end ;
 assign w_cache_inst_index = get_index(i_cache_instr_addr);
@@ -429,6 +434,8 @@ end
 
 //pipeline3
 assign o_valid = w_rbuffer_hita | w_receiving_hit | w_pipe_hit;
+assign o_cache_instr_valid = o_ready;
+
 always_comb begin
 	w_data = r_data;
 	if(w_rbuffer_hita)begin

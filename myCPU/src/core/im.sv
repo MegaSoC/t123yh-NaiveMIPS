@@ -61,12 +61,12 @@ always_comb begin
                 else
                     pc_next = pc;
             end
-            else if (pendingJump) begin
-                pc_next = pendingJumpAddr;
-                isDelaySlot = 1;
-            end
             else if (absJump) begin
                 pc_next = absJumpAddress;
+                isDelaySlot = 1;
+            end
+            else if (pendingJump) begin
+                pc_next = pendingJumpAddr;
                 isDelaySlot = 1;
             end
             if (pc_next[1:0] != 0) begin

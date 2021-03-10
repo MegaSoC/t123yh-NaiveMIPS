@@ -13,6 +13,7 @@ module CPU #(
            input inst_sram_tlb_miss,
            input inst_sram_tlb_invalid,
            output cache_op inst_cache_op,
+           input inst_cache_op_valid,
 
            output reg [31:0] data_sram_vaddr,
            output data_sram_read,
@@ -31,10 +32,13 @@ module CPU #(
            input data_sram_tlb_modified,
            output data_sram_va_hold,
 
+           input mem_idle,
+
            output [31:0] debug_wb_pc,
            output [3:0] debug_wb_rf_wen,
            output [4:0] debug_wb_rf_wnum,
            output [31:0] debug_wb_rf_wdata,
+           output [31:0] debug_wb_instr,
            output [31:0] debug_i_pc,
            output [31:0] debug_i_instr,
 
@@ -176,6 +180,7 @@ reg D_last_bubble;
 wire D_insert_bubble = D_last_bubble || D_data_waiting;
 ControlSignals D_ctrl;
 reg [31:0] D_pc;
+reg [31:0] D_instr; // WARNING: for debug purpose only, do not use in logic. To add new functionality, change decoder.
 reg D_isDelaySlot;
 ExcCode_t D_last_excCode;
 reg [31:0] D_badVAddr;
@@ -196,6 +201,7 @@ always @(posedge clk) begin
         D_ctrl <= kControlNop;
         D_last_likely_failed <= 0;
         D_tlb_refill <= 0;
+        D_instr <= 0;
     end
     else begin
         if (!D_stall) begin
@@ -204,6 +210,7 @@ always @(posedge clk) begin
             D_last_exception <= F_exception;
             D_last_excCode <= F_excCode;
             D_pc <= F_im.outputPC;
+            D_instr <= F_im.instruction;
             D_last_bubble <= F_insert_bubble || exceptionLevel[m_D] || D_last_likely_failed_next;
             D_ctrl <= (F_insert_bubble || exceptionLevel[m_D] || D_last_likely_failed_next || F_exception) ? kControlNop : F_dec.controls;
             D_last_likely_failed <= F_insert_bubble ? D_last_likely_failed_next : 0;
@@ -382,12 +389,13 @@ reg E_bubble;
 wire E_insert_bubble = E_bubble || E_data_waiting;
 ControlSignals E_ctrl;
 reg [31:0] E_pc;
+reg [31:0] E_instr; // Do not use
 reg [31:0] E_regRead1;
 reg [31:0] E_regRead2;
 reg [31:0] E_memAddress;
 reg [31:0] E_aluOutput;
 reg E_aluOverflow;
-reg E_running;
+reg E_mul_running;
 reg E_tlb_refill_last;
 reg E_moveDisable;
 reg E_regWriteDataValid;
@@ -447,9 +455,10 @@ always @(posedge clk) begin
         E_aluOutput <= 0;
         E_aluOverflow <= 0;
         E_LLbit <= 0;
-        E_running <= 0;
+        E_mul_running <= 0;
         E_moveDisable <= 0;
         E_tlb_refill_last <= 0;
+        E_instr <= 0;
     end
     else begin
         if (!E_stall) begin
@@ -466,16 +475,17 @@ always @(posedge clk) begin
             E_aluOutput <= D_alu.out;
             E_aluOverflow <= D_alu.overflow;
             E_LLbit <= E_LLbit_next;
-            E_running <= 0;
+            E_mul_running <= 0;
             E_tlb_refill_last <= D_tlb_refill;
             E_moveDisable <= D_moveDisable;
+            E_instr <= D_instr;
         end
         else begin
             E_bubble <= E_bubble || exceptionLevel[m_M];
             E_ctrl <= (E_bubble || exceptionLevel[m_M]) ? kControlNop : E_ctrl;
             E_regRead1 <= E_regRead1_forward.value;
             E_regRead2 <= E_regRead2_forward.value;
-            E_running <= 1;
+            E_mul_running <= E_mulStart || E_mul_running;
         end
     end
 end
@@ -547,14 +557,14 @@ logic E_mul_collision, E_mulStart;
 always_comb begin
     E_mulStart = 0;
     E_mul_collision = 0;
-    if (E_ctrl.mulEnable && E_ctrl.grfWriteSource == `grfWriteMul && !E_running) begin
+    if (E_ctrl.mulEnable && E_ctrl.grfWriteSource == `grfWriteMul && !E_mul_running) begin
         E_mul_collision = 1;
     end
     if (E_ctrl.mulEnable || E_ctrl.grfWriteSource == `grfWriteMul) begin
         if (E_mul.busy) begin
             E_mul_collision = 1;
         end
-        else if (E_ctrl.mulEnable && !M_exception) begin
+        else if (E_ctrl.mulEnable && !M_exception && !E_mul_running) begin
             E_mulStart = 1;
         end
     end
@@ -590,8 +600,9 @@ assign data_cache_op = E_ctrl.memDCacheOp;
 assign inst_cache_op = E_ctrl.memICacheOp;
 // icache has no waiting operation
 wire E_dcache_active = E_ctrl.memDCacheOp != CACHE_NOP;
+wire E_icache_active = E_ctrl.memICacheOp != CACHE_NOP;
 
-wire E_memory_waiting = ((data_sram_write || data_sram_read) && !data_sram_valid) || (E_dcache_active && !data_cache_op_valid);
+wire E_memory_waiting = ((data_sram_write || data_sram_read) && !data_sram_valid) || (E_dcache_active && !data_cache_op_valid) || (E_icache_active && !inst_cache_op_valid) || (E_ctrl.memWaitForIdle && !mem_idle);
 
 DataMemoryReadShifter E_dm_r(
         .originalData(E_regRead2_forward.value), // register@regRead2
@@ -639,6 +650,7 @@ end
 reg M_bubble;
 ControlSignals M_ctrl;
 reg [31:0] M_pc;
+reg [31:0] M_instr;
 reg [31:0] M_mulOutput;
 reg [31:0] M_memData;
 reg [31:0] M_lastBadVAddr;
@@ -671,6 +683,7 @@ always @(posedge clk) begin
         M_tlb_refill <= 0;
         M_bitCount <= 0;
         M_moveDisable <= 0;
+        M_instr <= 0;
     end
     else begin
         M_bubble <= E_insert_bubble || exceptionLevel[m_M];
@@ -688,6 +701,7 @@ always @(posedge clk) begin
         M_bitCount <= E_bitCounter.count;
         M_tlb_refill <= E_tlb_refill;
         M_moveDisable <= E_moveDisable;
+        M_instr <= E_instr;
 `ifndef SYNTHESIS
         if (E_exception) begin
             if (E_excCode == cERET) begin
@@ -756,5 +770,6 @@ assign debug_wb_pc = M_bubble ? 0 : M_pc;
 assign debug_wb_rf_wen = grfWriteAddress != 0 ? 4'b1111 : 0;
 assign debug_wb_rf_wnum = grfWriteAddress;
 assign debug_wb_rf_wdata = grfWriteData;
+assign debug_wb_instr = M_bubble ? 0 : M_instr;
 
 endmodule
