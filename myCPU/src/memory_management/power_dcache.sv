@@ -735,7 +735,7 @@ always_ff @(posedge i_clk) begin
 		end//写时机和pipeline2-3相同
 		r_wbuffer_hit <= w_wbuffer_hit;
 		r_wbuffer_hitindex <= w_wbuffer_hitindex;
-		if(w_state != WRITE_WAITING && r_state == WRITE_WAITING)begin
+		if(!r_wbuffer_full && r_state == WRITE_WAITING)begin
 			r_mem_wbuffer[i_lock] <= w_pipe_data_a[r_rbuffer_way];
 			r_wbuffer_tag[i_lock] <= r_old_tag;
 			r_wbuffer_index[i_lock] <= r_rbuffer_index1;
@@ -758,7 +758,7 @@ assign w_memwrite_req.wen = 4'b1111;
 assign w_memwrite_req.len = WORD_PER_LINE - 1;
 assign w_memwrite_req.addr = {r_writeback_addr[31:LINE_BYTE_OFFSET],{LINE_BYTE_OFFSET{1'b0}}};
 assign w_memwrite_req.size = 3'b010;
-assign w_memwrite_we = r_state == WRITE_WAITING && w_state != WRITE_WAITING;
+assign w_memwrite_we = r_state == WRITE_WAITING && !r_wbuffer_full;
 assign w_memwrite_start = i_memwrite_start;
 assign w_memwrite_end = i_memwrite_end;
 assign o_write_data = r_mem_wbuffer[w_key];
