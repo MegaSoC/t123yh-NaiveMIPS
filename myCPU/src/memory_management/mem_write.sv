@@ -75,7 +75,7 @@ logic [$clog2(LINE_WORD_NUM) - 1 : 0] r_cnt, w_cnt;
 logic [1:0] [BUFFER_NUM - 1 : 0] r_buffer_history;
 logic w_push1, r_push1, w_push2, r_push2, w_pop, r_pop, w_empty, w_empty1,w_empty2, w_full, w_lock_select, w_key_select;
 logic w_sram_start, w_dcache_start, r_write_process, w_start, w_write_process;
-logic w_axi_awvalid = 0, r_axi_awvalid, w_axi_wvalid = 0, r_axi_wvalid;
+logic w_axi_awvalid, r_axi_awvalid, w_axi_wvalid, r_axi_wvalid;
 logic [$clog2(FIFO_DEPTH) - 1 : 0] r_key1, r_key2,w_key;
 logic [$clog2(FIFO_DEPTH) - 2 : 0] w_dcache_lock, w_sram_lock, w_lock, r_sram_req_num;
 mem_write_req r_dcache_req, r_sram_req, w_out_req;

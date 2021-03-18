@@ -207,7 +207,7 @@ endfunction
 
 //goabal signal
 state w_state,r_state;
-index r_reset_cnt=0;
+index r_reset_cnt;
 logic w_idle_miss,w_receiving_hit,w_idle_hita; //ir: idle_receiving
 word w_data, r_data;
 tag w_reset_tag;
@@ -300,7 +300,7 @@ logic r_wbuffer_full, w_wbuffer_hit, r_wbuffer_hit;
 logic w_memwrite_start, w_memwrite_end, w_memwrite_we;
 mem_write_req w_memwrite_req;
 word [3:0] r_fifo_addr;
-logic [1:0] w_fifo_point = 0, w_fifo_posi = 0;
+logic [1:0] w_fifo_point, w_fifo_posi;
 logic w_fifo_empty;
 logic [$clog2(FIFO_DEPTH) - 1 : 0] w_key ;
 
