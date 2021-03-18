@@ -119,10 +119,10 @@ typedef struct packed {
     bit move;
     bit moveCondition;
 
-    tlb_op_t tlb;
+    tlb_op_t tlbop;
 } ControlSignals;
 
-localparam ControlSignals kControlNop = '{
+localparam ControlSignals kControlNop = ControlSignals'{
     regRead1: 0,
     regRead2: 0,
     grfWriteSource: `grfWriteDisable,
@@ -169,7 +169,7 @@ localparam ControlSignals kControlNop = '{
     move: 0,
     moveCondition: 'bx,
 
-    tlb: tlb_op_t'{p: 0, r: 0, w: 0, random: 0}
+    tlbop: tlb_op_t'{p: 0, r: 0, w: 0, random: 0}
 };
 
 `endif

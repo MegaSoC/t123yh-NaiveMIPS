@@ -627,7 +627,7 @@ end
 assign cp0_we = E_ctrl.writeCP0;
 assign cp0_number = E_ctrl.numberCP0;
 assign cp0_wdata = E_regRead1_forward.value;
-assign tlb_op = E_ctrl.tlb;
+assign tlb_op = E_ctrl.tlbop;
 
 count_bit E_bitCounter(
     .bit_val(E_ctrl.bitCounterType),

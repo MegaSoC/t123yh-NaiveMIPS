@@ -131,20 +131,20 @@ always_comb begin
 
                 11'b10000_000001: // tlbr
                 begin
-                    controls.tlb.r = 1;
+                    controls.tlbop.r = 1;
                 end
                 11'b10000_001000: // tlbp
                 begin
-                    controls.tlb.p = 1;
+                    controls.tlbop.p = 1;
                 end
                 11'b10000_000010: // tlbwi
                 begin
-                    controls.tlb.w = 1;
+                    controls.tlbop.w = 1;
                 end
                 11'b10000_000110: // tlbwr
                 begin
-                    controls.tlb.w = 1;
-                    controls.tlb.random = 1;
+                    controls.tlbop.w = 1;
+                    controls.tlbop.random = 1;
                 end
                 11'b1????_100000: // wait
                 begin
