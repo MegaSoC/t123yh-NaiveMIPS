@@ -93,8 +93,8 @@ module mycpu_top #(
     logic w_i_valid, w_d_valid;
 
     wire [3:0] w_data_sram_byteen;
-    wire cp0_we, cp0_en_exp, cp0_ewr_bd, cp0_interrupt_pending, cp0_kseg0_cached, cp0_kernel_mode, cp0_privileged;
-    wire [31:0] cp0_rdata, cp0_wdata, cp0_ewr_epc, cp0_ewr_badVAddr, cp0_epc_o, cp0_exc_handler, cp0_int_handler, cp0_tlb_refill_handler, cp0_tagLo0, cp0_erl, cp0_entryLo0, cp0_entryLo1, cp0_entryHi, cp0_index, cp0_pageMask;
+    wire cp0_we, cp0_en_exp, cp0_ewr_bd, cp0_interrupt_pending, cp0_kseg0_cached, cp0_kernel_mode, cp0_privileged, cp0_erl;
+    wire [31:0] cp0_rdata, cp0_wdata, cp0_ewr_epc, cp0_ewr_badVAddr, cp0_epc_o, cp0_exc_handler, cp0_int_handler, cp0_tlb_refill_handler, cp0_tagLo0, cp0_entryLo0, cp0_entryLo1, cp0_entryHi, cp0_index, cp0_pageMask;
     ExcCode_t cp0_ewr_excCode;
     wire w_data_cache_op_valid, w_inst_cache_op_valid, w_mem_idle;
     cp0_number_t cp0_rw_number;
