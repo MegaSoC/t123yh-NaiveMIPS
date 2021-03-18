@@ -634,14 +634,14 @@ always_comb begin
             controls.cmpCtrl = `cmpGreaterThanZero;
         end
 
-        5'b010100: // beql
+        6'b010100: // beql
         begin
             `simpleBranch
             controls.regRead2 = rti;
             controls.cmpCtrl = `cmpEqual;
             controls.branchLikely = 1;
         end
-        5'b010101: // bnel
+        6'b010101: // bnel
         begin
             `simpleBranch
             controls.regRead2 = rti;
