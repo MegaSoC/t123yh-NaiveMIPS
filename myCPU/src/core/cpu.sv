@@ -441,6 +441,8 @@ always_comb begin
     endcase
 end
 
+logic E_mul_collision, E_mulStart;
+
 always @(posedge clk) begin
     if (reset) begin
         E_bubble <= 1;
@@ -551,8 +553,6 @@ always_comb begin
         E_badVAddr_next = E_memAddress;
     end
 end
-
-logic E_mul_collision, E_mulStart;
 
 always_comb begin
     E_mulStart = 0;
