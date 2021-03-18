@@ -36,7 +36,7 @@ mem_read_req r_instr_req, r_data_req;
 mem_read_req w_din1,w_din2,w_dout;
 logic [31:0] r_va,r_addr;
 logic [1:0] r_status;
-logic w_axi_arvalid = 0,r_axi_arvalid, r_end, w_start,r_burst_process;
+logic w_axi_arvalid,r_axi_arvalid, r_end, w_start,r_burst_process;
 logic [3:0] r_dataid, r_instid, w_nowid;
 logic full,w_empty,r_push1,w_push1,w_push2,r_push2,w_pop,r_pop;
 always_comb begin
