@@ -32,7 +32,7 @@ module CP0 (
     output wire [31:0] entryLo0_o,
     output wire [31:0] entryLo1_o,
     output wire [31:0] entryHi_o,
-    output wire [31:0] pageMask_o,
+    output wire [11:0] pageMask_o,
     output wire [31:0] tlbIndex_o,
 
     input  wire        tlbp,
@@ -41,7 +41,7 @@ module CP0 (
     input  wire [31:0] entryLo0_i,
     input  wire [31:0] entryLo1_i,
     input  wire [31:0] entryHi_i,
-    input  wire [31:0] pageMask_i,
+    input  wire [11:0] pageMask_i,
     input  wire [31:0] index_i
 );
 
@@ -86,7 +86,7 @@ assign tagLo0_o  = cp0_reg_TagLo0;
 assign entryHi_o = cp0_reg_EntryHi;
 assign entryLo0_o = cp0_reg_EntryLo0;
 assign entryLo1_o = cp0_reg_EntryLo1;
-assign pageMask_o = cp0_reg_PageMask;
+assign pageMask_o = cp0_reg_PageMask[24:13];
 assign tlbIndex_o = tlbrandom ? cp0_reg_Random : cp0_reg_Index;
 
 wire SR_CU0 = cp0_reg_Status[28];
@@ -264,7 +264,7 @@ always_ff @(posedge clk) begin
             cp0_reg_EntryHi  <= entryHi_i;
             cp0_reg_EntryLo0 <= entryLo0_i;
             cp0_reg_EntryLo1 <= entryLo1_i;
-            cp0_reg_PageMask[28:13] <= pageMask_i;
+            cp0_reg_PageMask[24:13] <= pageMask_i;
         end else if (tlbp) begin
             cp0_reg_Index <= index_i;
         end else if (tlbrandom) begin

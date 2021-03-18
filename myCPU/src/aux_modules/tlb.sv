@@ -9,7 +9,7 @@ module TLB #(
 
     // TLB entry i_we
     input        we,        //1:TLBWI
-    input [IDX_BITS-1:0] index_i,           
+    input [31:0] index_reg_i,           
     input [11:0] mask_i,        
     input [31:0] entryhi_i,
     input [31:0] entrylo0_i,
@@ -57,6 +57,8 @@ reg        d0   [TLB_NUM-1:0];
 reg        d1   [TLB_NUM-1:0];
 reg        v0   [TLB_NUM-1:0];
 reg        v1   [TLB_NUM-1:0];
+
+wire [IDX_BITS-1:0] index_i = index_reg_i[IDX_BITS-1:0];
 
 integer n;
 always_ff @(posedge clk) begin

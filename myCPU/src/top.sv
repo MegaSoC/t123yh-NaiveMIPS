@@ -94,7 +94,7 @@ module mycpu_top #(
 
     wire [3:0] w_data_sram_byteen;
     wire cp0_we, cp0_en_exp, cp0_ewr_bd, cp0_interrupt_pending, cp0_kseg0_cached, cp0_kernel_mode, cp0_privileged, cp0_erl;
-    wire [31:0] cp0_rdata, cp0_wdata, cp0_ewr_epc, cp0_ewr_badVAddr, cp0_epc_o, cp0_exc_handler, cp0_int_handler, cp0_tlb_refill_handler, cp0_tagLo0, cp0_entryLo0, cp0_entryLo1, cp0_entryHi, cp0_index, cp0_pageMask;
+    wire [31:0] cp0_rdata, cp0_wdata, cp0_ewr_epc, cp0_ewr_badVAddr, cp0_epc_o, cp0_exc_handler, cp0_int_handler, cp0_tlb_refill_handler, cp0_tagLo0, cp0_entryLo0, cp0_entryLo1, cp0_entryHi, cp0_index;
     ExcCode_t cp0_ewr_excCode;
     wire w_data_cache_op_valid, w_inst_cache_op_valid, w_mem_idle;
     cp0_number_t cp0_rw_number;
@@ -105,7 +105,8 @@ module mycpu_top #(
     wire w_data_sram_va_hold;
     tlb_op_t cpu_tlb_op;
 
-    wire [31:0] tlb_entryLo0, tlb_entryLo1, tlb_entryHi, tlb_index, tlb_pageMask;
+    wire [31:0] tlb_entryLo0, tlb_entryLo1, tlb_entryHi, tlb_index;
+    wire [11:0] tlb_pageMask, cp0_pageMask;
 
     CPU #(.IMPLEMENT_LIKELY(IMPLEMENT_LIKELY)) core(
         .clk(aclk),
@@ -228,7 +229,7 @@ module mycpu_top #(
         .rst(global_reset),
 
         .we(cpu_tlb_op.w),
-        .index_i(cp0_index),
+        .index_reg_i(cp0_index),
         .mask_i(cp0_pageMask),
         .entryhi_i(cp0_entryHi),
         .entrylo1_i(cp0_entryLo1),
