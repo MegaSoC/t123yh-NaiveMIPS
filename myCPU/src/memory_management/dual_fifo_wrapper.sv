@@ -118,9 +118,9 @@ always @(posedge clk_i) begin
         last_read <= 1;
     end else begin
         if (pop_i) begin
-            last_read = current_read;
+            last_read <= current_read;
         end else if (force_switch) begin
-            last_read = ~current_read;
+            last_read <= ~current_read;
         end
     end
 end
