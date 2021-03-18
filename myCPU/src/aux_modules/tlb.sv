@@ -112,10 +112,13 @@ endgenerate
 
 assign probe_index_o = ((~|match) << 31) | index[TLB_NUM];
 
-MMUMatcher matcher0(va0, ce0, pa0, hit0, valid0, dirty0, cached0, error0);
-MMUMatcher matcher1(va1, ce1, pa1, hit1, valid1, dirty1, cached1, error1);
+MMUMatcher matcher0(clk, va0, ce0, pa0, hit0, valid0, dirty0, cached0, error0, mask, vpn2, asid, G, pfn0, pfn1, c0, c1, d0, d1, v0, v1);
+MMUMatcher matcher1(clk, va1, ce1, pa1, hit1, valid1, dirty1, cached1, error1, mask, vpn2, asid, G, pfn0, pfn1, c0, c1, d0, d1, v0, v1);
+
+endmodule
 
 module MMUMatcher(
+    input clk,
     input  [31:0] va,
     input         ce,
     output reg [31:0] pa,
@@ -123,8 +126,21 @@ module MMUMatcher(
     output reg valid,
     output reg dirty,
     output reg cached,
-    output reg addressError
+    output reg addressError,
+    input [11:0] mask [TLB_NUM-1:0],
+    input [18:0] vpn2 [TLB_NUM-1:0],
+    input [7 :0] asid [TLB_NUM-1:0],
+    input        G    [TLB_NUM-1:0],
+    input [19:0] pfn0 [TLB_NUM-1:0],
+    input [19:0] pfn1 [TLB_NUM-1:0],
+    input [2 :0] c0   [TLB_NUM-1:0],
+    input [2 :0] c1   [TLB_NUM-1:0],
+    input        d0   [TLB_NUM-1:0],
+    input        d1   [TLB_NUM-1:0],
+    input        v0   [TLB_NUM-1:0],
+    input        v1   [TLB_NUM-1:0]
 );
+
 
     wire [TLB_NUM-1:0] match0;
     wire [TLB_NUM-1:0] sel0;
@@ -243,4 +259,3 @@ module MMUMatcher(
     end
 endmodule
 
-endmodule
