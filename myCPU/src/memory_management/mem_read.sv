@@ -110,8 +110,8 @@ end
 
 always_ff @(posedge i_clk) begin
     if(i_rst)begin
-        r_icache_req_num = 0;
-        r_dcache_req_num = 0;
+        r_icache_req_num <= 0;
+        r_dcache_req_num <= 0;
     end
     else begin
         r_icache_req_num <= w_icache_req_num;
