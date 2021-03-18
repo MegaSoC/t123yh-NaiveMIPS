@@ -122,7 +122,7 @@ typedef struct packed {
     tlb_op_t tlb;
 } ControlSignals;
 
-const ControlSignals kControlNop = '{
+localparam ControlSignals kControlNop = '{
     regRead1: 0,
     regRead2: 0,
     grfWriteSource: `grfWriteDisable,
