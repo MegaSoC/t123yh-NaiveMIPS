@@ -487,7 +487,7 @@ end
 
 always_ff @(posedge i_clk) begin
 	if(i_rst) begin
-		r_switch_data_index = 0;
+		r_switch_data_index <= 0;
 	end
 	else begin
 		r_switch_data_index <= w_switch_data_index;
@@ -780,7 +780,7 @@ always_ff @(posedge i_clk) begin
 				r_save_onehot_way <= SET_ASSOC == 2?onehot1to2(w_cache_inst_hitway):onehot2to4(w_cache_inst_hitway);
 			end
 			else if(i_cache_instr == CACHE_INDEX_WRITEBACK_INVALIDATE) begin
-				r_save_select_way = w_cache_inst_waay;
+				r_save_select_way <= w_cache_inst_waay;
 				r_save_onehot_way <= w_cache_inst_way;
 			end
 		end
