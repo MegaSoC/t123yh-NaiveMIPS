@@ -135,7 +135,7 @@ endfunction
 //goabal signal
 logic w_inn_stall; //w_inn_stall：内部阻塞信�?????????????
 state w_state,r_state;
-index r_reset_cnt=0;
+index r_reset_cnt;
 logic w_idle_miss,w_receiving_hit,w_idle_hita; //ir: idle_receiving
 word w_data, r_data;
 logic r_stall_flag, r_stall_flag_flag, w_mvalid;
