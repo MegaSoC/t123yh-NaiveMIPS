@@ -112,12 +112,14 @@ endgenerate
 
 assign probe_index_o = ((~|match) << 31) | index[TLB_NUM];
 
-MMUMatcher matcher0(clk, va0, ce0, pa0, hit0, valid0, dirty0, cached0, error0, mask, vpn2, asid, G, pfn0, pfn1, c0, c1, d0, d1, v0, v1);
-MMUMatcher matcher1(clk, va1, ce1, pa1, hit1, valid1, dirty1, cached1, error1, mask, vpn2, asid, G, pfn0, pfn1, c0, c1, d0, d1, v0, v1);
+MMUMatcher #(.TLB_NUM(TLB_NUM)) matcher0(clk, va0, ce0, pa0, hit0, valid0, dirty0, cached0, error0, mask, vpn2, asid, G, pfn0, pfn1, c0, c1, d0, d1, v0, v1, entryhi_i, kernel_mode, cp0_erl, kseg0_cached);
+MMUMatcher #(.TLB_NUM(TLB_NUM)) matcher1(clk, va1, ce1, pa1, hit1, valid1, dirty1, cached1, error1, mask, vpn2, asid, G, pfn0, pfn1, c0, c1, d0, d1, v0, v1, entryhi_i, kernel_mode, cp0_erl, kseg0_cached);
 
 endmodule
 
-module MMUMatcher(
+module MMUMatcher #(
+    parameter TLB_NUM = 0
+)(
     input clk,
     input  [31:0] va,
     input         ce,
@@ -138,7 +140,12 @@ module MMUMatcher(
     input        d0   [TLB_NUM-1:0],
     input        d1   [TLB_NUM-1:0],
     input        v0   [TLB_NUM-1:0],
-    input        v1   [TLB_NUM-1:0]
+    input        v1   [TLB_NUM-1:0],
+    
+    input [31:0] entryhi_i,
+    input kernel_mode,
+    input cp0_erl,
+    input kseg0_cached
 );
 
 
