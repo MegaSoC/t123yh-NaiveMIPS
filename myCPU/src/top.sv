@@ -1,4 +1,4 @@
-`include "def.svh"
+`include "memory_management/def.svh"
 `include "global.svh"
 
 module mycpu_top #(
