@@ -246,7 +246,7 @@ module mycpu_top #(
         .cp0_erl(cp0_erl),
 
         .va0(w_inst_sram_addr),
-        .ce0(1),
+        .ce0(1'b1),
         .pa0(w_inst_sram_paddr),
         .cached0(w_inst_sram_cached),
         .hit0(w_inst_sram_tlb_hit),
@@ -269,7 +269,7 @@ module mycpu_top #(
 
     always @(posedge aclk) begin
         if (global_reset) begin
-            w_inst_sram_readen2 <= 0;
+            w_inst_sram_readen2 <= 1'b0;
         end else begin
             w_inst_sram_readen2 <= w_inst_sram_readen;
         end
