@@ -141,7 +141,10 @@ InstructionMemory F_im (
                       .inst_sram_rdata(inst_sram_rdata),
                       .inst_sram_addr(inst_sram_addr),
                       .inst_sram_readen(inst_sram_readen),
-                      .inst_sram_valid(inst_sram_valid || inst_sram_addressError || inst_sram_tlb_miss || inst_sram_tlb_invalid)
+                      .inst_sram_valid(inst_sram_valid),
+                      .inst_sram_addressError(inst_sram_addressError),
+                      .inst_sram_tlb_miss(inst_sram_tlb_miss),
+                      .inst_sram_tlb_invalid(inst_sram_tlb_invalid)
                   );
 
 logic [31:0] F_badVAddr;
@@ -152,26 +155,26 @@ always_comb begin
     F_excCode = cNone;
     F_badVAddr = 'bx;
     F_tlb_refill = 0;
-    if (F_im.outputPC[1:0] != 2'b0 || inst_sram_addressError) begin
+    if (F_im.outputPC[1:0] != 2'b0 || F_im.inst_sram_addressError_o) begin
         F_exception = 1;
         F_excCode = cAdEL;
         F_badVAddr = F_im.outputPC;
-    end else if (inst_sram_tlb_miss || inst_sram_tlb_invalid) begin
+    end else if (F_im.inst_sram_tlb_miss_o || F_im.inst_sram_tlb_invalid_o) begin
         F_exception = 1;
         F_excCode = cTLBL;
         F_badVAddr = F_im.outputPC;
-        F_tlb_refill = inst_sram_tlb_miss;
+        F_tlb_refill = F_im.inst_sram_tlb_miss_o;
     end
 end
-wire F_insert_bubble = F_im.bubble;
+wire F_insert_bubble = F_im.bubble_o;
 
 Decoder #(.IMPLEMENT_LIKELY(IMPLEMENT_LIKELY)) F_dec (
     .instruction(F_im.instruction),
     .reset(reset),
-    .bubble(F_im.bubble)
+    .bubble(F_im.bubble_o)
 );
 
-assign debug_i_pc = F_im.bubble ? 0 : F_im.outputPC;
+assign debug_i_pc = F_im.bubble_o ? 0 : F_im.outputPC;
 assign debug_i_instr = F_im.instruction;
 
 // ======== Decode Stage ========
