@@ -371,7 +371,7 @@ for(genvar i = 0; i < SET_ASSOC; ++i) begin : iswayhit
 	assign w_way_hita[i] = w_tag_res[i].tag == get_tag(w_phy_addr) && w_tag_res[i].valid; 
 	assign w_whichway_hita[i+1] = w_whichway_hita[i] | (w_way_hita[i]?i:0);
 end
-assign w_pipe_hit = |w_way_hita && (r_state == IDLE || r_state == IDLE_RECEIVING) && w_tag_num;
+assign w_pipe_hit = |w_way_hita && (r_state == IDLE || r_state == IDLE_RECEIVING);
 assign w_hit_way = w_whichway_hita[SET_ASSOC];
 
 //pipeline2-3
