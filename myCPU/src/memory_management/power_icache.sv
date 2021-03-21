@@ -10,7 +10,6 @@ module new_icache#(
     input logic i_clk,
 	input logic i_rst,
 
-    input logic i_valid1, //�?????????????�?????????????16�????????????? 可�?�项�?????????????16 8 4 2 1 0
     input logic i_valid2,
 	//input logic i_uncached,   //当前地址是否经过icache
 	input logic [31:0] i_phy_addr, //假设查tlb要花费一个周�?????????????
@@ -148,7 +147,6 @@ logic [SET_ASSOC - 1 : 0] w_cache_inst_way;
 logic [$clog2(SET_ASSOC) - 1 : 0] r_save_select_way, r_rbuffer_way2;
 logic [SET_ASSOC - 1 : 0] r_save_onehot_way;
 logic [SET_ASSOC - 1 : 0][GROUP_NUM - 1 : 0] r_dirty;
-logic tag_num;
 logic [LINE_WORD_OFFSET - 1 : 0] w_start_offseta, w_start_offsetb, w_end_offseta;
 tag [SET_ASSOC-1 : 0] w_tag_res;
 tag w_cache_inst_tag;
@@ -160,7 +158,6 @@ tag w_tag_din;
 //pipe1-2 siganl
 index r_indexa;
 word r_pipe1_va, r_pipe1_va_end;
-logic r_tag_num;
 logic [LINE_WORD_OFFSET - 1 : 0] r_start_offseta, r_end_offseta;
 
 //pipe 2 signal
@@ -324,7 +321,6 @@ always_comb begin
 	w_indexa = get_index (i_va);
 	w_tag_din.tag = '0;
 	w_tag_din.valid = 1'b0;
-	tag_num = i_valid1;
 	w_start_offseta = i_va[2 + LINE_WORD_OFFSET - 1 : 2];
 	w_end_offseta = w_va_end[2 + LINE_WORD_OFFSET - 1 : 2];
 	w_start_offsetb = '0;
@@ -353,7 +349,6 @@ end
 always_ff @(posedge i_clk) begin
 	if(i_rst || w_inn_stall)begin
 		r_pipe1_va <= '0;
-		r_tag_num <= '0;
 		r_indexa <= '0;
 		r_pipe1_va_end <= '0;
 		r_start_offseta <= '0;
@@ -361,7 +356,6 @@ always_ff @(posedge i_clk) begin
 	end
 	else begin
 		r_pipe1_va <= i_va;
-		r_tag_num <= i_valid1;
 		r_indexa <= w_indexa;
 		r_pipe1_va_end <= w_va_end;
 		r_start_offseta <= w_start_offseta;
@@ -371,7 +365,7 @@ end
 
 //pipeline2 process
 assign w_phy_addr = i_phy_addr;
-assign w_tag_num = i_valid2 && r_tag_num;
+assign w_tag_num = i_valid2;
 assign w_whichway_hita[0] = 0;
 for(genvar i = 0; i < SET_ASSOC; ++i) begin : iswayhit
 	assign w_way_hita[i] = w_tag_res[i].tag == get_tag(w_phy_addr) && w_tag_res[i].valid; 

@@ -289,9 +289,8 @@ module mycpu_top #(
                   .i_clk(aclk),
                   .i_rst(global_reset),
 
-	              .i_i_valid1(w_inst_sram_readen),
-                  .i_i_valid2(w_inst_sram_readen2 && w_inst_sram_okay),
                   .i_i_npc(w_inst_sram_addr),
+                  .i_i_valid(w_inst_sram_readen2 && w_inst_sram_okay),
                   .i_i_phyaddr(w_inst_sram_paddr),
                   .i_i_cached(w_inst_sram_cached),
                   .o_i_valid(w_i_valid),

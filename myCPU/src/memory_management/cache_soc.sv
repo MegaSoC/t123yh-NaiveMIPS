@@ -15,8 +15,7 @@ module cache_soc #(
 
     input word   i_i_npc,//指令的pc，由npc模块产生，比物理地址（i_icache_phyaddr）前一个周期到达
     input word   i_i_phyaddr,//icache的物理地址，时机与I级相同
-    input logic  i_i_valid1,//i_i_npc的valid信号
-    input logic  i_i_valid2,//i_i_phyaddr的valid信号
+    input logic  i_i_valid,//i_i_phyaddr的valid信号
     input logic  i_i_cached, //指明指令是否经过icache，1：经过，0：不经过
     output word  o_i_inst,//指令的查询结果，
     output logic o_i_valid, //o_i_inst的valid信号
@@ -159,11 +158,9 @@ icache1(
     .i_clk,
     .i_rst,
 
-    .i_valid1(i_i_valid1), 
-    .i_valid2(i_i_valid2 && i_i_cached),
+    .i_valid2(i_i_valid && i_i_cached),
     .i_phy_addr(i_i_phyaddr), 
     .i_va(i_i_npc), 
-    //.o_inn_stall(w_i_stall),
     .o_valid(w_icache_valid),
     .o_ready(w_icache_ready),
     .o_mdata_data(w_icache_inst),
@@ -247,13 +244,13 @@ always_ff @(posedge i_clk) begin
         r_dsram_write <= 0;
     end
     else begin
-        r_isram_valid <= ~w_out_isram_valid && ((!i_i_cached && i_i_valid2) || r_isram_valid);
+        r_isram_valid <= ~w_out_isram_valid && ((!i_i_cached && i_i_valid) || r_isram_valid);
         r_dsram_read <= ~w_out_dsram_valid && ((i_d_read && !i_d_cached && w_sram_empty) || r_dsram_read);
         r_dsram_write <= ~w_dsram_wend && ((i_d_write && !i_d_cached) || r_dsram_write);
     end
 end
 
-assign w_isram_valid = !i_i_cached && i_i_valid2  && ~r_isram_valid;
+assign w_isram_valid = !i_i_cached && i_i_valid  && ~r_isram_valid;
 assign w_dsram_read  = (i_d_read && !i_d_cached && w_sram_empty) && ~r_dsram_read;
 assign w_dsram_write = (i_d_write && !i_d_cached) && ~w_sram_full;
 
