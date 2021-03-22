@@ -252,25 +252,10 @@ module MMUMatcher #(
     end
 
     always_ff @(posedge clk) begin
-        if (rst) begin
-            vao <= 0;
-            addressError <= 0;
-            pa <= 0;
-            hit <= 1;
-            valid <= 1;
-            dirty <= 0;
-            cached <= 0;
-        end else if (ce) begin
+        if (ce) begin
             vao <= va;
-            if (error) begin
-                addressError <= 1;
-                pa <= 'bx;
-                hit <= 0;
-                valid <= 0;
-                dirty <= 'bx;
-                cached <= 0;
-            end else if (mapped) begin
-                addressError <= 0;
+            addressError <= error;
+            if (mapped) begin
                 pa <= lp_pa0[TLB_NUM];
                 hit <= |match0;
                 valid <= lp_v0[TLB_NUM];
@@ -278,7 +263,6 @@ module MMUMatcher #(
                 // See Table 9.9, P. 98, Vol. III
                 cached <= lp_c0[TLB_NUM] == 3;
             end else begin
-                addressError <= 0;
                 pa <= {3'b0, va[28:0]};
                 hit <= 1;
                 valid <= 1;

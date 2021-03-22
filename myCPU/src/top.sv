@@ -114,13 +114,8 @@ module mycpu_top #(
     wire [31:0] itlb_cache_va;
     wire itlb_cache_match = itlb_delayed_va[31:12] == itlb_cache_va[31:12] && itlb_delayed_cen;
     always @(posedge aclk) begin
-        if (global_reset) begin
-            itlb_delayed_va <= 0;
-            itlb_delayed_cen <= 0;
-        end else begin
-            itlb_delayed_va <= w_inst_sram_addr;
-            itlb_delayed_cen <= w_inst_sram_readen;
-        end
+        itlb_delayed_va <= w_inst_sram_addr;
+        itlb_delayed_cen <= w_inst_sram_readen;
     end
 
     // =======================
