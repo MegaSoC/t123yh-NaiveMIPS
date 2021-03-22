@@ -22,6 +22,7 @@ module InstructionMemory(
            input inst_sram_addressError,
            input inst_sram_tlb_miss,
            input inst_sram_tlb_invalid,
+           input inst_sram_tlb_ready,
            
            output logic inst_sram_addressError_o,
            output logic inst_sram_tlb_miss_o,
@@ -41,7 +42,7 @@ logic pendingJump_next;
 reg [31:0] pendingJumpAddr;
 reg busy;
 logic bubble;
-wire hasResponse = inst_sram_valid || currentFetchException;
+wire hasResponse = (inst_sram_valid || currentFetchException) && inst_sram_tlb_ready;
 wire canSendNewCommand = hasResponse || !busy;
 assign inst_sram_addr = pc_next;
 reg lastStall;

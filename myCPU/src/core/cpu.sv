@@ -12,6 +12,7 @@ module CPU #(
            input inst_sram_addressError,
            input inst_sram_tlb_miss,
            input inst_sram_tlb_invalid,
+           input inst_sram_tlb_ready,
            output cache_op inst_cache_op,
            input inst_cache_op_valid,
 
@@ -144,7 +145,8 @@ InstructionMemory F_im (
                       .inst_sram_valid(inst_sram_valid),
                       .inst_sram_addressError(inst_sram_addressError),
                       .inst_sram_tlb_miss(inst_sram_tlb_miss),
-                      .inst_sram_tlb_invalid(inst_sram_tlb_invalid)
+                      .inst_sram_tlb_invalid(inst_sram_tlb_invalid),
+                      .inst_sram_tlb_ready
                   );
 
 logic [31:0] F_badVAddr;

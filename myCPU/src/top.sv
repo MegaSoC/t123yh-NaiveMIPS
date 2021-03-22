@@ -112,7 +112,7 @@ module mycpu_top #(
     reg [31:0] itlb_delayed_va;
     reg itlb_delayed_cen;
     wire [31:0] itlb_cache_va;
-    wire itlb_cache_match = itlb_delayed_va[31:12] == itlb_cache_va[31:12] && w_inst_sram_tlb_hit;
+    wire itlb_cache_match = itlb_delayed_va[31:12] == itlb_cache_va[31:12] && itlb_delayed_cen;
     always @(posedge aclk) begin
         if (global_reset) begin
             itlb_delayed_va <= 0;
@@ -130,12 +130,13 @@ module mycpu_top #(
         .reset(global_reset),
 
         .inst_sram_rdata(w_i_inst),
-        .inst_sram_valid(w_i_valid && itlb_cache_match),
+        .inst_sram_valid(w_i_valid),
         .inst_sram_addr(w_inst_sram_addr),
         .inst_sram_readen(w_inst_sram_readen),
-        .inst_sram_addressError(w_inst_sram_tlb_addressError && itlb_delayed_cen),
-        .inst_sram_tlb_miss(!w_inst_sram_tlb_hit && itlb_delayed_cen),
-        .inst_sram_tlb_invalid(!w_inst_sram_tlb_valid && itlb_delayed_cen),
+        .inst_sram_addressError(w_inst_sram_tlb_addressError),
+        .inst_sram_tlb_miss(!w_inst_sram_tlb_hit),
+        .inst_sram_tlb_invalid(!w_inst_sram_tlb_valid),
+        .inst_sram_tlb_ready(itlb_cache_match),
         .inst_cache_op(icache_op),
         .inst_cache_op_valid(w_inst_cache_op_valid),
 
