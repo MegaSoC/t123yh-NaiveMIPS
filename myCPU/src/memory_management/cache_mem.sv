@@ -16,23 +16,23 @@ module data_ram #(
 );
 
 word w_rdata, w_wdata;
-logic w_isforward, r_isforward;
-generate 
-if (HAS_FORWARD == 1) begin
-	assign w_isforward = i_wen && i_raddr == i_waddr;
-	assign o_rdata = r_isforward ? w_wdata : w_rdata;
-end else begin
-	assign w_isforward = '0;
-	assign o_rdata = w_rdata;	
-end
-endgenerate
+logic w_isforward, r_isforward, r_wen;
+logic [INDEX_WIDTH - 1 : 0] r_raddr, r_waddr;
+assign w_isforward = r_wen && r_raddr == r_waddr;
+assign o_rdata = w_isforward ? w_wdata : w_rdata;
 
 always_ff @(posedge i_clk) begin
     if(i_rst)begin
         r_isforward <= 0;
+		r_raddr <= '0;
+		r_waddr <= '0;
+		r_wen <= 0;
     end
     else begin
         r_isforward <= w_isforward;
+		r_wen <= i_wen;
+		r_raddr <= i_raddr;
+		r_waddr <= i_waddr;
     end
 end
 
