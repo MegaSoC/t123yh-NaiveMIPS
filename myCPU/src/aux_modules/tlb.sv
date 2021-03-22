@@ -27,6 +27,7 @@ module TLB #(
 
     input  [31:0] va0,
     input         ce0,
+    output [31:0] vao0,
     output [31:0] pa0,
     output hit0,
     output valid0,
@@ -36,6 +37,7 @@ module TLB #(
 
     input  [31:0] va1,
     input         ce1,
+    output [31:0] vao1,
     output [31:0] pa1,
     output hit1,
     output valid1,
@@ -114,8 +116,8 @@ endgenerate
 
 assign probe_index_o = ((~|match) << 31) | index[TLB_NUM];
 
-MMUMatcher #(.TLB_NUM(TLB_NUM)) matcher0(clk, va0, ce0, pa0, hit0, valid0, dirty0, cached0, error0, mask, vpn2, asid, G, pfn0, pfn1, c0, c1, d0, d1, v0, v1, entryhi_i, kernel_mode, cp0_erl, kseg0_cached);
-MMUMatcher #(.TLB_NUM(TLB_NUM)) matcher1(clk, va1, ce1, pa1, hit1, valid1, dirty1, cached1, error1, mask, vpn2, asid, G, pfn0, pfn1, c0, c1, d0, d1, v0, v1, entryhi_i, kernel_mode, cp0_erl, kseg0_cached);
+MMUMatcher #(.TLB_NUM(TLB_NUM)) matcher0(clk, rst, va0, ce0, vao0, pa0, hit0, valid0, dirty0, cached0, error0, mask, vpn2, asid, G, pfn0, pfn1, c0, c1, d0, d1, v0, v1, entryhi_i, kernel_mode, cp0_erl, kseg0_cached);
+MMUMatcher #(.TLB_NUM(TLB_NUM)) matcher1(clk, rst, va1, ce1, vao1, pa1, hit1, valid1, dirty1, cached1, error1, mask, vpn2, asid, G, pfn0, pfn1, c0, c1, d0, d1, v0, v1, entryhi_i, kernel_mode, cp0_erl, kseg0_cached);
 
 endmodule
 
@@ -123,8 +125,10 @@ module MMUMatcher #(
     parameter TLB_NUM = 0
 )(
     input clk,
+    input rst,
     input  [31:0] va,
     input         ce,
+    output reg [31:0] vao,
     output reg [31:0] pa,
     output reg hit,
     output reg valid,
@@ -248,9 +252,25 @@ module MMUMatcher #(
     end
 
     always_ff @(posedge clk) begin
-        if (ce) begin
-            addressError <= error;
-            if (mapped) begin
+        if (rst) begin
+            vao <= 0;
+            addressError <= 0;
+            pa <= 0;
+            hit <= 1;
+            valid <= 1;
+            dirty <= 0;
+            cached <= 0;
+        end else if (ce) begin
+            vao <= va;
+            if (error) begin
+                addressError <= 1;
+                pa <= 'bx;
+                hit <= 0;
+                valid <= 0;
+                dirty <= 'bx;
+                cached <= 0;
+            end else if (mapped) begin
+                addressError <= 0;
                 pa <= lp_pa0[TLB_NUM];
                 hit <= |match0;
                 valid <= lp_v0[TLB_NUM];
@@ -258,6 +278,7 @@ module MMUMatcher #(
                 // See Table 9.9, P. 98, Vol. III
                 cached <= lp_c0[TLB_NUM] == 3;
             end else begin
+                addressError <= 0;
                 pa <= {3'b0, va[28:0]};
                 hit <= 1;
                 valid <= 1;
