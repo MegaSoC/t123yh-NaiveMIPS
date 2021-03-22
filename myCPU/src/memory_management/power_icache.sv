@@ -412,7 +412,8 @@ for(genvar i = 0; i < SET_ASSOC; i++) begin: gen_data_mem_group
 	for(genvar j = 0; j < WORD_PER_LINE; j++) begin: gen_data_mem_word
 
 		data_ram #(
-		      .INDEX_WIDTH(INDEX_WIDTH)
+		      .INDEX_WIDTH(INDEX_WIDTH),
+			  .HAS_FORWARD(0)
 		)data_ram(
 		    .i_clk,
 		    .i_rst,

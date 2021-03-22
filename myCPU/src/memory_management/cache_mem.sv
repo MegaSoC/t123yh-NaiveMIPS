@@ -1,7 +1,8 @@
 `include "def.svh"
 
 module data_ram #(
-	parameter INDEX_WIDTH = 7
+	parameter INDEX_WIDTH = 7,
+	parameter HAS_FORWARD = 1
 )(
     input  logic i_clk,
     input  logic i_rst,
@@ -16,8 +17,15 @@ module data_ram #(
 
 word w_rdata, w_wdata;
 logic w_isforward, r_isforward;
-assign w_isforward = i_wen && i_raddr == i_waddr;
-assign o_rdata = r_isforward ? w_wdata : w_rdata;
+generate 
+if (HAS_FORWARD == 1) begin
+	assign w_isforward = i_wen && i_raddr == i_waddr;
+	assign o_rdata = r_isforward ? w_wdata : w_rdata;
+end else begin
+	assign w_isforward = '0;
+	assign o_rdata = w_rdata;	
+end
+endgenerate
 
 always_ff @(posedge i_clk) begin
     if(i_rst)begin
