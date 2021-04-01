@@ -7,7 +7,7 @@ module mem_read # (
     input logic i_clk,
     input logic i_rst,
 
-    input mem_read_req i_instr_req,
+    input mem_read_req i_instr_req, 
     input logic i_icache_we,
     input logic i_isram_we,
     input mem_read_req i_data_req,
