@@ -581,7 +581,7 @@ always_ff @(posedge i_clk) begin
 end
 
 //内存传输的内容写进输出信�?????????????
-assign w_receiving_hit = cnt_rbuffer == r_save_offset && w_resp.valid2 &&(r_state == READ_WAITING || r_state == RECEIVING);
+assign w_receiving_hit = 0;
 always_ff @(posedge i_clk) begin
 	if(i_rst)begin
 		r_receiving_hit <= 0;
