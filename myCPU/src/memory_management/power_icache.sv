@@ -405,7 +405,7 @@ end
 assign w_data_indexa = get_index(i_va);   
 assign w_data_indexb = r_rbuffer_index1; 
 assign wea = 0;
-assign web_refill = r_state == REFILL;
+assign web_refill = w_resp.valid0;
 assign web = 0 ;
 //TODO!!!!!! lru
 for(genvar i = 0; i < SET_ASSOC; i++) begin: gen_data_mem_group
@@ -416,11 +416,11 @@ for(genvar i = 0; i < SET_ASSOC; i++) begin: gen_data_mem_group
 		)data_ram(
 		    .i_clk,
 		    .i_rst,
-		    .i_wen(web_refill && r_rbuffer_onehot_way[i]),
+		    .i_wen(web_refill && r_rbuffer_onehot_way[i] && j == cnt_rbuffer),
 		    .i_wbyteen(4'b1111),
 		    .i_raddr(w_data_indexa),
 		    .i_waddr(w_data_indexb),
-		    .i_wdata(r_mem_rbuffer_q[j]),
+		    .i_wdata(w_resp.data),
 		    .o_rdata(w_pipe_data_a[i][j])
 		);	
 	end
