@@ -427,7 +427,7 @@ for(genvar i = 0; i < SET_ASSOC; i++) begin: gen_data_mem_group
 end
 
 //pipeline3
-assign o_valid = w_rbuffer_hita | w_receiving_hit | w_pipe_hit;
+assign o_valid = w_rbuffer_hita | w_receiving_hit | (w_pipe_hit && !w_waita);
 assign o_cache_instr_valid = o_ready;
 
 always_comb begin
