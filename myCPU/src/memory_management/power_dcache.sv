@@ -290,6 +290,9 @@ logic w_rbuffer_hita, w_waita, w_waitb;
 //wbuffer
 localparam int WBUFFER_NUM =  FIFO_DEPTH >> 1; //2
 word [WBUFFER_NUM - 1 : 0][WORD_PER_LINE - 1 :0] r_mem_wbuffer;
+word [WORD_PER_LINE - 1 : 0] r_temp_wbuffer;
+logic [$clog2( RBUFFER_WORD_NUM  ) - 1 : 0] r_read_out_cnt, w_read_out_cnt;
+logic w_read_out_process, r_read_out_process;
 tag [WBUFFER_NUM - 1 : 0] r_wbuffer_tag;
 logic [WBUFFER_NUM - 1 : 0] r_wbuffer_r, r_wbuffer_v, w_wbuffer_hits; //r_wbuffer_r : 0:replaceable,1:not replaceable
 index [WBUFFER_NUM - 1 : 0] r_wbuffer_index;
@@ -476,13 +479,7 @@ assign w_pipe_hit = |w_way_hita && (r_state == IDLE || r_state == IDLE_RECEIVING
 assign w_hit_way = w_whichway_hita[SET_ASSOC];
 
 always_comb begin
-	w_switch_data_index = r_switch_data_index;
-	if((w_resp.last && w_resp.valid2)&& r_old_tag.valid) begin
-		w_switch_data_index = 1;
-	end
-	if(r_switch_data_index && !r_wbuffer_full) begin
-		w_switch_data_index = 0;
-	end
+	w_switch_data_index = r_state == RECEIVING;
 end
 
 always_ff @(posedge i_clk) begin
@@ -494,7 +491,7 @@ always_ff @(posedge i_clk) begin
 	end
 end
 
-assign w_data_indexa = w_switch_data_index ? r_rbuffer_index1 : get_index(i_va);   
+assign w_data_indexa = w_switch_data_index ? r_save_index : get_index(i_va);   
 assign w_data_indexb = web_refill ? r_rbuffer_index1 : r_indexa; 
 assign web_refill = w_resp.valid2 &&(r_state == RECEIVING);
 //TODO!!!!!! lru
@@ -610,6 +607,24 @@ assign w_line_num = i_line_num;
 assign o_memread_req = w_memread_req;
 assign o_mem_read_we = w_mem_read_we;
 
+always_comb begin
+	w_read_out_process = r_read_out_process;
+	if(w_read_out_process == 0 && w_memread_start  && r_save_tag.valid) begin
+		w_read_out_process = 1;
+	end
+	else if(w_read_out_process == 1 && r_read_out_cnt == '1) begin
+		w_read_out_process = 0;
+	end
+	w_read_out_cnt = r_read_out_cnt;
+	if(w_read_out_process == 0 && w_memread_start) begin
+		w_read_out_cnt = '0;
+	end
+	if(r_read_out_process) begin
+		w_read_out_cnt = w_read_out_cnt + 1;
+	end
+
+end
+
 //内存传输的rbuffer
 always_ff @(posedge i_clk) begin
 	if(i_rst)begin
@@ -620,7 +635,9 @@ always_ff @(posedge i_clk) begin
 		r_valid_offset2 <= '0;
 		r_rbuffer_way <= '0;
 		r_writeback_addr <= '0;
-		// r_replace_dirty <= 0;
+		r_read_out_process <= '0;
+		r_temp_wbuffer <= '0;
+		r_read_out_cnt <= '0;
 		r_rbuffer_valid <= '0;
 		r_rbuffer_index1 <= '0;
 		r_rbuffer_onehot_way <= '0;
@@ -628,6 +645,11 @@ always_ff @(posedge i_clk) begin
 	end
 	else begin
 	    r_mem_rbuffer_q <= r_mem_rbuffer_n;
+		r_read_out_process <= w_read_out_process;
+		r_read_out_cnt <= w_read_out_cnt;
+		if(r_read_out_process) begin
+			r_temp_wbuffer[r_read_out_cnt] <= w_pipe_data_a[r_rbuffer_way][r_read_out_cnt];
+		end
 		if(w_memread_start) begin
 			r_old_tag <= r_save_tag;
 			r_rbuffer_valid1 <=1;
@@ -736,7 +758,7 @@ always_ff @(posedge i_clk) begin
 		r_wbuffer_hit <= w_wbuffer_hit;
 		r_wbuffer_hitindex <= w_wbuffer_hitindex;
 		if(!r_wbuffer_full && r_state == WRITE_WAITING)begin
-			r_mem_wbuffer[i_lock] <= w_pipe_data_a[r_rbuffer_way];
+			r_mem_wbuffer[i_lock] <= r_temp_wbuffer;
 			r_wbuffer_tag[i_lock] <= r_old_tag;
 			r_wbuffer_index[i_lock] <= r_rbuffer_index1;
 			r_wbuffer_v[i_lock] <= 1'b1;
