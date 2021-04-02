@@ -242,7 +242,9 @@ logic [TAG_WIDTH - 1 : 0] w_phy_tag;
 
 // pipe 2-3 signal
 index w_data_indexa, w_data_indexb ;
+logic [INDEX_WIDTH + LINE_WORD_OFFSET- 1 : 0] w_data_raddr, w_data_waddr;
 word [SET_ASSOC - 1 : 0][WORD_PER_LINE - 1 : 0] w_pipe_data_a, w_pipe_data_b;
+word [SET_ASSOC - 1 : 0] w_data_out;
 
 // pipe 3-4 signal
 logic web_refill, web_w; 
@@ -491,26 +493,23 @@ always_ff @(posedge i_clk) begin
 	end
 end
 
-assign w_data_indexa = w_switch_data_index ? r_save_index : get_index(i_va);   
-assign w_data_indexb = web_refill ? r_rbuffer_index1 : r_indexa; 
+assign w_data_raddr = w_switch_data_index ? {r_save_index,w_read_out_cnt} : {get_index(i_va),w_start_offseta};   
+assign w_data_waddr = web_refill ? {r_rbuffer_index1,cnt_rbuffer} : {r_indexa,r_start_offseta}; 
 assign web_refill = w_resp.valid2 &&(r_state == RECEIVING);
 //TODO!!!!!! lru
 for(genvar i = 0; i < SET_ASSOC; i++) begin: gen_data_mem_group
-	for(genvar j = 0; j < WORD_PER_LINE; j++) begin: gen_data_mem_word
-
-		data_ram #(
-		      .INDEX_WIDTH(INDEX_WIDTH)
-		)data_ram(
-		    .i_clk,
-		    .i_rst,
-		    .i_wen((web_refill && r_rbuffer_onehot_way[i]) && j == cnt_rbuffer  || (web_w && w_way_hita[i] && j == r_start_offseta)),
-		    .i_wbyteen(web_refill?4'b1111:i_wen),
-		    .i_raddr(w_data_indexa),
-		    .i_waddr(w_data_indexb),
-		    .i_wdata(web_refill ? w_resp.data : i_in_data),
-		    .o_rdata(w_pipe_data_a[i][j])
-		);	
-	end
+	data_ram #(
+	      .INDEX_WIDTH(INDEX_WIDTH + LINE_WORD_OFFSET)
+	)data_ram(
+	    .i_clk,
+	    .i_rst,
+	    .i_wen((web_refill && r_rbuffer_onehot_way[i]) || (web_w && w_way_hita[i])),
+	    .i_wbyteen(web_refill?4'b1111:i_wen),
+	    .i_raddr(w_data_raddr),
+	    .i_waddr(w_data_waddr),
+	    .i_wdata(web_refill ? w_resp.data : i_in_data),
+	    .o_rdata(w_data_out[i])
+	);	
 end
 
 //pipeline3
@@ -530,7 +529,7 @@ always_comb begin
 		w_data = w_resp.data;
 	end
 	else if(w_pipe_hit)begin
-		w_data = w_pipe_data_a[w_hit_way][r_start_offseta];
+		w_data = w_data_out[w_hit_way];
 	end
 end
 
@@ -648,7 +647,7 @@ always_ff @(posedge i_clk) begin
 		r_read_out_process <= w_read_out_process;
 		r_read_out_cnt <= w_read_out_cnt;
 		if(r_read_out_process) begin
-			r_temp_wbuffer[r_read_out_cnt] <= w_pipe_data_a[r_rbuffer_way][r_read_out_cnt];
+			r_temp_wbuffer[r_read_out_cnt] <= w_data_out[r_rbuffer_way];
 		end
 		if(w_memread_start) begin
 			r_old_tag <= r_save_tag;
