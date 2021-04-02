@@ -304,7 +304,7 @@ end
 assign o_mdata_data = w_data;
 assign w_inn_stall = w_state != IDLE_RECEIVING && w_state != IDLE;
 assign o_inn_stall = w_inn_stall;
-assign o_ready = r_state != REFILL && r_state != INVALIDATING;
+assign o_ready = r_state != REFILL && r_state != INVALIDATING && w_memread_start != 1;
 
 //pipeline1 process 
 assign w_tag_wea = w_memread_end ;
@@ -336,10 +336,10 @@ for(genvar i = 0; i < SET_ASSOC; i++) begin :  gen_tag_mem
 	)tag_ram(
 		.i_clk,
 		.i_rst,
-		.i_wen((w_memread_end && r_rbuffer_onehot_way[i]) || (w_cache_inst_tag_wen && w_cache_inst_way[i]) || r_state == INVALIDATING),
+		.i_wen((w_memread_start && r_save_onehot_way[i]) || (w_cache_inst_tag_wen && w_cache_inst_way[i]) || r_state == INVALIDATING),
 		.i_raddr(w_indexa),
-		.i_waddr(w_cache_inst_tag_wen ? w_cache_inst_index : r_state == INVALIDATING ? r_reset_cnt : r_rbuffer_index1),
-		.i_wtag(w_cache_inst_tag_wen ? w_cache_inst_tag: r_state == INVALIDATING ? w_reset_tag: r_rbuffer_tag),
+		.i_waddr(w_cache_inst_tag_wen ? w_cache_inst_index : r_state == INVALIDATING ? r_reset_cnt : get_index(r_save_addr)),
+		.i_wtag(w_cache_inst_tag_wen ? w_cache_inst_tag: r_state == INVALIDATING ? w_reset_tag: r_save_new_tag),
 		.o_rtag(w_tag_res[i])
 
 	);
