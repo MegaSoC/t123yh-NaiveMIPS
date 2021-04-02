@@ -611,7 +611,7 @@ always_comb begin
 	if(w_read_out_process == 0 && w_memread_start  && r_save_tag.valid) begin
 		w_read_out_process = 1;
 	end
-	else if(w_read_out_process == 1 && r_read_out_cnt == '1) begin
+	else if(w_read_out_process == 1 && r_read_out_cnt == '1) begin 
 		w_read_out_process = 0;
 	end
 	w_read_out_cnt = r_read_out_cnt;
