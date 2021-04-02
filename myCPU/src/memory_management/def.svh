@@ -3,16 +3,6 @@
 
 `default_nettype wire
 
-`define ICACHE_WORD_PER_LINE 16
-`define ICACHE_SET_ASSOC 2
-`define ICACHE_SIZE (8*1024)
-`define ICACHE_TAG_WIDTH (32 - $clog2(`ICACHE_SIZE/`ICACHE_SET_ASSOC))
-`define DCACHE_WORD_PER_LINE 16
-`define DCACHE_SET_ASSOC 2
-`define DCACHE_SIZE (8*1024)
-`define DCACHE_TAG_WIDTH (32 - $clog2(`DCACHE_SIZE/`DCACHE_SET_ASSOC))
-`define MEM_WRITE_FIFO_DEPTH 4
-
 typedef struct packed {
     logic [3:0]  arid;
     logic [31:0] araddr;

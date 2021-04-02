@@ -117,7 +117,7 @@ const bit [31:0] INIT_PRId     = 32'h00018003;
 const bit [31:0] INIT_EBase    = 32'h80000000;
 const bit [31:0] INIT_Status   = 32'h00400000;
 const bit [31:0] INIT_Conf0    = {1'b1,3'b0,3'b0,9'b0,1'b0,2'b0,3'b0,3'b1,3'b0,1'b0,3'd3};
-const bit [31:0] INIT_Conf1    = {1'b0,6'd31,3'd0,3'd5,3'd1,3'd0,3'd5,3'd1,7'd0};
+const bit [31:0] INIT_Conf1    = {1'b0,6'd31,IS,IL,IA,DS,DL,DA,7'd0};
 
 // read
 assign data_o = ({32{rw_number == cp0_nIndex    }} & cp0_reg_Index    ) |
