@@ -171,6 +171,8 @@ word w_phy_addr;
 // pipe 2-3 signal
 word r_pipe2_va,r_pipe2_phy_addr; //phy:physics
 index w_data_indexa, w_data_indexb, r_pipe2_indexa;
+logic [INDEX_WIDTH + LINE_WORD_OFFSET- 1 : 0] w_data_raddr, w_data_waddr;
+word [SET_ASSOC - 1 : 0] w_data_out;
 word [SET_ASSOC - 1 : 0][WORD_PER_LINE - 1 : 0] w_pipe_data_a, w_pipe_data_b;
 logic [1:0] r_p2_tag_num;
 logic [LINE_WORD_OFFSET - 1 : 0] r_p2_start_offseta, r_p2_end_offseta;//p2:pipeline2
@@ -404,26 +406,25 @@ end
 
 assign w_data_indexa = get_index(i_va);   
 assign w_data_indexb = r_rbuffer_index1; 
+assign w_data_raddr = {get_index(i_va), w_start_offseta};
+assign w_data_waddr = {r_rbuffer_index1, cnt_rbuffer};
 assign wea = 0;
 assign web_refill = w_resp.valid0;
 assign web = 0 ;
 //TODO!!!!!! lru
 for(genvar i = 0; i < SET_ASSOC; i++) begin: gen_data_mem_group
-	for(genvar j = 0; j < WORD_PER_LINE; j++) begin: gen_data_mem_word
-
-		data_ram #(
-		      .INDEX_WIDTH(INDEX_WIDTH)
-		)data_ram(
-		    .i_clk,
-		    .i_rst,
-		    .i_wen(web_refill && r_rbuffer_onehot_way[i] && j == cnt_rbuffer),
-		    .i_wbyteen(4'b1111),
-		    .i_raddr(w_data_indexa),
-		    .i_waddr(w_data_indexb),
-		    .i_wdata(w_resp.data),
-		    .o_rdata(w_pipe_data_a[i][j])
-		);	
-	end
+	data_ram #(
+	      .INDEX_WIDTH(INDEX_WIDTH + LINE_WORD_OFFSET)
+	)data_ram(
+	    .i_clk,
+	    .i_rst,
+	    .i_wen(web_refill && r_rbuffer_onehot_way[i]),
+	    .i_wbyteen(4'b1111),
+	    .i_raddr(w_data_raddr),
+	    .i_waddr(w_data_waddr),
+	    .i_wdata(w_resp.data),
+	    .o_rdata(w_data_out[i])
+	);	
 end
 
 //pipeline3
@@ -439,7 +440,7 @@ always_comb begin
 		w_data = w_resp.data;
 	end
 	else if(w_pipe_hit)begin
-		w_data = w_pipe_data_a[w_hit_way][r_start_offseta];
+		w_data = w_data_out[w_hit_way];
 	end
 end
 
