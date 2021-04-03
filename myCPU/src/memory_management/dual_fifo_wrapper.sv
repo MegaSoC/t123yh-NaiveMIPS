@@ -49,7 +49,7 @@ dtype data_o1, data_o2;
 logic pop_i1, pop_i2;
 
 
-fifo_v3 #(.DEPTH(DEPTH), .DATA_WIDTH(DATA_WIDTH), .FALL_THROUGH(1)) 
+fifo_v3_old #(.DEPTH(DEPTH), .DATA_WIDTH(DATA_WIDTH), .FALL_THROUGH(1)) 
   fifo_1 (
   .clk_i(clk_i),
   .rst_i(rst_i),
@@ -63,7 +63,7 @@ fifo_v3 #(.DEPTH(DEPTH), .DATA_WIDTH(DATA_WIDTH), .FALL_THROUGH(1))
   .empty_o(empty_o1)
 );
 
-fifo_v3 #(.DEPTH(DEPTH), .DATA_WIDTH(DATA_WIDTH), .FALL_THROUGH(1)) 
+fifo_v3_old #(.DEPTH(DEPTH), .DATA_WIDTH(DATA_WIDTH), .FALL_THROUGH(1)) 
   fifo_2 (
   .clk_i(clk_i),
   .rst_i(rst_i),
