@@ -125,6 +125,7 @@ always @(posedge clk) begin
         last_addressError <= 0;
         last_tlb_invalid <= 0;
         last_tlb_miss <= 0;
+        latchResult <= 0;
     end
     else begin
         busy <= inst_sram_readen;
