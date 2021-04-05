@@ -515,7 +515,7 @@ end
 //pipeline3
 
 assign o_valid = w_rbuffer_hita | w_wbuffer_hit | w_receiving_hit | w_pipe_hit ;
-assign o_cache_instr_valid = w_cache_inst_unhit | w_receiving_hit  | (i_cache_instr == CACHE_INDEX_STORE_TAG) | (i_cache_instr == CACHE_HIT_INVALIDATE);
+assign o_cache_instr_valid = w_cache_inst_unhit | w_memread_end  | (i_cache_instr == CACHE_INDEX_STORE_TAG) | (i_cache_instr == CACHE_HIT_INVALIDATE);
 
 always_comb begin
 	w_data = r_data;
