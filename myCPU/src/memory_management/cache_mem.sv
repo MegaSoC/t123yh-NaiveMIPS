@@ -34,6 +34,30 @@ always_ff @(posedge i_clk) begin
     end
 end
 
+generate
+if (C_ASIC_SRAM) begin
+    if ((1 << INDEX_WIDTH) != 1024) begin
+        $fatal("data_ram memory depth mismatch, should be 1024!");
+    end
+    
+    S018DP_RAM_DP_W1024_B32_M4_BW data_mem(
+      .CLKA(i_clk),
+      .CLKB(i_clk),
+      .CENA(1'b0),
+      .CENB(1'b0),
+      .WENA(1'b1),
+      .WENB(~i_wen),
+      .AA(i_raddr),
+      .AB(i_waddr),
+      .BWENA(32'hFFFFFFFF),
+      .BWENB(~{{8{i_wbyteen[3]}}, {8{i_wbyteen[2]}}, {8{i_wbyteen[1]}}, {8{i_wbyteen[0]}}}),
+      .DA(32'h0),
+      .DB(i_wdata),
+      .QA(w_rdata),
+      .QB(w_wdata)
+    );
+end else begin
+
 xpm_memory_tdpram #(
 		// Common module parameters
 		.MEMORY_SIZE(32 << INDEX_WIDTH),
@@ -58,7 +82,7 @@ xpm_memory_tdpram #(
 		.READ_RESET_VALUE_B("0"),
 		.READ_LATENCY_B(1),
 		.WRITE_MODE_B("write_first")
-		) xpm_mem (
+    ) xpm_mem (
 		// Common module ports
 		.sleep          ( 1'b0  ),
 
@@ -89,8 +113,9 @@ xpm_memory_tdpram #(
 		.doutb          ( w_wdata ),
 		.sbiterrb       (       ), // do not change
 		.dbiterrb       (       )  // do not change
-		);
-
+    );
+end
+endgenerate
     
 endmodule
 
@@ -123,20 +148,30 @@ always_ff @(posedge i_clk) begin
     end
 end
 
-// tag_mem tag_mem (
-//   .clka(i_clk),    // input wire clka
-//   .rsta(i_rst),    // input wire rsta
-//   .wea(1'b0 ),      // input wire [0 : 0] wea
-//   .addra(i_raddr|{INDEX_WIDTH{w_isforward}}),  // input wire [5 : 0] addra
-//   .dina(i_wtag),    // input wire [20 : 0] dina
-//   .douta(w_rtag),  // output wire [20 : 0] douta
-//   .clkb(i_clk),    // input wire clkb
-//   .web(i_wen),      // input wire [0 : 0] web
-//   .addrb(i_waddr),  // input wire [5 : 0] addrb
-//   .dinb(i_wtag),    // input wire [20 : 0] dinb
-//   .doutb(w_wtag)  // output wire [20 : 0] doutb
-// );
-
+generate
+if (C_ASIC_SRAM) begin
+    if ((1 << INDEX_WIDTH) != 64) begin
+        $fatal("tag_ram memory depth mismatch, should be 64!");
+    end
+    if ((TAG_WIDTH + 1) != 21) begin
+        $fatal("tag_ram memory width mismatch, should be 21!");
+    end
+    
+    S018DP_RAM_DP_W64_B21_M4 data_mem (
+        .CLKA(i_clk),
+        .CLKB(i_clk),
+        .CENA(1'b0),
+        .CENB(1'b0),
+        .WENA(1'b1),
+        .WENB(~i_wen),
+        .AA(i_raddr),
+        .AB(i_waddr),
+        .DA({(TAG_WIDTH+1){1'b0}}),
+        .DB(i_wtag),
+        .QA(w_rtag),
+        .QB(w_wtag)
+    );
+end else begin
 xpm_memory_tdpram #(
 		// Common module parameters
 		.MEMORY_SIZE((TAG_WIDTH + 1) << INDEX_WIDTH),
@@ -161,7 +196,7 @@ xpm_memory_tdpram #(
 		.READ_RESET_VALUE_B("0"),
 		.READ_LATENCY_B(1),
 		.WRITE_MODE_B("write_first")
-		) xpm_mem (
+    ) xpm_mem (
 		// Common module ports
 		.sleep          ( 1'b0  ),
 
@@ -192,7 +227,8 @@ xpm_memory_tdpram #(
 		.doutb          ( w_wtag ),
 		.sbiterrb       (       ), // do not change
 		.dbiterrb       (       )  // do not change
-		);
-
+    );
+end
+endgenerate
     
 endmodule
