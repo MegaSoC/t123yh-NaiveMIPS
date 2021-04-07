@@ -1,7 +1,8 @@
 `include "def.svh"
 
 module data_ram #(
-	parameter INDEX_WIDTH = 7
+	parameter INDEX_WIDTH = 7,
+	parameter C_ASIC_SRAM = 0
 )(
     input  logic i_clk,
     input  logic i_rst,
@@ -32,22 +33,6 @@ always_ff @(posedge i_clk) begin
 		r_waddr <= i_waddr;
     end
 end
-
-// data_mem data_mem (
-//   .clka(i_clk),            // input wire clka
-//   .rsta(i_rst),            // input wire rsta
-//   .wea(4'b0),              // input wire [3 : 0] wea
-//   .addra(i_raddr|{INDEX_WIDTH{w_isforward}}),          // input wire [5 : 0] addra
-//   .dina(w_din),            // input wire [31 : 0] dina
-//   .douta(w_rdata),          // output wire [31 : 0] douta
-//   .clkb(i_clk),            // input wire clkb
-//   .web({4{i_wen}} & i_wbyteen),              // input wire [3 : 0] web
-//   .addrb(i_waddr),          // input wire [5 : 0] addrb
-//   .dinb(i_wdata),            // input wire [31 : 0] dinb
-//   .doutb(w_wdata),          // output wire [31 : 0] doutb
-//   .rsta_busy(),  // output wire rsta_busy
-//   .rstb_busy()  // output wire rstb_busy
-// );
 
 xpm_memory_tdpram #(
 		// Common module parameters
@@ -111,7 +96,8 @@ endmodule
 
 module tag_ram #(
     parameter INDEX_WIDTH = 7,
-    parameter TAG_WIDTH = 20
+    parameter TAG_WIDTH = 20,
+    parameter C_ASIC_SRAM = 0
 )(
     input  logic i_clk,
     input  logic i_rst,

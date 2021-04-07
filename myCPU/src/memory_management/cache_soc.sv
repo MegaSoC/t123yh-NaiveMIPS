@@ -8,7 +8,8 @@ module cache_soc #(
     parameter DCACHE_SET_ASSOC = 2,
     parameter DCACHE_SIZE = 8 * 1024,
     parameter DCACHE_TAG_WIDTH = 32 - $clog2(DCACHE_SIZE/DCACHE_SET_ASSOC),
-    parameter MEM_WRITE_FIFO_DEPTH = 8
+    parameter MEM_WRITE_FIFO_DEPTH = 8,
+    parameter C_ASIC_SRAM = 0
 )(
     input logic i_clk,
     input logic i_rst,
@@ -152,7 +153,8 @@ new_icache #(
     .WORD_PER_LINE(ICACHE_WORD_PER_LINE),
     .SET_ASSOC(ICACHE_SET_ASSOC),
     .CACHE_SIZE(ICACHE_SIZE),
-    .TAG_WIDTH(ICACHE_TAG_WIDTH)
+    .TAG_WIDTH(ICACHE_TAG_WIDTH),
+    .C_ASIC_SRAM(C_ASIC_SRAM)
 )
 icache1(
     .i_clk,
@@ -196,7 +198,8 @@ new_dcache #(
     .SET_ASSOC(DCACHE_SET_ASSOC),
     .CACHE_SIZE(DCACHE_SIZE),
     .TAG_WIDTH(DCACHE_TAG_WIDTH),
-    .FIFO_DEPTH(MEM_WRITE_FIFO_DEPTH)
+    .FIFO_DEPTH(MEM_WRITE_FIFO_DEPTH),
+    .C_ASIC_SRAM(C_ASIC_SRAM)
 )
 dcache1(
     .i_clk,

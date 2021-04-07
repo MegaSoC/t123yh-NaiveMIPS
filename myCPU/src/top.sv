@@ -2,7 +2,8 @@
 `include "global.svh"
 
 module mycpu_top #(
-    parameter IMPLEMENT_LIKELY = 0
+    parameter IMPLEMENT_LIKELY = 0,
+    parameter C_ASIC_SRAM = 0
 ) (
         input [5:0] ext_int, // ext_int[5] is ignored!
 
@@ -290,7 +291,8 @@ module mycpu_top #(
        .DCACHE_SET_ASSOC(`DCACHE_SET_ASSOC),
        .DCACHE_SIZE(`DCACHE_SIZE),
        .DCACHE_TAG_WIDTH(`DCACHE_TAG_WIDTH),
-       .MEM_WRITE_FIFO_DEPTH(`MEM_WRITE_FIFO_DEPTH)
+       .MEM_WRITE_FIFO_DEPTH(`MEM_WRITE_FIFO_DEPTH),
+       .C_ASIC_SRAM(C_ASIC_SRAM)
     ) cache (
                   .i_clk(aclk),
                   .i_rst(global_reset),

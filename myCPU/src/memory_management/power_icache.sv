@@ -4,8 +4,8 @@ module new_icache#(
 	parameter WORD_PER_LINE = 8, //cache中一个line的字�?????????????,是DATA_OUT_NUM�?????????????2的幂次�?�，可�?�项 4 8 16 32
 	parameter SET_ASSOC  = 4, //相连�????????????? 2或�??4 
 	parameter CACHE_SIZE = 16 * 1024, //byte
-	parameter TAG_WIDTH = 20 //equals to PFN
-
+	parameter TAG_WIDTH = 20, //equals to PFN
+    parameter C_ASIC_SRAM = 0
 )(
     input logic i_clk,
 	input logic i_rst,
@@ -334,7 +334,8 @@ end
 for(genvar i = 0; i < SET_ASSOC; i++) begin :  gen_tag_mem
 	tag_ram #(
 		.INDEX_WIDTH(INDEX_WIDTH),
-		.TAG_WIDTH(TAG_WIDTH)
+		.TAG_WIDTH(TAG_WIDTH),
+		.C_ASIC_SRAM(C_ASIC_SRAM)
 	)tag_ram(
 		.i_clk,
 		.i_rst,
@@ -414,7 +415,8 @@ assign web = 0 ;
 //TODO!!!!!! lru
 for(genvar i = 0; i < SET_ASSOC; i++) begin: gen_data_mem_group
 	data_ram #(
-	      .INDEX_WIDTH(INDEX_WIDTH + LINE_WORD_OFFSET)
+	    .INDEX_WIDTH(INDEX_WIDTH + LINE_WORD_OFFSET),
+		.C_ASIC_SRAM(C_ASIC_SRAM)
 	)data_ram(
 	    .i_clk,
 	    .i_rst,

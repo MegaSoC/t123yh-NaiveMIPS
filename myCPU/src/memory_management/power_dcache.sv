@@ -5,9 +5,9 @@ module new_dcache#(
 	parameter SET_ASSOC  = 4, //相连�????????????? 2或�??4 
 	parameter CACHE_SIZE = 16 * 1024, //byte
 	parameter TAG_WIDTH = 20, //equals to PFN
-	parameter FIFO_DEPTH = 16
-
-)(
+	parameter FIFO_DEPTH = 16,
+	parameter C_ASIC_SRAM = 0
+) (
     input logic i_clk, 
 	input logic i_rst,
 
@@ -436,7 +436,8 @@ for(genvar i = 0; i < SET_ASSOC; i++) begin :  gen_tag_mem
 
 	tag_ram #(
 		.INDEX_WIDTH(INDEX_WIDTH),
-		.TAG_WIDTH(TAG_WIDTH)
+		.TAG_WIDTH(TAG_WIDTH),
+		.C_ASIC_SRAM(C_ASIC_SRAM)
 	)tag_ram(
 		.i_clk,
 		.i_rst,
@@ -499,7 +500,8 @@ assign web_refill = w_resp.valid2 &&(r_state == RECEIVING);
 //TODO!!!!!! lru
 for(genvar i = 0; i < SET_ASSOC; i++) begin: gen_data_mem_group
 	data_ram #(
-	      .INDEX_WIDTH(INDEX_WIDTH + LINE_WORD_OFFSET)
+	    .INDEX_WIDTH(INDEX_WIDTH + LINE_WORD_OFFSET),
+		.C_ASIC_SRAM(C_ASIC_SRAM)
 	)data_ram(
 	    .i_clk,
 	    .i_rst,
