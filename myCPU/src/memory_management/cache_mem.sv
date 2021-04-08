@@ -36,7 +36,7 @@ end
 
 generate
 if (C_ASIC_SRAM) begin
-    assert ((1 << INDEX_WIDTH) == 1024) else
+    always assert ((1 << INDEX_WIDTH) == 1024) else
         $fatal("data_ram memory depth mismatch, should be 1024!");
     
     S018DP_RAM_DP_W1024_B32_M4_BW data_mem(
@@ -149,10 +149,10 @@ end
 
 generate
 if (C_ASIC_SRAM) begin
-    assert ((1 << INDEX_WIDTH) == 64) else
+    always assert ((1 << INDEX_WIDTH) == 64) else
         $fatal("tag_ram memory depth mismatch, should be 64!");
 
-    assert ((TAG_WIDTH + 1) == 21) else
+    always assert ((TAG_WIDTH + 1) == 21) else
         $fatal("tag_ram memory width mismatch, should be 21!");
     
     S018DP_RAM_DP_W64_B21_M4 data_mem (
