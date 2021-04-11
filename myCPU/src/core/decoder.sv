@@ -745,7 +745,7 @@ always_comb begin
                 5'b10000: // I: Hit Invalidate
                     controls.memICacheOp = CACHE_HIT_INVALIDATE;
                 5'b10001: // D: Hit Invalidate
-                    controls.memDCacheOp = CACHE_HIT_INVALIDATE;
+                    controls.memDCacheOp = CACHE_HIT_WRITEBACK_INVALIDATE;
                 5'b10101: // D: Hit Writeback Invalidate
                     controls.memDCacheOp = CACHE_HIT_WRITEBACK_INVALIDATE;
             endcase
