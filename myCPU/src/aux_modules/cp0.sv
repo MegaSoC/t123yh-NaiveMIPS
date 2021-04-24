@@ -93,7 +93,7 @@ wire SR_CU0 = cp0_reg_Status[28];
 wire SR_BEV = cp0_reg_Status[22];
 wire SR_EXL = cp0_reg_Status[1];
 wire SR_ERL = cp0_reg_Status[2];
-wire SR_KSU = cp0_reg_Status[4:3];
+wire [1:0] SR_KSU = cp0_reg_Status[4:3];
 wire CAUSE_IV = cp0_reg_Cause[23];
 
 // See Table 6.8 / 6.9, Reference III
