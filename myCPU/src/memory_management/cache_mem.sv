@@ -17,23 +17,18 @@ module data_ram #(
 );
 
 word w_rdata, w_wdata;
-logic w_isforward, r_wen, w_ren;
+logic w_isforward, r_wen, w_ren, r_isforward;
 logic [INDEX_WIDTH - 1 : 0] r_raddr, r_waddr;
-logic [INDEX_WIDTH - 1 : 0] w_raddr;
-assign w_isforward = r_wen && r_raddr == r_waddr;
-assign o_rdata = w_isforward ? w_wdata : w_rdata;
-assign w_ren = i_ren && !(i_ren && i_wen && i_raddr == i_waddr);
+assign w_isforward = i_wen && i_raddr == i_waddr;
+assign o_rdata = r_isforward ? w_wdata : w_rdata;
+assign w_ren = i_ren && !w_isforward;
 
 always_ff @(posedge i_clk) begin
     if(i_rst)begin
-		r_raddr <= '0;
-		r_waddr <= '0;
-		r_wen <= 0;
+		r_isforward <= '0;
     end
     else begin
-		r_wen <= i_wen;
-		r_raddr <= i_raddr;
-		r_waddr <= i_waddr;
+		r_isforward <= w_isforward;
     end
 end
 
@@ -49,9 +44,9 @@ if (C_ASIC_SRAM) begin
       .CLKB(i_clk),
       .CENA(~w_ren),
       .CENB(~i_wen),
-      .WENA('0),
+      .WENA('1),
       .WENB(~i_wen),
-      .AA(w_raddr),
+      .AA(i_raddr),
       .AB(i_waddr),
       .BWENA(32'hFFFFFFFF),
       .BWENB(~{{8{i_wbyteen[3]}}, {8{i_wbyteen[2]}}, {8{i_wbyteen[1]}}, {8{i_wbyteen[0]}}}),
@@ -96,7 +91,7 @@ xpm_memory_tdpram #(
 		.ena            ( w_ren   ),
 		.regcea         ( 1'b0  ),
 		.wea            ( 4'b0 ), 
-		.addra          ( w_raddr ), 
+		.addra          ( i_raddr ), 
 		.dina           ( '0 ),
 		.injectsbiterra ( 1'b0  ), // do not change
 		.injectdbiterra ( 1'b0  ), // do not change
@@ -143,7 +138,7 @@ logic [TAG_WIDTH : 0] w_rtag, w_wtag;
 logic w_isforward, r_isforward, w_ren;
 assign w_isforward = i_wen && i_raddr == i_waddr;
 assign o_rtag = r_isforward ? w_wtag : w_rtag;
-assign w_ren = i_ren && !(i_ren && i_wen && i_raddr == i_waddr);
+assign w_ren = i_ren && !w_isforward;
 
 always_ff @(posedge i_clk) begin
     if(i_rst)begin
@@ -169,9 +164,9 @@ if (C_ASIC_SRAM) begin
         .CLKB(i_clk),
         .CENA(~w_ren),
         .CENB(~i_wen),
-        .WENA('0),
+        .WENA('1),
         .WENB(~i_wen),
-        .AA(w_raddr),
+        .AA(i_raddr),
         .AB(i_waddr),
         .DA({(TAG_WIDTH+1){1'b0}}),
         .DB(i_wtag),
