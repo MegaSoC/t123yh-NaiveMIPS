@@ -17,6 +17,7 @@ module cache_soc #(
     input word   i_i_npc,//指令的pc，由npc模块产生，比物理地址（i_icache_phyaddr）前一个周期到达
     input word   i_i_phyaddr,//icache的物理地址，时机与I级相同
     input logic  i_i_valid,//i_i_phyaddr的valid信号
+    input logic  i_i_va_valid,
     input logic  i_i_cached, //指明指令是否经过icache，1：经过，0：不经过
     output word  o_i_inst,//指令的查询结果，
     output logic o_i_valid, //o_i_inst的valid信号
@@ -24,6 +25,7 @@ module cache_soc #(
     input word   i_d_va,//dcache的虚拟地址，由alu产生，比物理地址(i_d_phyaddr)前一个周期到达
     input word   i_d_phyaddr,//dcache的物理地址，时机与M级相同
     input logic  i_d_cached, //指明数据是否经过dcache，1：经过，0：不经过
+    input logic  i_d_va_valid,
     input logic  i_d_read, //数据的读信号，与i_d_phyaddr时机相同
     input logic  i_d_write,//数据的写信号，与i_d_phyaddr时机相同
     input logic  [3:0] i_d_byteen,//数据的byte enable信号

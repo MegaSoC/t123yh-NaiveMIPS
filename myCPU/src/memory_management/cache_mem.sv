@@ -19,8 +19,10 @@ module data_ram #(
 word w_rdata, w_wdata;
 logic w_isforward, r_wen;
 logic [INDEX_WIDTH - 1 : 0] r_raddr, r_waddr;
+logic [INDEX_WIDTH - 1 : 0] w_raddr;
 assign w_isforward = r_wen && r_raddr == r_waddr;
 assign o_rdata = w_isforward ? w_wdata : w_rdata;
+assign w_raddr = i_wen && i_ren && i_raddr == i_waddr ? i_raddr : i_raddr + 1;
 
 always_ff @(posedge i_clk) begin
     if(i_rst)begin
@@ -49,7 +51,7 @@ if (C_ASIC_SRAM) begin
       .CENB(~i_wen),
       .WENA(~i_ren),
       .WENB(~i_wen),
-      .AA(i_raddr),
+      .AA(w_raddr),
       .AB(i_waddr),
       .BWENA(32'hFFFFFFFF),
       .BWENB(~{{8{i_wbyteen[3]}}, {8{i_wbyteen[2]}}, {8{i_wbyteen[1]}}, {8{i_wbyteen[0]}}}),
@@ -94,7 +96,7 @@ xpm_memory_tdpram #(
 		.ena            ( i_ren   ),
 		.regcea         ( 1'b0  ),
 		.wea            ( 4'b0 ), 
-		.addra          ( i_raddr ), 
+		.addra          ( w_raddr ), 
 		.dina           ( '0 ),
 		.injectsbiterra ( 1'b0  ), // do not change
 		.injectdbiterra ( 1'b0  ), // do not change
@@ -137,10 +139,12 @@ module tag_ram #(
     output logic [TAG_WIDTH : 0]  o_rtag
 );
 
-logic [TAG_WIDTH : 0] w_rtag, w_wtag;
+logic [TAG_WIDTH : 0] w_rtag, w_wtag, w_raddr;
 logic w_isforward, r_isforward;
 assign w_isforward = i_wen && i_raddr == i_waddr;
 assign o_rtag = r_isforward ? w_wtag : w_rtag;
+assign w_raddr = i_wen && i_ren && i_raddr == i_waddr ? i_raddr : i_raddr + 1;
+
 
 always_ff @(posedge i_clk) begin
     if(i_rst)begin
@@ -168,7 +172,7 @@ if (C_ASIC_SRAM) begin
         .CENB(~i_wen),
         .WENA(~i_ren),
         .WENB(~i_wen),
-        .AA(i_raddr),
+        .AA(w_raddr),
         .AB(i_waddr),
         .DA({(TAG_WIDTH+1){1'b0}}),
         .DB(i_wtag),
@@ -210,7 +214,7 @@ xpm_memory_tdpram #(
 		.ena            ( i_ren   ),
 		.regcea         ( 1'b0  ),
 		.wea            ( '0 ), 
-		.addra          ( i_raddr ), 
+		.addra          ( w_raddr ), 
 		.dina           ( i_wtag ),
 		.injectsbiterra ( 1'b0  ), // do not change
 		.injectdbiterra ( 1'b0  ), // do not change
