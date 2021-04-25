@@ -17,12 +17,12 @@ module data_ram #(
 );
 
 word w_rdata, w_wdata;
-logic w_isforward, r_wen;
+logic w_isforward, r_wen, w_ren;
 logic [INDEX_WIDTH - 1 : 0] r_raddr, r_waddr;
 logic [INDEX_WIDTH - 1 : 0] w_raddr;
 assign w_isforward = r_wen && r_raddr == r_waddr;
 assign o_rdata = w_isforward ? w_wdata : w_rdata;
-assign w_raddr = i_wen && i_ren && i_raddr == i_waddr ? i_raddr : i_raddr + 1;
+assign w_ren = i_ren && !(i_ren && i_wen && i_raddr == i_waddr);
 
 always_ff @(posedge i_clk) begin
     if(i_rst)begin
@@ -47,9 +47,9 @@ if (C_ASIC_SRAM) begin
     S018DP_RAM_DP_W1024_B32_M4_BW data_mem(
       .CLKA(i_clk),
       .CLKB(i_clk),
-      .CENA(~i_ren),
+      .CENA(~w_ren),
       .CENB(~i_wen),
-      .WENA(~i_ren),
+      .WENA('0),
       .WENB(~i_wen),
       .AA(w_raddr),
       .AB(i_waddr),
@@ -93,7 +93,7 @@ xpm_memory_tdpram #(
 		// Port A module ports
 		.clka           ( i_clk   ),
 		.rsta           ( i_rst   ),
-		.ena            ( i_ren   ),
+		.ena            ( w_ren   ),
 		.regcea         ( 1'b0  ),
 		.wea            ( 4'b0 ), 
 		.addra          ( w_raddr ), 
@@ -139,12 +139,11 @@ module tag_ram #(
     output logic [TAG_WIDTH : 0]  o_rtag
 );
 
-logic [TAG_WIDTH : 0] w_rtag, w_wtag, w_raddr;
-logic w_isforward, r_isforward;
+logic [TAG_WIDTH : 0] w_rtag, w_wtag;
+logic w_isforward, r_isforward, w_ren;
 assign w_isforward = i_wen && i_raddr == i_waddr;
 assign o_rtag = r_isforward ? w_wtag : w_rtag;
-assign w_raddr = i_wen && i_ren && i_raddr == i_waddr ? i_raddr : i_raddr + 1;
-
+assign w_ren = i_ren && !(i_ren && i_wen && i_raddr == i_waddr);
 
 always_ff @(posedge i_clk) begin
     if(i_rst)begin
@@ -168,9 +167,9 @@ if (C_ASIC_SRAM) begin
     S018DP_RAM_DP_W64_B21_M4 data_mem (
         .CLKA(i_clk),
         .CLKB(i_clk),
-        .CENA(~i_ren),
+        .CENA(~w_ren),
         .CENB(~i_wen),
-        .WENA(~i_ren),
+        .WENA('0),
         .WENB(~i_wen),
         .AA(w_raddr),
         .AB(i_waddr),
@@ -211,10 +210,10 @@ xpm_memory_tdpram #(
 		// Port A module ports
 		.clka           ( i_clk   ),
 		.rsta           ( i_rst   ),
-		.ena            ( i_ren   ),
+		.ena            ( w_ren   ),
 		.regcea         ( 1'b0  ),
 		.wea            ( '0 ), 
-		.addra          ( w_raddr ), 
+		.addra          ( i_raddr ), 
 		.dina           ( i_wtag ),
 		.injectsbiterra ( 1'b0  ), // do not change
 		.injectdbiterra ( 1'b0  ), // do not change
