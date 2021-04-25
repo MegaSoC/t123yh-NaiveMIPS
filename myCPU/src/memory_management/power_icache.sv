@@ -10,6 +10,7 @@ module new_icache#(
     input logic i_clk,
 	input logic i_rst,
 
+	input logic i_valid1,
     input logic i_valid2,
 	//input logic i_uncached,   //当前地址是否经过icache
 	input logic [31:0] i_phy_addr, //假设查tlb要花费一个周�?????????????
@@ -339,6 +340,7 @@ for(genvar i = 0; i < SET_ASSOC; i++) begin :  gen_tag_mem
 	)tag_ram(
 		.i_clk,
 		.i_rst,
+		.i_ren(i_valid1),
 		.i_wen((w_memread_start && r_save_onehot_way[i]) || (w_cache_inst_tag_wen && w_cache_inst_way[i]) || r_state == INVALIDATING),
 		.i_raddr(w_indexa),
 		.i_waddr(w_cache_inst_tag_wen ? w_cache_inst_index : r_state == INVALIDATING ? r_reset_cnt : get_index(r_save_addr)),
@@ -420,6 +422,7 @@ for(genvar i = 0; i < SET_ASSOC; i++) begin: gen_data_mem_group
 	)data_ram(
 	    .i_clk,
 	    .i_rst,
+		.i_ren(i_valid1),
 	    .i_wen(web_refill && r_rbuffer_onehot_way[i]),
 	    .i_wbyteen(4'b1111),
 	    .i_raddr(w_data_raddr),

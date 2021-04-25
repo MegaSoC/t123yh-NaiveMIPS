@@ -8,6 +8,7 @@ module data_ram #(
     input  logic i_rst,
  
     input  logic i_wen,
+	input  logic i_ren,
     input  logic [3:0] i_wbyteen,
     input  logic [INDEX_WIDTH - 1 : 0]  i_raddr,
     input  logic [INDEX_WIDTH - 1 : 0]  i_waddr,
@@ -44,9 +45,9 @@ if (C_ASIC_SRAM) begin
     S018DP_RAM_DP_W1024_B32_M4_BW data_mem(
       .CLKA(i_clk),
       .CLKB(i_clk),
-      .CENA(1'b0),
-      .CENB(1'b0),
-      .WENA(1'b1),
+      .CENA(~i_ren),
+      .CENB(~i_wen),
+      .WENA(~i_ren),
       .WENB(~i_wen),
       .AA(i_raddr),
       .AB(i_waddr),
@@ -90,7 +91,7 @@ xpm_memory_tdpram #(
 		// Port A module ports
 		.clka           ( i_clk   ),
 		.rsta           ( i_rst   ),
-		.ena            ( 1'b1   ),
+		.ena            ( i_ren   ),
 		.regcea         ( 1'b0  ),
 		.wea            ( 4'b0 ), 
 		.addra          ( i_raddr ), 
@@ -104,7 +105,7 @@ xpm_memory_tdpram #(
 		// Port B module ports
 		.clkb           ( i_clk   ),
 		.rstb           ( i_rst   ),
-		.enb            ( 1'b1   ),
+		.enb            ( i_wen   ),
 		.regceb         ( 1'b0  ),
 		.web            ({4{i_wen}} & i_wbyteen), 
 		.addrb          ( i_waddr ),
@@ -127,7 +128,8 @@ module tag_ram #(
 )(
     input  logic i_clk,
     input  logic i_rst,
- 
+	
+	input  logic i_ren,
     input  logic i_wen,
     input  logic [INDEX_WIDTH - 1 : 0]  i_raddr,
     input  logic [INDEX_WIDTH - 1 : 0]  i_waddr,
@@ -162,9 +164,9 @@ if (C_ASIC_SRAM) begin
     S018DP_RAM_DP_W64_B21_M4 data_mem (
         .CLKA(i_clk),
         .CLKB(i_clk),
-        .CENA(1'b0),
-        .CENB(1'b0),
-        .WENA(1'b1),
+        .CENA(~i_ren),
+        .CENB(~i_wen),
+        .WENA(~i_ren),
         .WENB(~i_wen),
         .AA(i_raddr),
         .AB(i_waddr),
@@ -205,9 +207,9 @@ xpm_memory_tdpram #(
 		// Port A module ports
 		.clka           ( i_clk   ),
 		.rsta           ( i_rst   ),
-		.ena            ( 1'b1   ),
+		.ena            ( i_ren   ),
 		.regcea         ( 1'b0  ),
-		.wea            ( 1'b0 ), 
+		.wea            ( '0 ), 
 		.addra          ( i_raddr ), 
 		.dina           ( i_wtag ),
 		.injectsbiterra ( 1'b0  ), // do not change
@@ -219,7 +221,7 @@ xpm_memory_tdpram #(
 		// Port B module ports
 		.clkb           ( i_clk   ),
 		.rstb           ( i_rst   ),
-		.enb            ( 1'b1   ),
+		.enb            ( i_wen   ),
 		.regceb         ( 1'b0  ),
 		.web            (i_wen), 
 		.addrb          ( i_waddr ),

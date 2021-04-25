@@ -11,6 +11,7 @@ module new_dcache#(
     input logic i_clk, 
 	input logic i_rst,
 
+	input logic i_va_valid,
 	input logic i_valid, //�?????????????�?????????????16�????????????? 可�?�项�?????????????16 8 4 2 1 0
 	//input logic i_uncached,   //当前地址是否经过icache
 	
@@ -441,6 +442,7 @@ for(genvar i = 0; i < SET_ASSOC; i++) begin :  gen_tag_mem
 	)tag_ram(
 		.i_clk,
 		.i_rst,
+		.i_ren(i_va_valid),
 		.i_wen((w_memread_end && r_rbuffer_onehot_way[i]) || (w_cache_inst_tag_wen && w_cache_inst_way[i]) || r_state == INVALIDATING),
 		.i_raddr(w_indexa),
 		.i_waddr(w_cache_inst_tag_wen ? w_cache_inst_index : r_state == INVALIDATING ? r_reset_cnt : r_rbuffer_index1),
@@ -505,6 +507,7 @@ for(genvar i = 0; i < SET_ASSOC; i++) begin: gen_data_mem_group
 	)data_ram(
 	    .i_clk,
 	    .i_rst,
+		.i_ren(i_va_valid),
 	    .i_wen((web_refill && r_rbuffer_onehot_way[i]) || (web_w && w_way_hita[i])),
 	    .i_wbyteen(web_refill?4'b1111:i_wen),
 	    .i_raddr(w_data_raddr),
