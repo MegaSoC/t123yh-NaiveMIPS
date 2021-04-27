@@ -87,8 +87,9 @@ module mycpu_top #(
 
     word w_inst_sram_addr, w_w_inst_sram_paddr, w_data_sram_vaddr, w_data_sram_wdata;
     word data_sram_vaddr_last;
+    logic data_sram_vaddr_valid_last;
     logic [2:0] w_data_sram_size;
-    logic w_data_sram_read, w_data_sram_write, w_inst_sram_readen;
+    logic w_data_sram_read, w_data_sram_write, w_inst_sram_readen, w_data_sram_vaddr_valid;
 
     word w_d_outdata, w_i_inst;
     logic w_i_valid, w_d_valid;
@@ -138,6 +139,7 @@ module mycpu_top #(
 
         .data_sram_rdata(w_d_outdata),
         .data_sram_valid(w_d_valid),
+        .data_sram_vaddr_valid(w_data_sram_vaddr_valid),
         .data_sram_vaddr(w_data_sram_vaddr),
         .data_sram_va_hold(w_data_sram_va_hold),
         .data_sram_read(w_data_sram_read),
@@ -184,6 +186,7 @@ module mycpu_top #(
     always @(posedge aclk) begin
         if (!w_data_sram_va_hold) begin
             data_sram_vaddr_last <= w_data_sram_vaddr;
+            data_sram_vaddr_valid_last <= w_data_sram_vaddr_valid;
         end
     end
 
@@ -299,6 +302,7 @@ module mycpu_top #(
 
                   .i_i_npc(w_inst_sram_addr),
                   .i_i_valid(itlb_delayed_cen && w_inst_sram_okay && itlb_cache_match),
+                  .i_i_va_valid(w_inst_sram_readen),
                   .i_i_phyaddr({w_inst_sram_paddr[31:12], itlb_delayed_va[11:0]}),
                   .i_i_cached(w_inst_sram_cached),
                   .o_i_valid(w_i_valid),
@@ -308,6 +312,7 @@ module mycpu_top #(
                   .i_d_phyaddr(w_data_sram_paddr),
                   .i_d_cached(w_data_sram_tlb_cached),
                   .i_d_read(w_data_sram_read && w_data_sram_read_okay),
+                  .i_d_va_valid(w_data_sram_va_hold ? data_sram_vaddr_valid_last : w_data_sram_vaddr_valid),
                   .i_d_write(w_data_sram_write && w_data_sram_write_okay),
                   .i_d_size(w_data_sram_size),
                   .i_d_indata(w_data_sram_wdata),

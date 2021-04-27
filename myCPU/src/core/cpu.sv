@@ -16,7 +16,8 @@ module CPU #(
            output cache_op inst_cache_op,
            input inst_cache_op_valid,
 
-           output reg [31:0] data_sram_vaddr,
+           output data_sram_vaddr_valid,
+           output [31:0] data_sram_vaddr,
            output data_sram_read,
            output data_sram_write,
            output [31:0] data_sram_wdata,
@@ -268,6 +269,9 @@ ForwardController D_regRead2_forward (
 
 assign D_data_waiting = D_regRead1_forward.stallExec || D_regRead2_forward.stallExec;
 wire [31:0] D_memAddress = D_regRead1_forward.value + D_ctrl.immediate;
+wire D_dcache_active = D_ctrl.memDCacheOp != CACHE_NOP;
+wire D_icache_active = D_ctrl.memICacheOp != CACHE_NOP;
+wire D_memAddress_valid = D_ctrl.memStore || D_ctrl.memLoad || D_icache_active || D_dcache_active;
 wire D_moveDisable = D_ctrl.move && !(D_ctrl.moveCondition == (D_regRead2_forward.value != 0));
 
 Comparator cmp(
@@ -421,6 +425,7 @@ assign forwardAddressE = E_moveDisable ? 0 : E_ctrl.destinationRegister;
 assign forwardValueE = E_regWriteData;
 
 assign data_sram_vaddr = D_memAddress;
+assign data_sram_vaddr_valid = D_memAddress_valid;
 assign data_sram_va_hold = E_data_waiting;
 
 always_comb begin
