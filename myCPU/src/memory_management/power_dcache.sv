@@ -407,7 +407,7 @@ assign o_memread_stall = r_state == WRITE_WAITING;
 assign o_ready = r_state != REFILL && r_state != INVALIDATING;
 
 //pipeline1 process 
-always_comb 
+always_comb begin
 	if(w_cache_hit_inv_wen) begin
 		if(w_pipe_hit) begin
 			w_cache_inst_way = w_way_hita;
