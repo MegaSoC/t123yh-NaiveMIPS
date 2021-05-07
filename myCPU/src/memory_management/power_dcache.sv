@@ -223,6 +223,7 @@ logic [LINE_WORD_OFFSET - 1 : 0] w_start_offseta, w_start_offsetb, w_end_offseta
 tag [SET_ASSOC-1 : 0] w_tag_res;
 tag w_cache_inst_tag;
 logic w_cache_inst_hit, w_cache_inst_tag_wen, r_cache_wb_flag, w_cache_inst_wb, w_cache_inst_unhit;
+logic w_cache_store_tag_wen, w_cache_hit_inv_wen;
 word w_va_end;
 logic w_tag_wea;
 tag w_tag_din;
@@ -406,12 +407,29 @@ assign o_memread_stall = r_state == WRITE_WAITING;
 assign o_ready = r_state != REFILL && r_state != INVALIDATING;
 
 //pipeline1 process 
+always_comb 
+	if(w_cache_hit_inv_wen) begin
+		if(w_pipe_hit) begin
+			w_cache_inst_way = w_way_hita;
+		end
+		else if (w_rbuffer_hita) begin
+			w_cache_inst_way = r_rbuffer_onehot_way;
+		end
+		else begin
+			w_cache_inst_way = get_cache_inst_way(i_cache_instr_addr);
+		end
+	end
+	else begin
+		w_cache_inst_way = get_cache_inst_way(i_cache_instr_addr);
+	end
+end
 assign w_tag_wea = w_memread_end ;
 assign w_cache_inst_index = get_index(i_cache_instr_addr);
-assign w_cache_inst_way = get_cache_inst_way(i_cache_instr_addr);
 assign w_cache_inst_tag.tag = i_cache_instr_tag;
 assign w_cache_inst_tag.valid = i_cache_instr != CACHE_HIT_INVALIDATE;
-assign w_cache_inst_tag_wen = i_cache_instr == CACHE_INDEX_STORE_TAG || (w_cache_inst_hit && i_cache_instr == CACHE_HIT_INVALIDATE);
+assign w_cache_store_tag_wen = i_cache_instr == CACHE_INDEX_STORE_TAG;
+assign w_cache_hit_inv_wen = w_cache_inst_hit && i_cache_instr == CACHE_HIT_INVALIDATE;
+assign w_cache_inst_tag_wen = w_cache_store_tag_wen || w_cache_hit_inv_wen ;
 assign w_cache_inst_hit = (w_pipe_hit || w_rbuffer_hita || w_waita) && (i_cache_instr == CACHE_HIT_WRITEBACK_INVALIDATE || i_cache_instr == CACHE_HIT_INVALIDATE);
 assign w_cache_inst_wb = (w_cache_inst_hit && i_cache_instr == CACHE_HIT_WRITEBACK_INVALIDATE) || i_cache_instr == CACHE_INDEX_WRITEBACK_INVALIDATE;
 assign w_cache_inst_unhit = !w_pipe_hit && !w_rbuffer_hita && !w_waita && i_cache_instr == CACHE_HIT_WRITEBACK_INVALIDATE && (r_state == IDLE||r_state == IDLE_RECEIVING);
