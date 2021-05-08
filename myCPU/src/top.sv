@@ -9,6 +9,7 @@ module mycpu_top #(
 
         input aclk,
         input aresetn,
+        output global_reset,
 
         output [3 :0] arid ,
         output [31:0] araddr ,
@@ -83,7 +84,7 @@ module mycpu_top #(
         end
     end
 
-    wire global_reset = !(aresetn && myaresetn);
+    assign global_reset = !(aresetn && myaresetn);
 
     word w_inst_sram_addr, w_w_inst_sram_paddr, w_data_sram_vaddr, w_data_sram_wdata;
     word data_sram_vaddr_last;
