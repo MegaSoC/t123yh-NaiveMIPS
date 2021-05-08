@@ -828,10 +828,10 @@ always_ff @(posedge i_clk) begin
 				r_save_onehot_way <= w_cache_inst_way;
 			end
 		end
-		else if(w_rbuffer_hita || w_waita)begin
+		else if((i_valid && w_rbuffer_hita) || w_waita)begin
 			r_lru_ram[r_indexa] <= gen_new_lru(r_lru_ram[r_indexa], r_rbuffer_way);
 		end
-		else if (w_pipe_hit)begin
+		else if (w_pipe_hit && i_valid)begin
 			r_lru_ram[r_indexa] <= gen_new_lru(r_lru_ram[r_indexa],w_hit_way);
 		end
 		else if(w_idle_miss)begin
