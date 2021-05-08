@@ -237,9 +237,9 @@ always_ff @(posedge i_clk) begin
 		r_stall_flag <= r_state == INVALIDATING ? 0 : w_inn_stall;
 		r_state <= w_state;
 		r_data <= w_data;
-	end
-	if(r_state == INVALIDATING)begin
-		r_reset_cnt <= (&r_reset_cnt) ? r_reset_cnt : r_reset_cnt + 1;
+		if(r_state == INVALIDATING)begin
+			r_reset_cnt <= (&r_reset_cnt) ? r_reset_cnt : r_reset_cnt + 1;
+		end
 	end
 end
 always_comb begin

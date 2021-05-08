@@ -326,9 +326,9 @@ always_ff @(posedge i_clk) begin
 	else begin
 		r_state <= w_state;
 		r_data <= w_data;
-	end
-	if(r_state == INVALIDATING)begin
-		r_reset_cnt <= (&r_reset_cnt) ? r_reset_cnt : r_reset_cnt + 1;
+		if(r_state == INVALIDATING)begin
+			r_reset_cnt <= (&r_reset_cnt) ? r_reset_cnt : r_reset_cnt + 1;
+		end
 	end
 end
 always_comb begin
