@@ -75,13 +75,13 @@ module mycpu_top #(
         if (!aresetn) begin
             myaresetn <= 1'b0;
             resetCounter <= 7'b0;
-        end
-        if (aresetn & !myaresetn) begin
-            resetCounter <= resetCounter + 1;
-        end
-        if (aresetn & !myaresetn & (&resetCounter)) begin
-            myaresetn <= 1'b1;
-        end
+        end else begin
+            if (!myaresetn) begin
+		resetCounter <= resetCounter + 1;
+                if (&resetCounter)
+		    myaresetn <= 1'b1;
+            end
+	end
     end
 
     assign global_reset = !(aresetn && myaresetn);
