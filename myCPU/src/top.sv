@@ -69,22 +69,7 @@ module mycpu_top #(
     (* mark_debug = "true" *) wire [31:0] _debug_i_pc = debug_i_pc;
     (* mark_debug = "true" *) wire [31:0] _debug_i_instr = debug_i_instr;
 
-    reg myaresetn;
-    reg [6:0] resetCounter;
-    always_ff @(posedge aclk) begin
-        if (!aresetn) begin
-            myaresetn <= 1'b0;
-            resetCounter <= 7'b0;
-        end else begin
-            if (!myaresetn) begin
-		resetCounter <= resetCounter + 1;
-                if (&resetCounter)
-		    myaresetn <= 1'b1;
-            end
-	end
-    end
-
-    assign global_reset = !(aresetn && myaresetn);
+    assign global_reset = !aresetn;
 
     word w_inst_sram_addr, w_w_inst_sram_paddr, w_data_sram_vaddr, w_data_sram_wdata;
     word data_sram_vaddr_last;
