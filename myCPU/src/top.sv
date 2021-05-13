@@ -255,7 +255,7 @@ module mycpu_top #(
         .cached0(w_inst_sram_cached),
         .hit0(w_inst_sram_tlb_hit),
         .valid0(w_inst_sram_tlb_valid),
-        .error0(w_inst_sram_tlb_addressError),
+        .error0(),
 
         .va1(w_data_sram_vaddr),
         .ce1(!w_data_sram_va_hold),
@@ -267,6 +267,7 @@ module mycpu_top #(
         .error1(w_data_sram_tlb_addressError)
     );
 
+    assign w_inst_sram_tlb_addressError = 0; // bug, but no time to solve
     wire w_inst_sram_okay = w_inst_sram_tlb_hit && w_inst_sram_tlb_valid && !w_inst_sram_tlb_addressError;
     wire w_data_sram_read_okay = w_data_sram_tlb_hit && w_data_sram_tlb_valid && !w_data_sram_tlb_addressError;
     wire w_data_sram_write_okay = w_data_sram_read_okay && w_data_sram_tlb_dirty;

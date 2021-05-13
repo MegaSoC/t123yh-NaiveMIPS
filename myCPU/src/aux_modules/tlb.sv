@@ -222,7 +222,7 @@ module MMUMatcher #(
                     mapped = 0;
                     error = 0;
                 end else begin
-                    mapped = 'bX;
+                    mapped = 0;
                     error = 1;
                 end
             end
@@ -231,7 +231,7 @@ module MMUMatcher #(
                     mapped = 1;
                     error = 0;
                 end else begin
-                    mapped = 'bX;
+                    mapped = 0;
                     error = 1;
                 end
             end
@@ -240,13 +240,13 @@ module MMUMatcher #(
                     mapped = 1;
                     error = 0;
                 end else begin
-                    mapped = 'bX;
+                    mapped = 0;
                     error = 1;
                 end
             end
             default: begin
                 error = 1;
-                mapped = 'bX;
+                mapped = 0;
             end
         endcase
     end
