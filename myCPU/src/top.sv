@@ -268,7 +268,7 @@ module mycpu_top #(
     );
 
     wire w_inst_sram_okay = w_inst_sram_tlb_hit && w_inst_sram_tlb_valid && !w_inst_sram_tlb_addressError;
-    wire w_data_sram_read_okay = w_data_sram_tlb_hit && w_data_sram_tlb_valid && !w_inst_sram_tlb_addressError;
+    wire w_data_sram_read_okay = w_data_sram_tlb_hit && w_data_sram_tlb_valid && !w_data_sram_tlb_addressError;
     wire w_data_sram_write_okay = w_data_sram_read_okay && w_data_sram_tlb_dirty;
 
     cache_soc #(
